@@ -4,10 +4,12 @@ import {
   serverTimestamp,
   setDoc,
   doc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseUtils/firebase";
+import { getUser } from "../userUtils/getUser";
 
-export const addGroupMessage = async (senderId, groupID, messageText) => {
+export const sendGroupMessage = async (senderId, groupID, messageText) => {
   const groupRef = doc(db, "groups", groupID);
   const message = {
     text: messageText,
@@ -16,7 +18,17 @@ export const addGroupMessage = async (senderId, groupID, messageText) => {
     reaction: null,
     groupID: groupID,
   };
+  const senderDisplayName = senderId.senderDisplayName;
+  const user = await getUser(senderId)
+  const newMessage = {
+    lastMessage: messageText,
+    timeStamp: serverTimestamp(),
+    senderId: senderId,
+    senderDisplayName: user.name,
+    senderDisplayImg: user.photoUrl,
+  };
   try {
+    await updateDoc(groupRef, { lastMessage: newMessage });
     const messagesRef = collection(groupRef, "messages");
     await addDoc(messagesRef, message);
     console.log(
@@ -30,7 +42,4 @@ export const addGroupMessage = async (senderId, groupID, messageText) => {
       error
     );
   }
-  // const groupsRef = collection(db, "groups")
-  // const groupMessagesRef = collection(groupsRef, "groupMessages")
-  // await addDoc(groupMessagesRef, message)
 };

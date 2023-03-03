@@ -18,7 +18,7 @@ export const createGroup = async (
       bio: bio,
       blockedUsers: [],
       groupInvites: [],
-      members: [],
+      members: [creator, "1ewf"],
       isPublic: isPublic,
       admins: [creator],
     });
