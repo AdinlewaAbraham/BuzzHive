@@ -1,10 +1,39 @@
-import React from "react";
+import { useState } from "react";
+import SideBar from "./sidebar/SideBar";
+import ChannelBar from "./ChannelBar/ChannelBar";
+import ContentContainer from "./ContentContainer/ContentContainer";
+import SelectedChannelContext from "@/context/SelectedChannelContext ";
+
 const App = () => {
-  //const chats = useGetChats("1");
+  const [selectedChannel, setSelectedChannel] = useState("chats");
+  const [Chats, setChats] = useState([]);
+  const [Loading, setLoading] = useState(false);
+  const [ChatObject, setChatObject] = useState({
+    activeChatId: "",
+    activeChatType: "",
+    otherUserId: "",
+    message: ""
+  });
+
   return (
-    <div>
-      <h1 className="text-3xl">gggggg</h1>
-    </div>
+    <SelectedChannelContext.Provider
+      value={{
+        selectedChannel,
+        setSelectedChannel,
+        Loading,
+        setLoading,
+        Chats,
+        setChats,
+        ChatObject,
+        setChatObject,
+      }}
+    >
+      <main className="flex">
+        <SideBar />
+        <ChannelBar />
+        <ContentContainer />
+      </main>
+    </SelectedChannelContext.Provider>
   );
 };
 
