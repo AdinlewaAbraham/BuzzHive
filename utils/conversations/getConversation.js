@@ -9,6 +9,5 @@ export const getConversation = async (conversationId) => {
   chatSnapshot.forEach((doc) => {
     chatsData.push(doc.data());
   });
-console.log(chatsData)
   return chatsData;
 };

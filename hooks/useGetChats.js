@@ -10,7 +10,6 @@ export const useGetChats = () => {
   const [groupChats, setgroupChats] = useState([]);
 
   useMemo(() => {
-    console.log("code run")
     const conversationRef = collection(db, "conversations");
     const groupRef = collection(db, "groups");
     const groupQuery = query(
@@ -80,7 +79,7 @@ export const useGetChats = () => {
   }, [ ]);
 
   const mergedChats = useMemo(() => [...chats, ...groupChats], [chats, groupChats]);
-  mergedChats.sort((a, b) => b.timestamp - a.timestamp);
+  mergedChats.sort((a, b) => a.timestamp - b.timestamp);
 
   return mergedChats;
 };

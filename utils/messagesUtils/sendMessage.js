@@ -3,15 +3,14 @@ import {
   collection,
   doc,
   setDoc,
-  serverTimestamp,
   addDoc,
 } from "firebase/firestore";
 
-export async function sendMessage(user1Id, user2Id, messageText, senderId) {
+export async function sendMessage(user1Id, user2Id, messageText, senderId, time ) {
   const message = {
     text: messageText,
     senderId: senderId,
-    timestamp: serverTimestamp(),
+    timestamp: time,
     reaction: "love",
   };
 
@@ -26,7 +25,7 @@ export async function sendMessage(user1Id, user2Id, messageText, senderId) {
     const newConversationData = {
       participants: [user1Id, user2Id],
       lastMessage : messageText,
-      timeStamp: serverTimestamp(),
+      timeStamp: time,
     };
     await setDoc(newConversationRef, newConversationData);
 
