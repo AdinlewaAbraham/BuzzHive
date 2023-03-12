@@ -4,7 +4,6 @@ export const createGroup = async (
   isPublic,
   creator,
   groupName,
-  email,
   photoUrl,
   bio
 ) => {
@@ -12,7 +11,6 @@ export const createGroup = async (
     const docRef = await addDoc(collection(db, "groups"), {
       id: "id",
       name: groupName,
-      email: email,
       photoUrl: photoUrl,
       creator: creator,
       bio: bio,

@@ -9,11 +9,11 @@ import {
 import { db } from "../firebaseUtils/firebase";
 import { getUser } from "../userUtils/getUser";
 
-export const sendGroupMessage = async (senderId, groupID, messageText) => {
+export const sendGroupMessage = async (senderId, groupID, messageText, time) => {
   const groupRef = doc(db, "groups", groupID);
   const message = {
     text: messageText,
-    timeStamp: serverTimestamp(),
+    timeStamp: time,
     senderId: senderId,
     reaction: null,
     groupID: groupID,
@@ -22,7 +22,7 @@ export const sendGroupMessage = async (senderId, groupID, messageText) => {
   const user = await getUser(senderId)
   const newMessage = {
     lastMessage: messageText,
-    timeStamp: serverTimestamp(),
+    timeStamp: time,
     senderId: senderId,
     senderDisplayName: user.name,
     senderDisplayImg: user.photoUrl,

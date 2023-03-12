@@ -1,9 +1,24 @@
-import React from 'react'
+import UserCard from "./UserCard";
+import useFetchUsers from "@/hooks/useFetchUsers";
 
 const AddContact = () => {
-  return (
-    <div>AddContactdsdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</div>
-  )
-}
+  const { users, lastDoc, loading, handleScroll } = useFetchUsers();
 
-export default AddContact
+  const handleOnScroll = (event) => {
+    const { scrollTop, clientHeight, scrollHeight } = event.target;
+    if (scrollHeight - scrollTop === clientHeight) {
+      handleScroll();
+    }
+  };
+
+  return (
+    <div onScroll={handleOnScroll}>
+      {users.map((user) => (
+        <UserCard name={user.name} id={user.id} image={user.photoUrl} />
+      ))}
+      {loading && <div>User Loading...</div>}
+    </div>
+  );
+};
+
+export default AddContact;

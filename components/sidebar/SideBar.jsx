@@ -5,6 +5,7 @@ import { BsChatRightText } from "react-icons/bs";
 import { MdPersonAddAlt } from "react-icons/md";
 import { AiOutlineSetting } from "react-icons/ai";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
+import { getAuth, signOut } from "firebase/auth";
 
 const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
   const { setSelectedChannel } = useContext(SelectedChannelContext);
@@ -66,6 +67,21 @@ const SideBar = () => {
       </i>
 
       <i className="mx-auto flex flex-col mb-10 cursor-pointer">
+        <button
+          className="bg-red-600"
+          onClick={() => {
+            const auth = getAuth();
+            signOut(auth)
+              .then(() => {
+                console.log("Sign-out successful.");
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }}
+        >
+          sign <br /> out
+        </button>
         <SideBarIcon icon={renderThemeChanger()} />
         <SideBarIcon icon={<AiOutlineSetting size={22} />} />
       </i>

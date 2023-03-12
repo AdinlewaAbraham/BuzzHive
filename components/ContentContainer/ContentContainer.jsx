@@ -1,26 +1,29 @@
-import { useContext } from "react";
+import { useContext, useState, useMemo } from "react";
 import Input from "../input/Input";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
-const ContentContainer = () => {
-  const { Chats, Loading } = useContext(SelectedChannelContext);
 
-  console.log(Chats);
-  const sortedChats = Chats.sort(
-    (a, b) =>
-      a.timestamp.seconds * 1000 +
-      a.timestamp.nanoseconds / 1000000 -
-      b.timestamp.seconds * 1000 -
-      b.timestamp.nanoseconds / 1000000
-  );
-  console.log(sortedChats);
-  const currentId = "1";
+import { UserContext } from "../App";
+const ContentContainer = () => {
+  const { Chats, Loading, ChatObject } = useContext(SelectedChannelContext);
+
+  const [sortedChats, setSortedChats] = useState([]);
+  const { User } = useContext(UserContext);
+
+  useMemo(() => {
+    setSortedChats(Chats.sort((a, b) => a.timestamp - b.timestamp));
+  }, [Chats]);
+  const currentId = User.uid;
   return (
     <div
-      className="
+      className="relative
       bg-gray-300 dark:bg-gray-700 h-screen w-screen overflow-y-scroll"
     >
+      <div className="fixed top-0 flex bg-gray-700 w-screen p-4 items-center">
+        <img src={ChatObject.photoUrl} alt="" className="w-[40px] h-[40px] mr-4"/>{" "}
+        {ChatObject.displayName}
+      </div>
       {Loading ? (
-        <>Loading</>
+        <div className="text-center text-2xl">Loading</div>
       ) : (
         <>
           {sortedChats &&

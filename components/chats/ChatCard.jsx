@@ -1,11 +1,9 @@
 import { useContext, useState } from "react";
-import Image from "next/image";
 import { getConversation } from "@/utils/conversations/getConversation";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
-import Fav from "../../public/favicon.ico";
 
 const ChatCard = ({
   img,
@@ -27,6 +25,8 @@ const ChatCard = ({
       activeChatId: `${id}`,
       activeChatType: `${type}`,
       otherUserId: `${otherUserId}`,
+      photoUrl: `${img}`,
+      displayName: `${name}`,
     });
     if (type == "group") {
       const q = query(collection(db, "groups", id, "messages"));
@@ -63,7 +63,7 @@ const ChatCard = ({
     >
       <div className="flex flex-row  align-middle items-center">
         <div className="w-14 h-14 mr-3">
-          <Image className="object-cover w-full h-full" src={Fav} alt="hello" />
+          <img className="object-cover w-full h-full" src={img} alt="hello" />
         </div>
         <div>
           <h3>{name}</h3>

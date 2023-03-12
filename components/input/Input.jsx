@@ -2,13 +2,24 @@ import { useContext, useState } from "react";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
+
+import { UserContext } from "../App";
 const Input = () => {
+  const {User} = useContext(UserContext)
   const { ChatObject, setChatObject, setChats } = useContext(
     SelectedChannelContext
   );
-  const [senderid, setsenderid] = useState("1");
+  const senderid = User.uid
   function handleSend() {
     if (ChatObject.activeChatType == "group") {
+      const time = new Date();
+      const message = {
+        text: ChatObject.message,
+        senderId: senderid,
+        timestamp: time,
+        reaction: "love",
+      };
+      setChats((prevChats) => [...prevChats, message]);
       sendGroupMessage("1", ChatObject.activeChatId, ChatObject.message);
     } else if (ChatObject.activeChatType == "personal") {
       const time = new Date();
@@ -33,14 +44,7 @@ const Input = () => {
       {" "}
       <input
         type="text"
-        className="fixed w-20 bg-blue-200 bottom-20 text-black  px-4 py-2"
-        onChange={(e) => {
-          setsenderid(e.target.value);
-        }}
-      />
-      <input
-        type="text"
-        className="fixed w-full bg-white bottom-0 text-black  px-4 py-2"
+        className=" fixed w-full bg-white bottom-0 text-black  px-4 py-2"
         value={ChatObject.message}
         onChange={(e) => {
           setChatObject({ ...ChatObject, message: `${e.target.value}` });

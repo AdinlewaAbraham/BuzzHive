@@ -1,15 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { db } from "@/utils/firebaseUtils/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 import { getUser } from "@/utils/userUtils/getUser";
 
-export const useGetChats = () => {
-  const currentUserId = "1";
+export const useGetChats = (currentUserId) => {
   const [chats, setChats] = useState([]);
   const [groupChats, setgroupChats] = useState([]);
 
-  useMemo(() => {
+  useEffect(() => {
     const conversationRef = collection(db, "conversations");
     const groupRef = collection(db, "groups");
     const groupQuery = query(
@@ -23,7 +22,6 @@ export const useGetChats = () => {
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const chats = [];
       const promises = querySnapshot.docs.map(async (doc) => {
         const conversation = doc.data();
         const otherParticipants = await conversation.participants.filter(
@@ -48,8 +46,6 @@ export const useGetChats = () => {
         setChats(chats);
       });
     });
-
-
 
     const unsub = onSnapshot(groupQuery, (querySnapshot) => {
       const promises = querySnapshot.docs.map(async (doc) => {
@@ -76,10 +72,14 @@ export const useGetChats = () => {
       unsubscribe();
       unsub();
     };
-  }, [ ]);
+  }, []);
 
-  const mergedChats = useMemo(() => [...chats, ...groupChats], [chats, groupChats]);
-  mergedChats.sort((a, b) => a.timestamp - b.timestamp);
+  const mergedChats = useMemo(
+    () => [...chats, ...groupChats],
+    [chats, groupChats]
+  );
+
+  mergedChats.sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds);
 
   return mergedChats;
 };
