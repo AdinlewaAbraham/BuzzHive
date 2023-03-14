@@ -27,16 +27,23 @@ export const useGetChats = (currentUserId) => {
         const otherParticipants = await conversation.participants.filter(
           (id) => id !== currentUserId
         );
-        const user = await getUser(otherParticipants);
+
+        //alows users to send message to there self
+        const otherParticipant = otherParticipants.length !== 0
+          ? otherParticipants[0]
+          : conversation.participants[0];
+        const user = await getUser(otherParticipant);
         const lastMessage = conversation.lastMessage;
-        const timeStamp = conversation.timeStamp;
+        const timestamp = conversation.timestamp;
         const chat = {
           id: doc.id,
-          senderId: otherParticipants,
+          senderId: conversation.senderId,
+          otherParticipant: otherParticipant,
           senderDisplayName: user.name,
+          lastMessageSenderName: conversation.senderDisplayName,
           senderDisplayImg: user.photoUrl,
           lastMessage: lastMessage,
-          timeStamp: timeStamp,
+          timestamp: timestamp,
           type: "personal",
         };
         return chat;
@@ -49,15 +56,17 @@ export const useGetChats = (currentUserId) => {
 
     const unsub = onSnapshot(groupQuery, (querySnapshot) => {
       const promises = querySnapshot.docs.map(async (doc) => {
-        const groupChats = doc.data();
-        const sender = await getUser(groupChats.lastMessage.senderId);
+        const group = doc.data();
+        const sender = await getUser(group.lastMessage.senderId);
         const groupChat = {
           id: doc.id,
-          senderId: groupChats.lastMessage.senderId,
-          senderDisplayName: groupChats.lastMessage.senderDisplayName,
-          senderDisplayImg: groupChats.lastMessage.senderDisplayImg,
-          lastMessage: groupChats.lastMessage.lastMessage,
-          timeStamp: groupChats.lastMessage.timeStamp,
+          senderId: group.lastMessage.senderId,
+          otherParticipant: doc.id,
+          senderDisplayName: group.name,
+          lastMessageSenderName: group.lastMessage.senderDisplayName,
+          senderDisplayImg: group.photoUrl,
+          lastMessage: group.lastMessage.lastMessage,
+          timestamp: group.lastMessage.timestamp,
           type: "group",
         };
         return groupChat;
@@ -79,7 +88,7 @@ export const useGetChats = (currentUserId) => {
     [chats, groupChats]
   );
 
-  mergedChats.sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds);
+  mergedChats.sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
 
   return mergedChats;
 };

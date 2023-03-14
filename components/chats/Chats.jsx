@@ -2,6 +2,8 @@ import { useContext, useState, useMemo } from "react";
 import { useGetChats } from "@/hooks/useGetChats";
 import ChatCard from "./ChatCard";
 import AddGroup from "../addGroup/AddGroup";
+import { GrGroup } from "react-icons/gr";
+import { FaUserCircle } from "react-icons/fa";
 
 import { UserContext } from "../App";
 
@@ -15,10 +17,10 @@ const Chats = () => {
     }
     const sortedChats = chats.sort(
       (a, b) =>
-        a.timeStamp.seconds * 1000 +
-        a.timeStamp.nanoseconds / 1000000 -
-        b.timeStamp.seconds * 1000 -
-        b.timeStamp.nanoseconds / 1000000
+        a.timestamp.seconds * 1000 +
+        a.timestamp.nanoseconds / 1000000 -
+        b.timestamp.seconds * 1000 -
+        b.timestamp.nanoseconds / 1000000
     );
     setSortedChats(sortedChats);
   }, [chats]);
@@ -48,17 +50,19 @@ const Chats = () => {
       </div>
       {sortedChats.length > 0 ? (
         <div>
-          {sortedChats.map((chat) => (
+          {sortedChats.reverse().map((chat) => (
             <ChatCard
               key={chat.id}
-              otherUserId={chat.senderId}
+              otherUserId={chat.otherParticipant}// this is the bug
               type={chat.type}
               id={chat.id}
-              img={chat.senderDisplayImg || MyImage}
+              img={<img src={chat.senderDisplayImg} alt="" />}
               name={chat.senderDisplayName}
-              sender={chat.type === "group" ? "group" : "me"}
+              sender={
+                chat.senderId == User.uid ? "you" : chat.lastMessageSenderName
+              }
               message={chat.lastMessage}
-              //  timeStamp={chat.timeStamp}
+              //  timestamp={chat.timestamp}
             />
           ))}
         </div>

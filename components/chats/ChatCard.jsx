@@ -3,14 +3,14 @@ import { getConversation } from "@/utils/conversations/getConversation";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
-
-
+import { GrGroup } from "react-icons/gr";
+import FaUserCircle from "react-icons/fa";
 const ChatCard = ({
   img,
   name,
   sender,
   message,
-  timeStamp,
+  timestamp,
   id,
   type,
   otherUserId,
@@ -25,9 +25,11 @@ const ChatCard = ({
       activeChatId: `${id}`,
       activeChatType: `${type}`,
       otherUserId: `${otherUserId}`,
-      photoUrl: `${img}`,
+      photoUrl: img,
       displayName: `${name}`,
     });
+    console.log(otherUserId);
+
     if (type == "group") {
       const q = query(collection(db, "groups", id, "messages"));
       const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -63,7 +65,13 @@ const ChatCard = ({
     >
       <div className="flex flex-row  align-middle items-center">
         <div className="w-14 h-14 mr-3">
-          <img className="object-cover w-full h-full" src={img} alt="hello" />
+          {img.props.src ? (
+            img
+          ) : type === "group" ? (
+            <GrGroup size={35} />
+          ) : (
+            <FaUserCircle />
+          )}
         </div>
         <div>
           <h3>{name}</h3>
@@ -72,7 +80,7 @@ const ChatCard = ({
           </div>
         </div>
       </div>
-      <p className="">{timeStamp}</p>
+      <p className="">{timestamp}</p>
     </div>
   );
 };

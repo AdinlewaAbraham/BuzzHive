@@ -13,7 +13,7 @@ export const sendGroupMessage = async (senderId, groupID, messageText, time) => 
   const groupRef = doc(db, "groups", groupID);
   const message = {
     text: messageText,
-    timeStamp: time,
+    timestamp: time,
     senderId: senderId,
     reaction: null,
     groupID: groupID,
@@ -22,7 +22,7 @@ export const sendGroupMessage = async (senderId, groupID, messageText, time) => 
   const user = await getUser(senderId)
   const newMessage = {
     lastMessage: messageText,
-    timeStamp: time,
+    timestamp: time,
     senderId: senderId,
     senderDisplayName: user.name,
     senderDisplayImg: user.photoUrl,

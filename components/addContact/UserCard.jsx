@@ -11,11 +11,13 @@ const UserCard = ({ name, id, image }) => {
   const handleUserClick = async () => {
     setLoading(true);
     const activeChatId = User.uid > id ? User.uid + id : id + User.uid;
-    setChatObject({
+     setChatObject({
       ...ChatObject,
       activeChatId: `${activeChatId}`,
       activeChatType: `personal`,
       otherUserId: `${id}`,
+      photoUrl: image,
+      displayName: `${name}`,
     });
     const q = query(collection(db, "conversations", id, "messages"));
     const unsubscribe = onSnapshot(q, (snapshot) => {

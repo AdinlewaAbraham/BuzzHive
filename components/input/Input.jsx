@@ -2,8 +2,8 @@ import { useContext, useState } from "react";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
-
 import { UserContext } from "../App";
+
 const Input = () => {
   const {User} = useContext(UserContext)
   const { ChatObject, setChatObject, setChats } = useContext(
@@ -16,17 +16,17 @@ const Input = () => {
       const message = {
         text: ChatObject.message,
         senderId: senderid,
-        timestamp: time,
+        timeStamp: time,
         reaction: "love",
       };
       setChats((prevChats) => [...prevChats, message]);
-      sendGroupMessage("1", ChatObject.activeChatId, ChatObject.message);
+      sendGroupMessage(User.uid, ChatObject.activeChatId, ChatObject.message, time);
     } else if (ChatObject.activeChatType == "personal") {
       const time = new Date();
       const message = {
         text: ChatObject.message,
         senderId: senderid,
-        timestamp: time,
+        timeStamp: time,
         reaction: "love",
       };
       setChats((prevChats) => [...prevChats, message]);
@@ -37,6 +37,10 @@ const Input = () => {
         senderid,
         time
       );
+      console.log(
+        senderid)
+      console.log(
+        ChatObject.otherUserId)
     }
   }
   return (

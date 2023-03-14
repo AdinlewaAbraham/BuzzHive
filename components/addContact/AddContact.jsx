@@ -12,7 +12,7 @@ const AddContact = () => {
   };
 
   return (
-    <div onScroll={handleOnScroll}>
+    <div onScroll={handleOnScroll} >
       {users.map((user) => (
         <UserCard name={user.name} id={user.id} image={user.photoUrl} />
       ))}
