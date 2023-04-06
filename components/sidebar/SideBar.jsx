@@ -57,7 +57,7 @@ const SideBar = () => {
     }
   };
   return (
-    <div className="h-screen w-20 px-5- flex flex-col justify-between dark:bg-gray-900 text-white shadow-lg">
+    <div className="max-h-screen  w-20 px-5- flex flex-col justify-between dark:bg-gray-900 text-white shadow-lg">
       <i>
         <SideBarIcon icon={<BsChatRightText size="20" />} clickevent="chats" />
         <SideBarIcon

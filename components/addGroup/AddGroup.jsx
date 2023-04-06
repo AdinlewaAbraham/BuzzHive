@@ -3,13 +3,36 @@ import { BiArrowBack } from "react-icons/bi";
 import useFetchUsers from "@/hooks/useFetchUsers";
 import { UserContext } from "../App";
 import { createGroup } from "@/utils/groupUtils/createGroup";
+import SelectedChannelContext from "@/context/SelectedChannelContext ";
+
+import Modal from "react-modal";
 
 const AddGroup = () => {
   const { User } = useContext(UserContext);
+  const { ShowAddGroup, setShowAddGroup } = useContext(SelectedChannelContext);
   const { users } = useFetchUsers();
   const [selectedUsers, setselectedUsers] = useState([]);
   const [showAddGroupMenu, setshowAddGroupMenu] = useState(false);
   const [groupName, setgroupName] = useState("");
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const customStyles = {
+    overlay: {
+      backgroundColor: "rgba(0, 0, 0, 0.6)",
+    },
+    content: {
+      top: "50%",
+      left: "55%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+      zIndex: "50",
+      color: "black",
+    },
+  };
+
   function handleSelect(user, checked) {
     if (checked) {
       setselectedUsers((prevSelectedUsers) => [...prevSelectedUsers, user]);
@@ -19,10 +42,27 @@ const AddGroup = () => {
       );
     }
   }
+
   return (
-    <div className="fixed z-10 bg-red-700 h-[80%] min-h-[430px] w-[300px] p-5 ">
+    <div className="fixed z-[1] bg-red-700 h-[80%] min-h-[430px] w-[300px] p-5 ">
+      <button onClick={() => setIsOpen(true)}>Open Modal</button>
+      <Modal
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+        style={customStyles}
+      >
+        <h1>Modal Content</h1>
+        <button onClick={() => setIsOpen(false)}>Close Modal</button>
+      </Modal>
       <div className="flex items-center">
-        <BiArrowBack className="cursor-pointer" />{" "}
+        <BiArrowBack
+          className="cursor-pointer"
+          onClick={() => {
+            if (!selectedUsers[0]) {
+              setShowAddGroup(false);
+            }
+          }}
+        />{" "}
         <h1 className="text-2xl ml-2  mb-2">New group</h1>
       </div>
       <div className="flex flex-col">
@@ -39,12 +79,6 @@ const AddGroup = () => {
             </div>
           ))}
         </div>
-        <input
-          type="text"
-          className="border border-pink-600 bg-white w-full mt-2 text-black appearance-none caret-black
-      focus:outline-none min-w-1 px-2 py-1"
-          placeholder="search"
-        />
       </div>
 
       {showAddGroupMenu ? (
@@ -81,6 +115,12 @@ const AddGroup = () => {
         </>
       ) : (
         <>
+          <input
+            type="text"
+            className="border border-pink-600 bg-white w-full mt-2 text-black appearance-none caret-black
+      focus:outline-none min-w-1 px-2 py-1"
+            placeholder="search"
+          />
           {selectedUsers.length > 0 && (
             <div className="flex mt-2">
               <button

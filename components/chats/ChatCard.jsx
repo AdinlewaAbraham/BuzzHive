@@ -5,6 +5,7 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { GrGroup } from "react-icons/gr";
 import FaUserCircle from "react-icons/fa";
+import { BsEmojiSmile } from "react-icons/bs";
 const ChatCard = ({
   img,
   name,
@@ -58,7 +59,7 @@ const ChatCard = ({
   return (
     <div
       className="flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
-        rounded-xl hover:bg-gray-600 transition-all duration-100 ease-linear border w-[100%]"
+        rounded-xl hover:bg-gray-600 transition-all duration-100 ease-linear border w-[100%] hover: relative"
       onClick={() => {
         handleChatClick();
       }}
@@ -75,7 +76,7 @@ const ChatCard = ({
         </div>
         <div>
           <h3>{name}</h3>
-          <div className="flex flex-row truncate border">
+          <div className="flex flex-row truncate">
             <p>{sender}</p>: <p> {message}</p>
           </div>
         </div>

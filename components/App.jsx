@@ -23,12 +23,11 @@ const App = () => {
     if (u) {
       setUser(u);
       setitu(true);
-      const user = await getDoc(doc(db, "users", u.uid))
+      const user = await getDoc(doc(db, "users", u.uid));
 
-      if (!user.data()){
-        createUser(u.uid, u.displayName, u.email, u.photoURL, "debo")
+      if (!user.data()) {
+        createUser(u.uid, u.displayName, u.email, u.photoURL, "debo");
       }
-
     } else {
       setUser(null);
       console.log("user signed out");
@@ -41,7 +40,7 @@ const App = () => {
       {itu ? (
         <UserContext.Provider value={{ User, setUser }}>
           <SelectedChannelProvider>
-            <main className="flex">
+            <main className="flex h-screen"> 
               <SideBar />
               <ChannelBar />
               <ContentContainer />
@@ -52,7 +51,9 @@ const App = () => {
         <div className="h-screen flex justify-center items-center">
           <button
             className="bg-green-600 px-2 py-4 rounded-lg"
-            onClick={() => {SigninWithGoogle()}}
+            onClick={() => {
+              SigninWithGoogle();
+            }}
           >
             sign in with google{" "}
           </button>

@@ -9,8 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emoji-mart/data": "^1.1.2",
+    "@emoji-mart/react": "^1.1.1",
     "@heroicons/react": "^2.0.16",
     "@next/font": "13.1.6",
+    "emoji-mart": "^5.5.2",
+    "emoji-picker-react": "^4.4.7",
     "eslint": "8.34.0",
     "eslint-config-next": "13.1.6",
     "firebase": "^9.17.1",
@@ -19,6 +23,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.8.0",
+    "react-modal": "^3.16.1",
     "redux": "^4.2.1"
   },
   "devDependencies": {

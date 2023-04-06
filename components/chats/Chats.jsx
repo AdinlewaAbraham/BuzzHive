@@ -4,6 +4,8 @@ import ChatCard from "./ChatCard";
 import AddGroup from "../addGroup/AddGroup";
 import { GrGroup } from "react-icons/gr";
 import { FaUserCircle } from "react-icons/fa";
+import { MdGroupAdd } from "react-icons/md";
+import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
 import { UserContext } from "../App";
 
@@ -24,20 +26,21 @@ const Chats = () => {
     );
     setSortedChats(sortedChats);
   }, [chats]);
-  const [ShowAddGroup, setShowAddGroup] = useState(false);
+  const {ShowAddGroup, setShowAddGroup} = useContext(SelectedChannelContext);
   return (
     <>
-      <div>
-        <div className="flex justify-between my-2">
+      <div className="h-[10vh] min-h-[100px]">
+        <div className="flex justify-between items-center ">
           <h1 className="text-2xl ">Chats</h1>{" "}
           <div className="relative">
-            <button
+            <i
               onClick={() => {
                 setShowAddGroup(!ShowAddGroup);
               }}
+              className="cursor-pointer"
             >
-              add
-            </button>
+              <MdGroupAdd size={24} />
+            </i>
             {ShowAddGroup && <AddGroup />}
           </div>
         </div>
@@ -45,15 +48,15 @@ const Chats = () => {
         <input
           type="text"
           placeholder="Search your chats"
-          className="w-full mb-5 mt-2"
+          className="w-full my-5"
         />
       </div>
       {sortedChats.length > 0 ? (
-        <div>
+        <div className="overflow-y-auto overflow-x-hidden h-[85vh]">
           {sortedChats.reverse().map((chat) => (
             <ChatCard
               key={chat.id}
-              otherUserId={chat.otherParticipant}// this is the bug
+              otherUserId={chat.otherParticipant} // this is the bug
               type={chat.type}
               id={chat.id}
               img={<img src={chat.senderDisplayImg} alt="" />}
