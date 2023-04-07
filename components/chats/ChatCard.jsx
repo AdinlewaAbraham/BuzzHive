@@ -5,7 +5,6 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { GrGroup } from "react-icons/gr";
 import FaUserCircle from "react-icons/fa";
-import { BsEmojiSmile } from "react-icons/bs";
 const ChatCard = ({
   img,
   name,
@@ -29,7 +28,6 @@ const ChatCard = ({
       photoUrl: img,
       displayName: `${name}`,
     });
-    console.log(otherUserId);
 
     if (type == "group") {
       const q = query(collection(db, "groups", id, "messages"));
@@ -59,7 +57,7 @@ const ChatCard = ({
   return (
     <div
       className="flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
-        rounded-xl hover:bg-gray-600 transition-all duration-100 ease-linear border w-[100%] hover: relative"
+        rounded-xl hover:bg-gray-600 transition-all duration-100 ease-linear w-[100%] hover: relative"
       onClick={() => {
         handleChatClick();
       }}

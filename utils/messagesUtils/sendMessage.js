@@ -9,25 +9,19 @@ export async function sendMessage(
   senderId,
   time
 ) {
-  // if (user1Id == senderId) {
-  //   alert("cant send message to yourself");
-  //   return null;
-  // }
   const message = {
+    id: null,
     text: messageText,
     senderId: senderId,
     timestamp: time,
-    reaction: "love",
+    reaction: [],
   };
 
   try {
-    // Check if a conversation document exists for the two users
     const conversationsRef = collection(db, "conversations");
-
-    // Create a new conversation document and add the message to its messages subcollection
     const conversationId =
       user1Id > user2Id ? user1Id + user2Id : user2Id + user1Id;
-      console.log(conversationId)
+    console.log(conversationId);
     const newConversationRef = doc(conversationsRef, conversationId);
     const user = await getUser(senderId);
     const newConversationData = {
@@ -40,12 +34,14 @@ export async function sendMessage(
     await setDoc(newConversationRef, newConversationData);
 
     const messagesRef = collection(newConversationRef, "messages");
-    await addDoc(messagesRef, message);
+    const newMessageRef = await addDoc(messagesRef, message);
+    const newMessageId = newMessageRef.id;
+    message.id = newMessageId;
 
-    // Return the message data after it has been successfully sent
+    await setDoc(newMessageRef, message);
+
     return message;
   } catch (error) {
-    // Handle the error and return null
     console.error("Failed to send message:", error);
     return null;
   }

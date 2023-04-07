@@ -10,7 +10,7 @@ const UserCard = ({ name, id, image }) => {
   const { User } = useContext(UserContext);
   const handleUserClick = async () => {
     setLoading(true);
-    const activeChatId = User.uid > id ? User.uid + id : id + User.uid;
+    const activeChatId = User.id > id ? User.id + id : id + User.id;
      setChatObject({
       ...ChatObject,
       activeChatId: `${activeChatId}`,

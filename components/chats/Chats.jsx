@@ -2,8 +2,6 @@ import { useContext, useState, useMemo } from "react";
 import { useGetChats } from "@/hooks/useGetChats";
 import ChatCard from "./ChatCard";
 import AddGroup from "../addGroup/AddGroup";
-import { GrGroup } from "react-icons/gr";
-import { FaUserCircle } from "react-icons/fa";
 import { MdGroupAdd } from "react-icons/md";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
@@ -11,7 +9,7 @@ import { UserContext } from "../App";
 
 const Chats = () => {
   const { User } = useContext(UserContext);
-  const chats = useGetChats(User.uid);
+  const chats = useGetChats(User.id);
   const [sortedChats, setSortedChats] = useState([]);
   useMemo(() => {
     if (!chats[0]) {
@@ -62,7 +60,7 @@ const Chats = () => {
               img={<img src={chat.senderDisplayImg} alt="" />}
               name={chat.senderDisplayName}
               sender={
-                chat.senderId == User.uid ? "you" : chat.lastMessageSenderName
+                chat.senderId == User.id ? "you" : chat.lastMessageSenderName
               }
               message={chat.lastMessage}
               //  timestamp={chat.timestamp}

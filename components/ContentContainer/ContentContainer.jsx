@@ -6,36 +6,58 @@ import { FaUserCircle } from "react-icons/fa";
 import { UserContext } from "../App";
 import { BsEmojiSmile } from "react-icons/bs";
 import { Emoji } from "emoji-picker-react";
+import reactTomessage from "@/utils/messagesUtils/reactToMessage";
 
-const ChatCard = ({ chat }) => {
+const ChatCard = ({ chat, key }) => {
+  const { ChatObject } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
 
   const [showReactEmojiTray, setshowReactEmojiTray] = useState(false);
 
-  const currentId = User.uid;
-  console.log(chat);
+  const currentId = User.id;
   const timestamp = chat.timestamp;
-  const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+  console.log(chat.reaction);
+  // const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
 
-  // Format the time as a string
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const formattedTime = `${hours}:${minutes}`;
+  // const hours = date.getHours().toString().padStart(2, '0');
+  // const minutes = date.getMinutes().toString().padStart(2, '0');
+  // const formattedTime = `${hours}:${minutes}`;
+  const handleEmojiClick = (emoji) => {
+    reactTomessage(
+      emoji,
+      chat.id,
+      ChatObject.activeChatId,
+      User,
+      ChatObject.activeChatType
+    );
+  };
   return (
     <div
       className={`flex items-center my-2 justify-start${
         chat.senderId === currentId ? " flex-row-reverse" : " "
       } `}
+      key={key}
     >
       <div
         className={`text-left rounded-lg p-2 max-w-[80%] relative ${
           chat.senderId === currentId
             ? " text-white text-right ml-2 bg-green-500 mr-5"
             : "bg-red-800 text-white text-left mr-2 ml-5"
-        }`}
+        } ${chat.reaction ? "" : "mb-[20px]"} `}
       >
         {chat.text}
-        <p>{formattedTime}</p>
+        <p>{}</p>
+        <div
+          className={`${
+            chat.reaction ? "" : "p-[5px]"
+          } rounded-lg max-w-[500px] flex absolute bottom-[-20px] right-0  bg-white`}
+        >
+          {chat.reaction.map(({ emoji }) => (
+            <>
+              <Emoji unified={emoji} size="15" />
+            </>
+          ))}
+        </div>
       </div>
 
       <div
@@ -45,10 +67,13 @@ const ChatCard = ({ chat }) => {
       >
         <div className="relative">
           {showReactEmojiTray && (
-            <div className=" flex bg-blue-700 absolute bottom-[25px] left-[-100px] w-[200px] p-[20px] rounded-lg">
-              {["1f423", "1f423", "1f433", "1f423", "1f423"].map(() => (
-                <div className="mx-[5px]">
-                  <Emoji unified="1f423" size="25" />
+            <div className=" flex bg-blue-700 absolute bottom-[25px] left-[-100px] w-[200px] p-[20px] rounded-lg z-20">
+              {["1f423", "1f423", "1f433", "1f423", "1f423"].map((emoji) => (
+                <div
+                  className="mx-[5px]"
+                  onClick={() => handleEmojiClick(emoji)}
+                >
+                  <Emoji unified={emoji} size="25" />
                 </div>
               ))}
             </div>
@@ -107,7 +132,8 @@ const ContentContainer = () => {
         <div className="text-center text-2xl">Loading</div>
       ) : (
         <div className="my-20">
-          {sortedChats && sortedChats.map((chat) => <ChatCard chat={chat} />)}
+          {sortedChats &&
+            sortedChats.map((chat) => <ChatCard chat={chat} key={chat.id} />)}
         </div>
       )}
       <Input />

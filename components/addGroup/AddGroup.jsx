@@ -101,7 +101,7 @@ const AddGroup = () => {
                 createGroup(
                   members,
                   true,
-                  User.uid,
+                  User.id,
                   groupName,
                   null,
                   "debo is the greatest"

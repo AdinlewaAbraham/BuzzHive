@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useEffect, useState, createContext, useMemo } from "react";
 import SideBar from "./sidebar/SideBar";
 import ChannelBar from "./ChannelBar/ChannelBar";
 import ContentContainer from "./ContentContainer/ContentContainer";
@@ -14,33 +14,46 @@ import { db } from "@/utils/firebaseUtils/firebase";
 export const UserContext = createContext();
 
 const App = () => {
-  const [User, setUser] = useState({});
+  const [User, setUser] = useState(null);
   const auth = getAuth();
 
-  const [itu, setitu] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
 
-  onAuthStateChanged(auth, async (u) => {
-    if (u) {
-      setUser(u);
-      setitu(true);
-      const user = await getDoc(doc(db, "users", u.uid));
-
-      if (!user.data()) {
-        createUser(u.uid, u.displayName, u.email, u.photoURL, "debo");
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
+      if (u) {
+        setIsAuthed(true);
+        const userSnapshot = await getDoc(doc(db, "users", u.uid));
+        const userData = userSnapshot.data();
+        if (!userData) {
+          await createUser(u.uid, u.displayName, u.email, u.photoURL, "hello");
+          const userSnapshot = await getDoc(doc(db, "users", u.uid));
+          const userData = userSnapshot.data();
+          setUser(userData);
+        } else {
+          setUser(userData);
+        }
+      } else {
+        setUser(null);
+        console.log("user signed out");
+        setIsAuthed(false);
       }
-    } else {
-      setUser(null);
-      console.log("user signed out");
-      setitu(false);
-    }
-  });
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const memoizedUser = useMemo(() => User, [User]);
+  if (!memoizedUser && isAuthed) {
+    return <p>Loading user...</p>;
+  }
 
   return (
     <>
-      {itu ? (
+      {isAuthed ? (
         <UserContext.Provider value={{ User, setUser }}>
           <SelectedChannelProvider>
-            <main className="flex h-screen"> 
+            <main className="flex h-screen">
               <SideBar />
               <ChannelBar />
               <ContentContainer />

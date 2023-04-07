@@ -13,14 +13,10 @@ const Input = () => {
   const { ChatObject, setChatObject, setChats } = useContext(
     SelectedChannelContext
   );
-  const senderid = User.uid;
+  const senderid = User.id;
 
   function handleSend() {
-    if (
-      ChatObject.message.replace(" ", "") == "" &&
-      ChatObject.message.replace(" ", "")
-    )
-      return null;
+    if (!ChatObject.message || ChatObject.message.trim().length === 0) return;
     if (ChatObject.activeChatType == "group") {
       const time = new Date();
       const message = {
@@ -31,7 +27,7 @@ const Input = () => {
       };
       setChats((prevChats) => [...prevChats, message]);
       sendGroupMessage(
-        User.uid,
+        User.id,
         ChatObject.activeChatId,
         ChatObject.message,
         time

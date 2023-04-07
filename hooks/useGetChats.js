@@ -57,7 +57,6 @@ export const useGetChats = (currentUserId) => {
     const unsub = onSnapshot(groupQuery, (querySnapshot) => {
       const promises = querySnapshot.docs.map(async (doc) => {
         const group = doc.data();
-        const sender = await getUser(group.lastMessage.senderId);
         const groupChat = {
           id: doc.id,
           senderId: group.lastMessage.senderId,

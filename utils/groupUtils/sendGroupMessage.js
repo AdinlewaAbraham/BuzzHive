@@ -1,9 +1,8 @@
 import {
   addDoc,
   collection,
-  serverTimestamp,
-  setDoc,
   doc,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseUtils/firebase";
@@ -12,10 +11,11 @@ import { getUser } from "../userUtils/getUser";
 export const sendGroupMessage = async (senderId, groupID, messageText, time) => {
   const groupRef = doc(db, "groups", groupID);
   const message = {
+    id: null,
     text: messageText,
     timestamp: time,
     senderId: senderId,
-    reaction: null,
+    reaction: [],
     groupID: groupID,
   };
   const senderDisplayName = senderId.senderDisplayName;
@@ -28,13 +28,12 @@ export const sendGroupMessage = async (senderId, groupID, messageText, time) => 
     senderDisplayImg: user.photoUrl,
   };
   try {
-    await updateDoc(groupRef, { lastMessage: newMessage });
     const messagesRef = collection(groupRef, "messages");
-    await addDoc(messagesRef, message);
-    console.log(
-      "Message added to messages subcollection for group with ID",
-      groupID
-    );
+    const newMessageRef = await addDoc(messagesRef, message);
+    const newMessageId = newMessageRef.id;
+    message.id = newMessageId;
+    await updateDoc(groupRef, { lastMessage: newMessage });
+    await setDoc(newMessageRef, message)
   } catch (error) {
     console.error(
       "Error adding message to messages subcollection for group with ID",
