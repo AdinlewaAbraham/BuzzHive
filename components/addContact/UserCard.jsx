@@ -35,7 +35,7 @@ const UserCard = ({ name, id, image }) => {
   return (
     <div
       key={id}
-      className="border rounded-lg flex cursor-pointer "
+      className="rounded-lg flex cursor-pointer items-center hover:bg-gray-600  px-4 py-3 "
       onClick={() => {
         handleUserClick();
       }}

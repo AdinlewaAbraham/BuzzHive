@@ -53,11 +53,11 @@ const App = () => {
       {isAuthed ? (
         <UserContext.Provider value={{ User, setUser }}>
           <SelectedChannelProvider>
-            <main className="flex h-screen">
+            <div className="flex flex-col-reverse h-full md:flex-row">
               <SideBar />
               <ChannelBar />
               <ContentContainer />
-            </main>
+            </div>
           </SelectedChannelProvider>
         </UserContext.Provider>
       ) : (

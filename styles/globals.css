@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @layer base {
-    /* body {
+  /* body {
 
     } */
 }
@@ -25,4 +25,39 @@
   }
 }
 
+/* target element with overflow */
+.my-element::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+}
 
+/* Firefox */
+.my-element::-moz-scrollbar-thumb {
+  border-radius: 999px;
+}
+
+/* IE 10+ */
+.my-element::-ms-scrollbar-thumb {
+  border-radius: 999px;
+}
+
+/* standard */
+.my-element::scrollbar-thumb {
+  border-radius: 999px;
+}
+
+.skeleton {
+  background-color: #ccc;
+  animation: skeleton-loading 1s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}

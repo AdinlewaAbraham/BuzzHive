@@ -1,5 +1,5 @@
 import { db } from "../firebaseUtils/firebase";
-import { arrayUnion, collection, doc, getDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
 export default async function reactTomessage(
   emoji,
@@ -14,13 +14,17 @@ export default async function reactTomessage(
     const groupRef = doc(groupColRef, conversationId);
     const messageColRef = collection(groupRef, "messages");
     const messageRef = doc(messageColRef, messageId);
+    const ReactionColRef = collection(messageRef, "reactions")
+
 
     const reactionData = {
       emoji: emoji,
       userName: user.name,
       userDisplayImg: user.photoUrl,
+      userID: user.id
     };
-    await updateDoc(messageRef, { reaction: arrayUnion(reactionData) });
+    await setDoc(doc(ReactionColRef, user.id), reactionData)
+
   } else {
     //const messageRef =
   }

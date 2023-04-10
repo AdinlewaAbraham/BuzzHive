@@ -14,14 +14,12 @@ export async function sendMessage(
     text: messageText,
     senderId: senderId,
     timestamp: time,
-    reaction: [],
   };
 
   try {
     const conversationsRef = collection(db, "conversations");
     const conversationId =
       user1Id > user2Id ? user1Id + user2Id : user2Id + user1Id;
-    console.log(conversationId);
     const newConversationRef = doc(conversationsRef, conversationId);
     const user = await getUser(senderId);
     const newConversationData = {
@@ -39,8 +37,6 @@ export async function sendMessage(
     message.id = newMessageId;
 
     await setDoc(newMessageRef, message);
-
-    return message;
   } catch (error) {
     console.error("Failed to send message:", error);
     return null;

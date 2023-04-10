@@ -1,4 +1,4 @@
-import { useContext, useState, useMemo } from "react";
+import { useContext, useState, useMemo, useEffect } from "react";
 import { useGetChats } from "@/hooks/useGetChats";
 import ChatCard from "./ChatCard";
 import AddGroup from "../addGroup/AddGroup";
@@ -10,12 +10,40 @@ import { UserContext } from "../App";
 const Chats = () => {
   const { User } = useContext(UserContext);
   const chats = useGetChats(User.id);
+  const [Chats, setChats] = useState([]);
   const [sortedChats, setSortedChats] = useState([]);
+
+  const data = localStorage.getItem(`${User.id}_userChats`);
+  useEffect(() => {
+    let dataArray;
+    
+    if (data) { 
+      dataArray = JSON.parse(data);
+
+      if (dataArray == []) {
+        console.log("slow");
+        setChats(chats);
+      } else {
+        setChats(dataArray);
+      }
+
+      // check for update
+      if (dataArray !== chats && (chats == null || chats.length !== 0)) {
+        chats == null
+          ? localStorage.setItem(`${User.id}_userChats`, JSON.stringify([]))
+          : localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
+      }
+    } else {
+      console.log("no data");
+      localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
+      setChats(chats);
+    }
+  }, [chats, User.id, data]);
   useMemo(() => {
-    if (!chats[0]) {
+    if (chats == null || !Chats[0]) {
       return null;
     }
-    const sortedChats = chats.sort(
+    const sortedChats = Chats.sort(
       (a, b) =>
         a.timestamp.seconds * 1000 +
         a.timestamp.nanoseconds / 1000000 -
@@ -23,8 +51,8 @@ const Chats = () => {
         b.timestamp.nanoseconds / 1000000
     );
     setSortedChats(sortedChats);
-  }, [chats]);
-  const {ShowAddGroup, setShowAddGroup} = useContext(SelectedChannelContext);
+  }, [Chats]);
+  const { ShowAddGroup, setShowAddGroup } = useContext(SelectedChannelContext);
   return (
     <>
       <div className="h-[10vh] min-h-[100px]">
@@ -49,26 +77,34 @@ const Chats = () => {
           className="w-full my-5"
         />
       </div>
-      {sortedChats.length > 0 ? (
-        <div className="overflow-y-auto overflow-x-hidden h-[85vh]">
-          {sortedChats.reverse().map((chat) => (
-            <ChatCard
-              key={chat.id}
-              otherUserId={chat.otherParticipant} // this is the bug
-              type={chat.type}
-              id={chat.id}
-              img={<img src={chat.senderDisplayImg} alt="" />}
-              name={chat.senderDisplayName}
-              sender={
-                chat.senderId == User.id ? "you" : chat.lastMessageSenderName
-              }
-              message={chat.lastMessage}
-              //  timestamp={chat.timestamp}
-            />
-          ))}
-        </div>
+      {chats == null ? (
+        <>you have no chats</>
       ) : (
-        <>Loading</>
+        <>
+          {sortedChats.length !== 0 ? (
+            <div className="overflow-y-auto overflow-x-hidden h-[calc(100vh-50px)]  md:h-[85vh]">
+              {sortedChats.reverse().map((chat) => (
+                <ChatCard
+                  key={chat.id}
+                  otherUserId={chat.otherParticipant} // this is the bug
+                  type={chat.type}
+                  id={chat.id}
+                  img={chat.senderDisplayImg}
+                  name={chat.senderDisplayName}
+                  sender={
+                    chat.senderId == User.id
+                      ? "you"
+                      : chat.lastMessageSenderName
+                  }
+                  message={chat.lastMessage}
+                  //  timestamp={chat.timestamp}
+                />
+              ))}
+            </div>
+          ) : (
+            <>Loading</>
+          )}
+        </>
       )}
     </>
   );

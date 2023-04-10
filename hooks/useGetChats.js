@@ -6,7 +6,8 @@ import { getUser } from "@/utils/userUtils/getUser";
 
 export const useGetChats = (currentUserId) => {
   const [chats, setChats] = useState([]);
-  const [groupChats, setgroupChats] = useState([]);
+  const [groupChats, setGroupChats] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const conversationRef = collection(db, "conversations");
@@ -29,9 +30,10 @@ export const useGetChats = (currentUserId) => {
         );
 
         //alows users to send message to there self
-        const otherParticipant = otherParticipants.length !== 0
-          ? otherParticipants[0]
-          : conversation.participants[0];
+        const otherParticipant =
+          otherParticipants.length !== 0
+            ? otherParticipants[0]
+            : conversation.participants[0];
         const user = await getUser(otherParticipant);
         const lastMessage = conversation.lastMessage;
         const timestamp = conversation.timestamp;
@@ -72,7 +74,7 @@ export const useGetChats = (currentUserId) => {
       });
 
       Promise.all(promises).then((groupChats) => {
-        setgroupChats(groupChats);
+        setGroupChats(groupChats);
       });
     });
 
@@ -82,12 +84,24 @@ export const useGetChats = (currentUserId) => {
     };
   }, []);
 
-  const mergedChats = useMemo(
-    () => [...chats, ...groupChats],
-    [chats, groupChats]
-  );
+  useEffect(() => {
+    if (chats.length > 0 && groupChats.length > 0) {
+      setLoading(false);
+    }
+  }, [chats, groupChats]);
 
-  mergedChats.sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
-
-  return mergedChats;
+  const mergedChats = useMemo(() => {
+    if (loading) {
+      return [];
+    } else {
+      return [...chats, ...groupChats].sort(
+        (a, b) => a.timestamp.seconds - b.timestamp.seconds
+      );
+    }
+  }, [chats, groupChats, loading]);
+  let whatToReturn;
+  (chats.length == 0 || groupChats.length == 0) && !loading
+    ? (whatToReturn = null)
+    : (whatToReturn = mergedChats);
+  return whatToReturn;
 };

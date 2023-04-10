@@ -56,9 +56,10 @@ const SideBar = () => {
       );
     }
   };
+
   return (
-    <div className="max-h-screen  w-20 px-5- flex flex-col justify-between dark:bg-gray-900 text-white shadow-lg">
-      <i>
+    <div className="h-[50px] justify-center w-[500px] max-h-screen md:max-w-[70px] md:w-[5%] md:h-screen  md:min-w-[70px] flex  md:flex-col md:justify-between dark:bg-gray-900 text-white shadow-lg">
+      <i className="flex md:flex-col">
         <SideBarIcon icon={<BsChatRightText size="20" />} clickevent="chats" />
         <SideBarIcon
           icon={<MdPersonAddAlt size="27" />}
@@ -66,9 +67,9 @@ const SideBar = () => {
         />
       </i>
 
-      <i className="mx-auto flex flex-col mb-10 cursor-pointer">
+      <i className="md:mx-auto flex md:flex-col mb-10 cursor-pointer">
         <button
-          className="bg-red-600"
+          className="bg-red-600 mx-0 my-0"
           onClick={() => {
             const auth = getAuth();
             signOut(auth)
@@ -80,8 +81,11 @@ const SideBar = () => {
               });
           }}
         >
-          sign <br /> out
+          sign out
         </button>
+        <button className="mx-0 my-0" onClick={()=>{
+          localStorage.clear()
+        }}>reset local</button>
         <SideBarIcon icon={renderThemeChanger()} />
         <SideBarIcon icon={<AiOutlineSetting size={22} />} />
       </i>

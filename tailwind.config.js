@@ -3,6 +3,14 @@ module.exports = {
   content: ["./pages/**/*.{js,jsx}", "./components/**/*.{js,jsx}"],
   darkMode: "class",
   theme: {
+    screens: {
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+      idle: { min: "800px", max: "1023px" },
+    },
     extend: {
       colors: {
         gray: {
@@ -18,5 +26,6 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+
+  plugins: [require("tailwind-scrollbar")],
 };

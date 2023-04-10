@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { getConversation } from "@/utils/conversations/getConversation";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, getDocs } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
-import { GrGroup } from "react-icons/gr";
+import { MdGroup } from "react-icons/md";
 import FaUserCircle from "react-icons/fa";
 const ChatCard = ({
   img,
@@ -15,10 +15,11 @@ const ChatCard = ({
   type,
   otherUserId,
 }) => {
-  const { setChats, setLoading, ChatObject, setChatObject } = useContext(
+  const { setChats, Chats ,setLoading, ChatObject, setChatObject } = useContext(
     SelectedChannelContext
   );
   const handleChatClick = async () => {
+    console.log("start");
     setLoading(true);
     setChatObject({
       ...ChatObject,
@@ -29,45 +30,69 @@ const ChatCard = ({
       displayName: `${name}`,
     });
 
-    if (type == "group") {
-      const q = query(collection(db, "groups", id, "messages"));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
+    // checks local storage for cached chats
+    if (localStorage.getItem("Chats")) {
+      console.log("checking local storage")
+      const myArrayString = localStorage.getItem("Chats");
+      const myArray = JSON.parse(myArrayString);
+    } else {
+      console.log("fetching from sever ")
+      let q;
+      if (type === "group") {
+        q = query(collection(db, "groups", id, "messages"));
+      } else if (type === "personal") {
+        q = query(collection(db, "conversations", id, "messages"));
+      }
+      const unsubscribe = onSnapshot(q, async (snapshot) => {
         let chats = [];
-        snapshot.forEach((doc) => {
-          chats.push(doc.data());
-        });
-        setChats(chats); // Update the state with the latest data
+        const promises = [];
+        for (const doc of snapshot.docs) {
+          let chat = doc.data();
+          const reactionsRef = collection(doc.ref, "reactions");
+          const promise = getDocs(reactionsRef).then((querySnapshot) => {
+            let reactionsArray = [];
+            querySnapshot.forEach((doc) => {
+              reactionsArray.push(doc.data());
+            });
+            chat.reactions = reactionsArray;
+          });
+          promises.push(promise);
+          chats.push(chat);
+        }
+        await Promise.all(promises);
+        setChats(chats);
       });
       setLoading(false);
-      return () => unsubscribe();
-    } else if (type == "personal") {
-      const q = query(collection(db, "conversations", id, "messages"));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        let chats = [];
-        snapshot.forEach((doc) => {
-          chats.push(doc.data());
-        });
-        setChats(chats); // Update the state with the latest data
-      });
-      setLoading(false);
+      console.log("end");
       return () => unsubscribe();
     }
-    setLoading(false);
+    // saves to localstorage 
+    const myChatsString = JSON.stringify(myArray);
+    localStorage.setItem("Chats", myChatsString);
   };
+
   return (
     <div
-      className="flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
-        rounded-xl hover:bg-gray-600 transition-all duration-100 ease-linear w-[100%] hover: relative"
+      className={`${
+        ChatObject.activeChatId == id
+          ? "bg-gray-600 hover:bg-gray-600"
+          : "hover:bg-gray-700 "
+      } flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
+        rounded-xl w-[100%] hover: relative`}
       onClick={() => {
         handleChatClick();
       }}
     >
       <div className="flex flex-row  align-middle items-center">
-        <div className="w-14 h-14 mr-3">
-          {img.props.src ? (
-            img
+        <div className="w-[50px] h-[50px] mr-3 flex items-center justify-center bg-gray-500 rounded-full">
+          {img ? (
+            <img
+              src={img}
+              alt=""
+              className="rounded-full object-cover h-full w-full"
+            />
           ) : type === "group" ? (
-            <GrGroup size={35} />
+            <MdGroup size={35} />
           ) : (
             <FaUserCircle />
           )}

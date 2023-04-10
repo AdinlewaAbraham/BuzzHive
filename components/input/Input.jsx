@@ -8,47 +8,39 @@ import { BsEmojiSmile } from "react-icons/bs";
 import EmojiPicker from "emoji-picker-react";
 import { AiOutlineSend } from "react-icons/ai";
 
+
 const Input = () => {
   const { User } = useContext(UserContext);
   const { ChatObject, setChatObject, setChats } = useContext(
     SelectedChannelContext
   );
+  const [message, setmessage] = useState("");
   const senderid = User.id;
 
   function handleSend() {
-    if (!ChatObject.message || ChatObject.message.trim().length === 0) return;
+    if (!message || message.trim().length === 0) return;
     if (ChatObject.activeChatType == "group") {
       const time = new Date();
-      const message = {
-        text: ChatObject.message,
+      const messageObj = {
+        text: message,
         senderId: senderid,
         timeStamp: time,
-        reaction: "love",
+        reactions: []
       };
-      setChats((prevChats) => [...prevChats, message]);
-      sendGroupMessage(
-        User.id,
-        ChatObject.activeChatId,
-        ChatObject.message,
-        time
-      );
+      setChats((prevChats) => [...prevChats, messageObj]);
+      sendGroupMessage(User.id, ChatObject.activeChatId, message, time);
     } else if (ChatObject.activeChatType == "personal") {
       const time = new Date();
-      const message = {
-        text: ChatObject.message,
+      const messageObj = {
+        text: message,
         senderId: senderid,
         timeStamp: time,
-        reaction: "love",
+        reactions: []
       };
-      setChats((prevChats) => [...prevChats, message]);
-      sendMessage(
-        senderid,
-        ChatObject.otherUserId,
-        ChatObject.message,
-        senderid,
-        time
-      );
+      setChats((prevChats) => [...prevChats, messageObj]);
+      sendMessage(senderid, ChatObject.otherUserId, message, senderid, time);
     }
+    setmessage("");
   }
 
   const [showEmojiPicker, setshowEmojiPicker] = useState(false);
@@ -65,9 +57,14 @@ const Input = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [setshowEmojiPicker]);
+  function handleInputKeyDown(e) {
+    if (e.key == "Enter") {
+      handleSend();
+    }
+  }
   return (
     <>
-      <div className="flex bg-white items-center  px-[4px] py-[8px] fixed bottom-0 justify-start">
+      <div className="flex bg-white items-center justify-between px-[4px] py-[8px] w-full">
         <div className="relative">
           <div
             className="detectme bg-red-600 p-[10px] bg-transparent"
@@ -92,9 +89,10 @@ const Input = () => {
           type="text"
           className="text-black  px-4 py-2 bg-transparent w-full outline-none placeholder-black"
           placeholder="Type a message"
-          value={ChatObject.message}
+          value={message}
+          onKeyDown={handleInputKeyDown}
           onChange={(e) => {
-            setChatObject({ ...ChatObject, message: `${e.target.value}` });
+            setmessage(e.target.value);
           }}
         />
         <div
