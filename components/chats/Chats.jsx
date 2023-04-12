@@ -18,7 +18,7 @@ const Chats = () => {
   const chats = whatToReturn;
 
   const getStoredChats = () => {
-    const storedData = localStorage.getItem(`${User.id}_userChats`)
+    const storedData = localStorage.getItem(`${User.id}_userChats`);
     return storedData ? JSON.parse(storedData) : null;
   };
 
@@ -47,7 +47,9 @@ const Chats = () => {
       setLoading(false); // Set loading to false after setting the stored chats
     } else {
       setChats(chats);
-      localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
+      chats == null
+        ? 0
+        : localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
       setLoading(false); // Set loading to false after fetching new chats
     }
     if ((chats == null || chats.length == 0) && !loading) {
@@ -59,12 +61,11 @@ const Chats = () => {
     const fetchData = async () => {
       // Check if the chat data has changed
       if (
-        JSON.stringify(chats) !== JSON.stringify(Chats) &&
+        JSON.stringify(chats) !== JSON.stringify(getStoredChats()) &&
         !loading &&
         isOnline
       ) {
         localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
-
         setChats(chats);
       }
     };
@@ -72,7 +73,7 @@ const Chats = () => {
     // Fetch new data every 10 minutes
     const interval = setInterval(fetchData, 600000);
     return () => clearInterval(interval);
-  }, [User.id, chats]);
+  }, [User.id, chats,loading]);
 
   useMemo(() => {
     if (!Chats) return;

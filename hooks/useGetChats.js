@@ -95,15 +95,15 @@ export const useGetChats = (currentUserId) => {
   }, [chats, groupChats, isPersonalChatLoading, isGroupChatsLoading]);
 
   useEffect(() => {
-    setLoading(isPersonalChatLoading && isGroupChatsLoading);
+    setLoading(isPersonalChatLoading || isGroupChatsLoading);
   }, [isPersonalChatLoading, isGroupChatsLoading]);
-  
+
   console.log(isPersonalChatLoading);
   console.log(isGroupChatsLoading);
   console.log(loading);
   let whatToReturn;
-  (chats.length == 0 && groupChats.length == 0) && !loading
-    ? whatToReturn = null
-    : whatToReturn = mergedChats;
+  mergedChats == 0 && !loading
+    ? (whatToReturn = null)
+    : (whatToReturn = mergedChats);
   return { loading, whatToReturn };
 };
