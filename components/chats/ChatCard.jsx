@@ -15,7 +15,7 @@ const ChatCard = ({
   type,
   otherUserId,
 }) => {
-  const { setChats, Chats ,setLoading, ChatObject, setChatObject } = useContext(
+  const { setChats, Chats ,setLoading, ChatObject, setChatObject, setshowChats } = useContext(
     SelectedChannelContext
   );
   const handleChatClick = async () => {
@@ -29,6 +29,7 @@ const ChatCard = ({
       photoUrl: img,
       displayName: `${name}`,
     });
+    setshowChats(true)
 
     // checks local storage for cached chats
     if (localStorage.getItem("Chats")) {

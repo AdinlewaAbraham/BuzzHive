@@ -20,6 +20,8 @@ const SelectedChannelContext = createContext({
   setShowAddGroup: () => {},
   isPopupOpen: false,
   setisPopupOpen: () => {},
+  showChats: false,
+  setshowChats:()=>{}
 });
 
 export const SelectedChannelProvider = ({ children }) => {
@@ -28,6 +30,7 @@ export const SelectedChannelProvider = ({ children }) => {
   const [selectedChannel, setSelectedChannel] = useState("chats");
   const [Chats, setChats] = useState([]);
   const [Loading, setLoading] = useState(false);
+  const [showChats, setshowChats] = useState(true);
   const [ChatObject, setChatObject] = useState({
     activeChatId: "",
     activeChatType: "",
@@ -50,6 +53,8 @@ export const SelectedChannelProvider = ({ children }) => {
         setShowAddGroup,
         isPopupOpen,
         setisPopupOpen,
+        showChats,
+        setshowChats,
       }}
     >
       {children}

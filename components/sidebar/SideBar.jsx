@@ -2,18 +2,23 @@ import { useState, useEffect, useContext } from "react";
 import { useTheme } from "next-themes";
 import { BsSun, BsMoon } from "react-icons/bs";
 import { BsChatRightText } from "react-icons/bs";
-import { MdPersonAddAlt } from "react-icons/md";
+import { MdOutlineDelete, MdPersonAddAlt } from "react-icons/md";
 import { AiOutlineSetting } from "react-icons/ai";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { getAuth, signOut } from "firebase/auth";
 
+import { BiLogOut } from "react-icons/bi";
+
 const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
-  const { setSelectedChannel } = useContext(SelectedChannelContext);
+  const { setSelectedChannel, selectedChannel } = useContext(
+    SelectedChannelContext
+  );
   return (
     <div
       className="sidebar-icon group"
       onClick={() => {
-        setSelectedChannel(clickevent);
+        console.log(clickevent);
+        setSelectedChannel(clickevent ? clickevent : selectedChannel);
       }}
     >
       {icon}{" "}
@@ -37,28 +42,29 @@ const SideBar = () => {
 
     if (currenTheme === "dark") {
       return (
-        <BsSun
-          size={20}
+        <i
           onClick={() => {
             setTheme("light");
           }}
-        />
+        >
+          <SideBarIcon icon={<BsSun size={20} />} />
+        </i>
       );
     } else {
       return (
-        <BsMoon
-          color="black"
-          size={20}
+        <i
           onClick={() => {
             setTheme("dark");
           }}
-        />
+        >
+          <SideBarIcon icon={<BsMoon color="black" size={20} />} />
+        </i>
       );
     }
   };
 
   return (
-    <div className="h-[50px] justify-center w-[500px] max-h-screen md:max-w-[70px] md:w-[5%] md:h-screen  md:min-w-[70px] flex  md:flex-col md:justify-between dark:bg-gray-900 text-white shadow-lg">
+    <div className="h-[50px] justify-center w-screen max-h-screen md:max-w-[70px] md:w-[5%] md:h-screen  md:min-w-[70px] flex  md:flex-col md:justify-between dark:bg-gray-900 text-white shadow-lg">
       <i className="flex md:flex-col">
         <SideBarIcon icon={<BsChatRightText size="20" />} clickevent="chats" />
         <SideBarIcon
@@ -68,8 +74,7 @@ const SideBar = () => {
       </i>
 
       <i className="md:mx-auto flex md:flex-col mb-10 cursor-pointer">
-        <button
-          className="bg-red-600 mx-0 my-0"
+        <i
           onClick={() => {
             const auth = getAuth();
             signOut(auth)
@@ -81,12 +86,16 @@ const SideBar = () => {
               });
           }}
         >
-          sign out
-        </button>
-        <button className="mx-0 my-0" onClick={()=>{
-          localStorage.clear()
-        }}>reset local</button>
-        <SideBarIcon icon={renderThemeChanger()} />
+          <SideBarIcon icon={<BiLogOut size="27" />} />
+        </i>
+        <i
+          onClick={() => {
+            localStorage.clear();
+          }}
+        >
+          <SideBarIcon icon={<MdOutlineDelete size="27" />} />
+        </i>
+        {renderThemeChanger()}
         <SideBarIcon icon={<AiOutlineSetting size={22} />} />
       </i>
     </div>

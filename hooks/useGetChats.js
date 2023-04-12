@@ -97,10 +97,7 @@ export const useGetChats = (currentUserId) => {
   useEffect(() => {
     setLoading(isPersonalChatLoading || isGroupChatsLoading);
   }, [isPersonalChatLoading, isGroupChatsLoading]);
-
-  console.log(isPersonalChatLoading);
-  console.log(isGroupChatsLoading);
-  console.log(loading);
+;
   let whatToReturn;
   mergedChats == 0 && !loading
     ? (whatToReturn = null)
