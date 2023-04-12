@@ -9,50 +9,57 @@ import { UserContext } from "../App";
 
 const Chats = () => {
   const { User } = useContext(UserContext);
-  const chats = useGetChats(User.id);
-  const [Chats, setChats] = useState([]);
+  const { loading, whatToReturn } = useGetChats(User.id);
+  const [Chats, setChats] = useState(null);
   const [sortedChats, setSortedChats] = useState([]);
+  const [Loading, setLoading] = useState(true);
 
-  const data = localStorage.getItem(`${User.id}_userChats`);
+  console.log(loading);
+  console.log(whatToReturn);
+  const chats = whatToReturn;
+
+  const getStoredChats = () => {
+    const storedData = localStorage.getItem(`${User.id}_userChats`)
+      ? localStorage.getItem(`${User.id}_userChats`)
+      : null;
+    return storedData ? JSON.parse(storedData) : null;
+  };
+
   useEffect(() => {
-    let dataArray;
-    
-    if (data) { 
-      dataArray = JSON.parse(data);
-
-      if (dataArray == []) {
-        console.log("slow");
-        setChats(chats);
-      } else {
-        setChats(dataArray);
-      }
-
-      // check for update
-      if (dataArray !== chats && (chats == null || chats.length !== 0)) {
-        chats == null
-          ? localStorage.setItem(`${User.id}_userChats`, JSON.stringify([]))
-          : localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
-      }
+    const storedChats = getStoredChats();
+    if (storedChats && storedChats.length) {
+      setChats(storedChats);
     } else {
-      console.log("no data");
-      localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
       setChats(chats);
+      localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
     }
-  }, [chats, User.id, data]);
+    setLoading(false);
+  }, [chats, User.id, whatToReturn]);
+  useEffect(() => {
+    const fetchData = async () => {
+      // Check if the chat data has changed
+      if (JSON.stringify(chats) !== JSON.stringify(Chats) && !loading) {
+        localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
+
+        setChats(chats);
+      }
+    };
+    fetchData();
+    // Fetch new data every 10 minutes
+    const interval = setInterval(fetchData, 600000);
+    return () => clearInterval(interval);
+  }, [User.id, chats]);
+
   useMemo(() => {
-    if (chats == null || !Chats[0]) {
-      return null;
-    }
-    const sortedChats = Chats.sort(
-      (a, b) =>
-        a.timestamp.seconds * 1000 +
-        a.timestamp.nanoseconds / 1000000 -
-        b.timestamp.seconds * 1000 -
-        b.timestamp.nanoseconds / 1000000
+    if (!Chats) return;
+    const sortedChats = Chats.slice().sort(
+      (a, b) => b.timestamp.seconds - a.timestamp.seconds
     );
     setSortedChats(sortedChats);
   }, [Chats]);
+
   const { ShowAddGroup, setShowAddGroup } = useContext(SelectedChannelContext);
+  console.log(Chats);
   return (
     <>
       <div className="h-[10vh] min-h-[100px]">
@@ -77,16 +84,18 @@ const Chats = () => {
           className="w-full my-5"
         />
       </div>
-      {chats == null ? (
-        <>you have no chats</>
+      {console.log(Chats)}
+      {Loading || Chats == null ? (
+        <>Loading......</>
       ) : (
         <>
-          {sortedChats.length !== 0 ? (
+          {console.log(chats)}
+          {Chats.length !== 0 ? (
             <div className="overflow-y-auto overflow-x-hidden h-[calc(100vh-50px)]  md:h-[85vh]">
-              {sortedChats.reverse().map((chat) => (
+              {sortedChats.map((chat) => (
                 <ChatCard
                   key={chat.id}
-                  otherUserId={chat.otherParticipant} // this is the bug
+                  otherUserId={chat.otherParticipant}
                   type={chat.type}
                   id={chat.id}
                   img={chat.senderDisplayImg}
@@ -102,7 +111,7 @@ const Chats = () => {
               ))}
             </div>
           ) : (
-            <>Loading</>
+            <>you have no chats</>
           )}
         </>
       )}

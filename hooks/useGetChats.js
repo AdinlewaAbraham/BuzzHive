@@ -7,9 +7,12 @@ import { getUser } from "@/utils/userUtils/getUser";
 export const useGetChats = (currentUserId) => {
   const [chats, setChats] = useState([]);
   const [groupChats, setGroupChats] = useState([]);
+  const [isPersonalChatLoading, setisPersonalChatLoading] = useState(true);
+  const [isGroupChatsLoading, setisGroupChatsLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("i ran");
     const conversationRef = collection(db, "conversations");
     const groupRef = collection(db, "groups");
     const groupQuery = query(
@@ -22,8 +25,9 @@ export const useGetChats = (currentUserId) => {
       where("participants", "array-contains", currentUserId)
     );
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const promises = querySnapshot.docs.map(async (doc) => {
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+      const chats = [];
+      for (const doc of querySnapshot.docs) {
         const conversation = doc.data();
         const otherParticipants = await conversation.participants.filter(
           (id) => id !== currentUserId
@@ -48,16 +52,16 @@ export const useGetChats = (currentUserId) => {
           timestamp: timestamp,
           type: "personal",
         };
-        return chat;
-      });
-
-      Promise.all(promises).then((chats) => {
-        setChats(chats);
-      });
+        chats.push(chat);
+      }
+      setChats(chats);
+      setisPersonalChatLoading(false);
     });
 
-    const unsub = onSnapshot(groupQuery, (querySnapshot) => {
-      const promises = querySnapshot.docs.map(async (doc) => {
+    console.log("i ran");
+    const unsub = onSnapshot(groupQuery, async (querySnapshot) => {
+      const groupChats = [];
+      for (const doc of querySnapshot.docs) {
         const group = doc.data();
         const groupChat = {
           id: doc.id,
@@ -70,12 +74,10 @@ export const useGetChats = (currentUserId) => {
           timestamp: group.lastMessage.timestamp,
           type: "group",
         };
-        return groupChat;
-      });
-
-      Promise.all(promises).then((groupChats) => {
-        setGroupChats(groupChats);
-      });
+        groupChats.push(groupChat);
+      }
+      setGroupChats(groupChats);
+      setisGroupChatsLoading(false);
     });
 
     return () => {
@@ -84,24 +86,25 @@ export const useGetChats = (currentUserId) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (chats.length > 0 && groupChats.length > 0) {
-      setLoading(false);
-    }
-  }, [chats, groupChats]);
-
   const mergedChats = useMemo(() => {
-    if (loading) {
+    if (isPersonalChatLoading && isGroupChatsLoading) {
       return [];
     } else {
       return [...chats, ...groupChats].sort(
         (a, b) => a.timestamp.seconds - b.timestamp.seconds
       );
     }
-  }, [chats, groupChats, loading]);
+  }, [chats, groupChats, isPersonalChatLoading, isGroupChatsLoading]);
+
+  console.log("i ran");
+  //isGroupChatsLoading && isPersonalChatLoading ? setLoading(true):setLoading(false)
+  useEffect(() => {
+    setLoading(isPersonalChatLoading || isGroupChatsLoading);
+  }, [isPersonalChatLoading, isGroupChatsLoading]);
+  console.log(loading);
   let whatToReturn;
-  (chats.length == 0 || groupChats.length == 0) && !loading
-    ? (whatToReturn = null)
-    : (whatToReturn = mergedChats);
-  return whatToReturn;
+  (chats.length == 0 && groupChats.length == 0) && !loading
+    ? whatToReturn = null
+    : whatToReturn = mergedChats;
+  return { loading, whatToReturn };
 };

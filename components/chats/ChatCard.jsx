@@ -63,9 +63,9 @@ const ChatCard = ({
         setChats(chats);
       });
       setLoading(false);
-      console.log("end");
       return () => unsubscribe();
     }
+      console.log("end");
     // saves to localstorage 
     const myChatsString = JSON.stringify(myArray);
     localStorage.setItem("Chats", myChatsString);
