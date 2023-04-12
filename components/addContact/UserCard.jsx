@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { UserContext } from "../App";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
+import { images } from "@/next.config";
 const UserCard = ({ name, id, image }) => {
   const { setChats, setLoading, ChatObject, setChatObject } = useContext(
     SelectedChannelContext
@@ -40,7 +41,7 @@ const UserCard = ({ name, id, image }) => {
         handleUserClick();
       }}
     >
-      <img src={image} width={50} height={50} />
+      {image ? <img src={image} width={50} height={50} />: <>you have no img</>}
       {name}
     </div>
   );

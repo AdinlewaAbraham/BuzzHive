@@ -12,7 +12,6 @@ export const useGetChats = (currentUserId) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("i ran");
     const conversationRef = collection(db, "conversations");
     const groupRef = collection(db, "groups");
     const groupQuery = query(
@@ -58,7 +57,6 @@ export const useGetChats = (currentUserId) => {
       setisPersonalChatLoading(false);
     });
 
-    console.log("i ran");
     const unsub = onSnapshot(groupQuery, async (querySnapshot) => {
       const groupChats = [];
       for (const doc of querySnapshot.docs) {
@@ -96,11 +94,12 @@ export const useGetChats = (currentUserId) => {
     }
   }, [chats, groupChats, isPersonalChatLoading, isGroupChatsLoading]);
 
-  console.log("i ran");
-  //isGroupChatsLoading && isPersonalChatLoading ? setLoading(true):setLoading(false)
   useEffect(() => {
-    setLoading(isPersonalChatLoading || isGroupChatsLoading);
+    setLoading(isPersonalChatLoading && isGroupChatsLoading);
   }, [isPersonalChatLoading, isGroupChatsLoading]);
+  
+  console.log(isPersonalChatLoading);
+  console.log(isGroupChatsLoading);
   console.log(loading);
   let whatToReturn;
   (chats.length == 0 && groupChats.length == 0) && !loading

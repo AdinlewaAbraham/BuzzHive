@@ -13,32 +13,56 @@ const Chats = () => {
   const [Chats, setChats] = useState(null);
   const [sortedChats, setSortedChats] = useState([]);
   const [Loading, setLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(true);
 
-  console.log(loading);
-  console.log(whatToReturn);
   const chats = whatToReturn;
 
   const getStoredChats = () => {
     const storedData = localStorage.getItem(`${User.id}_userChats`)
-      ? localStorage.getItem(`${User.id}_userChats`)
-      : null;
     return storedData ? JSON.parse(storedData) : null;
   };
+
+  useEffect(() => {
+    function handleOnline() {
+      setIsOnline(true);
+    }
+
+    function handleOffline() {
+      setIsOnline(false);
+    }
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     const storedChats = getStoredChats();
     if (storedChats && storedChats.length) {
       setChats(storedChats);
+      setLoading(false); // Set loading to false after setting the stored chats
     } else {
       setChats(chats);
       localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
+      setLoading(false); // Set loading to false after fetching new chats
     }
-    setLoading(false);
+    if ((chats == null || chats.length == 0) && !loading) {
+      setChats(null);
+    }
   }, [chats, User.id, whatToReturn]);
+
   useEffect(() => {
     const fetchData = async () => {
       // Check if the chat data has changed
-      if (JSON.stringify(chats) !== JSON.stringify(Chats) && !loading) {
+      if (
+        JSON.stringify(chats) !== JSON.stringify(Chats) &&
+        !loading &&
+        isOnline
+      ) {
         localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
 
         setChats(chats);
@@ -59,7 +83,6 @@ const Chats = () => {
   }, [Chats]);
 
   const { ShowAddGroup, setShowAddGroup } = useContext(SelectedChannelContext);
-  console.log(Chats);
   return (
     <>
       <div className="h-[10vh] min-h-[100px]">
@@ -85,12 +108,11 @@ const Chats = () => {
         />
       </div>
       {console.log(Chats)}
-      {Loading || Chats == null ? (
-        <>Loading......</>
+      {sortedChats.length === 0 && !Loading && Chats == null ? (
+        <>you have nothing </>
       ) : (
         <>
-          {console.log(chats)}
-          {Chats.length !== 0 ? (
+          {sortedChats.length !== 0 ? (
             <div className="overflow-y-auto overflow-x-hidden h-[calc(100vh-50px)]  md:h-[85vh]">
               {sortedChats.map((chat) => (
                 <ChatCard
@@ -111,7 +133,7 @@ const Chats = () => {
               ))}
             </div>
           ) : (
-            <>you have no chats</>
+            <>loading....</>
           )}
         </>
       )}
