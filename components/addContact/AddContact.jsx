@@ -22,7 +22,7 @@ const AddContact = () => {
         <UserCard name={user.name} id={user.id} image={user.photoUrl} />
       ))}
       {loading &&
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((key) => (
+        [1, 2, 3, 4].map((key) => (
           <div
             className="rounded-lg flex cursor-pointer items-center px-4 py-3 "
             key={key}

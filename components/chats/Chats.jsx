@@ -1,7 +1,6 @@
 import { useContext, useState, useMemo, useEffect } from "react";
 import { useGetChats } from "@/hooks/useGetChats";
 import ChatCard from "./ChatCard";
-import AddGroup from "../addGroup/AddGroup";
 import { MdGroupAdd } from "react-icons/md";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
@@ -73,7 +72,7 @@ const Chats = () => {
     // Fetch new data every 10 minutes
     const interval = setInterval(fetchData, 600000);
     return () => clearInterval(interval);
-  }, [User.id, chats,loading]);
+  }, [User.id, chats, loading]);
 
   useMemo(() => {
     if (!Chats) return;
@@ -83,38 +82,40 @@ const Chats = () => {
     setSortedChats(sortedChats);
   }, [Chats]);
 
-  const { ShowAddGroup, setShowAddGroup } = useContext(SelectedChannelContext);
+  const { ShowAddGroup, setShowAddGroup, setSelectedChannel } = useContext(
+    SelectedChannelContext
+  );
   return (
-    <>
-      <div className="h-[10vh] min-h-[100px]">
-        <div className="flex justify-between items-center ">
+    <div className="">
+      <div className="h-[95px]">
+        <div className="flex justify-between items-center px-2 ">
           <h1 className="text-2xl ">Chats</h1>{" "}
           <div className="relative">
             <i
               onClick={() => {
-                setShowAddGroup(!ShowAddGroup);
+                setSelectedChannel("addGroup");
               }}
               className="cursor-pointer"
             >
               <MdGroupAdd size={24} />
             </i>
-            {ShowAddGroup && <AddGroup />}
           </div>
         </div>
-
-        <input
-          type="text"
-          placeholder="Search your chats"
-          className="w-full my-5"
-        />
+        <div className=" flex justify-center items-center">
+          <input
+            type="text"
+            placeholder="Search"
+            className="w-[90%] my-5 rounded-lg px-3 py-2 dark:bg-[#12171d] "
+          />
+        </div>
       </div>
-      {console.log(Chats)}
       {sortedChats.length === 0 && !Loading && Chats == null ? (
         <>you have nothing </>
       ) : (
         <>
           {sortedChats.length !== 0 ? (
-            <div className="overflow-y-auto overflow-x-hidden h-[calc(100vh-50px)]  md:h-[85vh]">
+            <div className="flex flex-col items-center overflow-y-auto pt-[2px] pr-[2px] overflow-x-hidden md:h-[calc(100vh-125px)] h-[calc(100vh-195px)] mt-2 my-element scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
+            scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar-">
               {sortedChats.map((chat) => (
                 <ChatCard
                   key={chat.id}
@@ -138,7 +139,7 @@ const Chats = () => {
           )}
         </>
       )}
-    </>
+    </div>
   );
 };
 

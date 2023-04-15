@@ -10,6 +10,7 @@ import reactTomessage from "@/utils/messagesUtils/reactToMessage";
 import getMessageReactions from "@/utils/messagesUtils/getMessageReactions";
 import { GiCancel } from "react-icons/gi";
 import { AiOutlineSearch } from "react-icons/ai";
+import {BiArrowBack} from "react-icons/bi"
 
 const MessageCard = ({ chat }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
@@ -32,7 +33,7 @@ const MessageCard = ({ chat }) => {
 
   return (
     <div
-      className={`flex items-center my-2 justify-start${
+      className={`flex items-center my-2 justify-start ${
         chat.senderId === currentId ? " flex-row-reverse" : " "
       } ${chat.reactions.length === 0 ? "" : "mb-[30px]"} `}
       key={chat.id}
@@ -40,8 +41,8 @@ const MessageCard = ({ chat }) => {
       <div
         className={`text-left rounded-lg p-2 max-w-[80%] relative ${
           chat.senderId === currentId
-            ? " text-white text-right ml-2 bg-green-500 mr-5"
-            : "bg-red-800 text-white text-left mr-2 ml-5"
+            ? " text-white text-right ml-2 dark:bg-[#296eff] mr-5"
+            : "dark:bg-[#252d35] text-white text-left mr-2 ml-5"
         }  `}
       >
         {chat.text}
@@ -118,9 +119,9 @@ const ContentContainer = () => {
       setPhotoUrl(ChatObject.photoUrl.props.src);
     }
   }, [ChatObject]);
-  useEffect(()=>{
-   if (!IsMobile) setshowChats(true)
-  },[IsMobile])
+  useEffect(() => {
+    if (!IsMobile) setshowChats(true);
+  }, [IsMobile]);
 
   useMemo(() => {
     setSortedChats(Chats.sort((a, b) => a.timestamp - b.timestamp));
@@ -128,16 +129,15 @@ const ContentContainer = () => {
 
   if (ChatObject.activeChatId == "") {
     return (
-      <div className="bg-gray-300 dark:bg-gray-700 flex-1 overflow-hidden hidden items-center justify-center md:flex">
+      <div className="bg-gray-300 dark:bg-[#12171d]  flex-1 overflow-hidden hidden items-center justify-center md:flex">
         no active chat right now
       </div>
     );
   }
   return (
-    showChats &&
-    (
+    showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
-        <div className=" flex-col relative bg-gray-300 dark:bg-gray-700  overflow-y-auto inset md:flex ">
+        <div className=" flex-col relative bg-gray-300 dark:bg-[#12171d]  overflow-y-auto inset md:flex ">
           {showProfile && (
             <div className="bg-pink-500 inset-0 absolute z-30 ">
               <div
@@ -146,24 +146,26 @@ const ContentContainer = () => {
                   setshowProfile(false);
                 }}
               >
-                <GiCancel size={30} />
+                <div className="cursor-pointer">
+                  <GiCancel size={30} />
+                </div>
               </div>
             </div>
           )}
           <div
-            className="flex justify-between items-center bg-gray-700 w-full p-4 z-20 border-b cursor-pointer"
+            className="flex justify-between  items-center dark:bg-[#1d232a] w-full p-[13px] max-h-[66px] z-20 cursor-pointer"
             onClick={() => {
               //setshowProfile(true);
             }}
           >
-            <div className="flex">
+            <div className="flex items-center">
               {IsMobile && (
-                <div
+                <div className="mr-[15px]"
                   onClick={() => {
                     setshowChats(false);
                   }}
                 >
-                  back
+                  <BiArrowBack size={20}/>
                 </div>
               )}
               <div
@@ -195,19 +197,19 @@ const ContentContainer = () => {
               <AiOutlineSearch />
             </div>
           </div>
-          <main
-            className="my-element overflow-y-auto scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
-         scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar- transition-all duration-300"
-            style={{ height: "calc(100vh - 124px)" }}
-          >
+          <main className="h-[calc(100vh-123px)] flex flex-col justify-end">
             {Loading ? (
               <div className="text-center text-2xl">Loading</div>
             ) : (
-              <div className="my-[20px]">
+              <div
+                className="my-[20px] w-full  my-element overflow-y-auto scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
+              scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar- transition-all duration-300"
+              >
                 {sortedChats &&
                   sortedChats.map((chat) => <MessageCard chat={chat} />)}
               </div>
             )}
+            <div id="scrollToMe"></div>
           </main>
           <Input />
         </div>

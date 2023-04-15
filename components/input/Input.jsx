@@ -8,7 +8,6 @@ import { BsEmojiSmile } from "react-icons/bs";
 import EmojiPicker from "emoji-picker-react";
 import { AiOutlineSend } from "react-icons/ai";
 
-
 const Input = () => {
   const { User } = useContext(UserContext);
   const { ChatObject, setChatObject, setChats } = useContext(
@@ -25,7 +24,7 @@ const Input = () => {
         text: message,
         senderId: senderid,
         timeStamp: time,
-        reactions: []
+        reactions: [],
       };
       setChats((prevChats) => [...prevChats, messageObj]);
       sendGroupMessage(User.id, ChatObject.activeChatId, message, time);
@@ -35,18 +34,21 @@ const Input = () => {
         text: message,
         senderId: senderid,
         timeStamp: time,
-        reactions: []
+        reactions: [],
       };
       setChats((prevChats) => [...prevChats, messageObj]);
       sendMessage(senderid, ChatObject.otherUserId, message, senderid, time);
     }
+    //location.href = "#scrollToMe"
+    document
+      .getElementById("scrollToMe")
+      .scrollIntoView({ behavior: "smooth" });
     setmessage("");
   }
 
   const [showEmojiPicker, setshowEmojiPicker] = useState(false);
 
   useEffect(() => {
-    // add event listener to document object
     const handleClickOutside = (e) => {
       if (e.target.closest(".detectme") === null) {
         setshowEmojiPicker(false);
@@ -64,13 +66,13 @@ const Input = () => {
   }
   return (
     <>
-      <div className="flex bg-white items-center justify-between px-[4px] py-[8px] w-full">
+      <div className="flex dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px] w-full">
         <div className="relative">
           <div
-            className="detectme bg-red-600 p-[10px] bg-transparent"
+            className="detectme bg-red-600 p-[10px] bg-transparent text-[#aaabaf] hover:text-white "
             onClick={() => setshowEmojiPicker(!showEmojiPicker)}
           >
-            <BsEmojiSmile color="black" />
+            <BsEmojiSmile />
           </div>
           {showEmojiPicker && (
             <div className="fixed bottom-[60px] left-[20%] detectme ">
@@ -87,7 +89,7 @@ const Input = () => {
         </div>
         <input
           type="text"
-          className="text-black  px-4 py-2 bg-transparent w-full outline-none placeholder-black"
+          className="text-white  px-4 py-2 bg-transparent w-full outline-none placeholder-[#aaabaf]"
           placeholder="Type a message"
           value={message}
           onKeyDown={handleInputKeyDown}
@@ -99,10 +101,10 @@ const Input = () => {
           onClick={() => {
             handleSend();
           }}
-          className="bg-transparent p-[10px]"
+          className="bg-transparent p-[10px] text-[#aaabaf] hover:text-white "
         >
           {" "}
-          <AiOutlineSend color="black" />
+          <AiOutlineSend/>
         </div>
       </div>
     </>

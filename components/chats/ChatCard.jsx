@@ -1,10 +1,10 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { getConversation } from "@/utils/conversations/getConversation";
 import { collection, onSnapshot, query, getDocs } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";
-import FaUserCircle from "react-icons/fa";
+import {FaUserAlt} from "react-icons/fa";
 const ChatCard = ({
   img,
   name,
@@ -15,9 +15,15 @@ const ChatCard = ({
   type,
   otherUserId,
 }) => {
-  const { setChats, Chats ,setLoading, ChatObject, setChatObject, setshowChats } = useContext(
-    SelectedChannelContext
-  );
+  const {
+    setChats,
+    Chats,
+    setLoading,
+    ChatObject,
+    setChatObject,
+    setshowChats,
+  } = useContext(SelectedChannelContext);
+
   const handleChatClick = async () => {
     console.log("start");
     setLoading(true);
@@ -29,15 +35,14 @@ const ChatCard = ({
       photoUrl: img,
       displayName: `${name}`,
     });
-    setshowChats(true)
+    setshowChats(true);
 
-    // checks local storage for cached chats
     if (localStorage.getItem("Chats")) {
-      console.log("checking local storage")
+      console.log("checking local storage");
       const myArrayString = localStorage.getItem("Chats");
       const myArray = JSON.parse(myArrayString);
     } else {
-      console.log("fetching from sever ")
+      console.log("fetching from sever ");
       let q;
       if (type === "group") {
         q = query(collection(db, "groups", id, "messages"));
@@ -66,12 +71,13 @@ const ChatCard = ({
       setLoading(false);
       return () => unsubscribe();
     }
-      console.log("end");
-    // saves to localstorage 
+    console.log("end");
+
     const myChatsString = JSON.stringify(myArray);
     localStorage.setItem("Chats", myChatsString);
   };
-
+  const [invalidURL, setinvalidURL] = useState(true);
+ 
   return (
     <div
       className={`${
@@ -84,23 +90,24 @@ const ChatCard = ({
         handleChatClick();
       }}
     >
-      <div className="flex flex-row  align-middle items-center">
+      <div className="flex flex-row  align-middle items-center w-full">
         <div className="w-[50px] h-[50px] mr-3 flex items-center justify-center bg-gray-500 rounded-full">
-          {img ? (
+          {img && invalidURL ? (
             <img
               src={img}
-              alt=""
+              alt="profile pic"
               className="rounded-full object-cover h-full w-full"
+              onError={()=>setinvalidURL(false)}
             />
           ) : type === "group" ? (
             <MdGroup size={35} />
           ) : (
-            <FaUserCircle />
+            <FaUserAlt size={22} />
           )}
         </div>
-        <div>
+        <div className=" truncate w-[90%]">
           <h3>{name}</h3>
-          <div className="flex flex-row truncate">
+          <div className="flex flex-row">
             <p>{sender}</p>: <p> {message}</p>
           </div>
         </div>

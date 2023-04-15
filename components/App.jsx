@@ -30,17 +30,26 @@ const App = () => {
           const userSnapshot = await getDoc(doc(db, "users", u.uid));
           const userData = userSnapshot.data();
           setUser(userData);
+          localStorage.setItem("user", JSON.stringify(userData)); // Save user data to local storage
         } else {
           setUser(userData);
+          localStorage.setItem("user", JSON.stringify(userData)); // Save user data to local storage
         }
       } else {
         setUser(null);
-        console.log("user signed out");
         setIsAuthed(false);
       }
     });
 
     return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+      setIsAuthed(true);
+    }
   }, []);
 
   const memoizedUser = useMemo(() => User, [User]);
@@ -53,14 +62,15 @@ const App = () => {
       {isAuthed ? (
         <UserContext.Provider value={{ User, setUser }}>
           <SelectedChannelProvider>
-            <div className="flex flex-col-reverse h-full md:flex-row">
+            <div className="flex flex-col-reverse h-full md:flex-row w-full overflow-y-hidden">
               <SideBar />
               <ChannelBar />
               <ContentContainer />
             </div>
           </SelectedChannelProvider>
         </UserContext.Provider>
-      ) : (
+      ) : null} 
+      {!isAuthed ? (
         <div className="h-screen flex justify-center items-center">
           <button
             className="bg-green-600 px-2 py-4 rounded-lg"
@@ -71,7 +81,7 @@ const App = () => {
             sign in with google{" "}
           </button>
         </div>
-      )}
+      ) : null}
     </>
   );
 };
