@@ -1,10 +1,9 @@
 import { useContext, useEffect, useState, useRef } from "react";
-import { getConversation } from "@/utils/conversations/getConversation";
 import { collection, onSnapshot, query, getDocs } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";
-import {FaUserAlt} from "react-icons/fa";
+import { FaUserAlt } from "react-icons/fa";
 const ChatCard = ({
   img,
   name,
@@ -15,69 +14,92 @@ const ChatCard = ({
   type,
   otherUserId,
 }) => {
-  const {
-    setChats,
-    Chats,
-    setLoading,
-    ChatObject,
-    setChatObject,
-    setshowChats,
-  } = useContext(SelectedChannelContext);
+  const { setChats, ChatObject, setChatObject, setshowChats } = useContext(
+    SelectedChannelContext
+  );
+  const [invalidURL, setinvalidURL] = useState(true);
 
   const handleChatClick = async () => {
-    console.log("start");
-    setLoading(true);
+    if (ChatObject.activeChatId === id) {
+      return;
+    }
     setChatObject({
-      ...ChatObject,
-      activeChatId: `${id}`,
-      activeChatType: `${type}`,
-      otherUserId: `${otherUserId}`,
+      activeChatId: id,
+      activeChatType: type,
+      otherUserId: otherUserId,
       photoUrl: img,
-      displayName: `${name}`,
+      displayName: name,
     });
     setshowChats(true);
+  };
 
-    if (localStorage.getItem("Chats")) {
+  useEffect(() => {
+    if (
+      localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&
+      localStorage.getItem(`${ChatObject.activeChatId}`)
+    ) {
+      console.log(ChatObject.activeChatId);
+      console.log(localStorage.getItem(`${ChatObject.activeChatId}`));
       console.log("checking local storage");
-      const myArrayString = localStorage.getItem("Chats");
-      const myArray = JSON.parse(myArrayString);
+      const ChatString = localStorage.getItem(`${ChatObject.activeChatId}`);
+      const Chat = JSON.parse(ChatString);
+      setChats(Chat);
     } else {
+      setChats(null);
+      if (ChatObject.activeChatId == [""]) {
+        return;
+      }
       console.log("fetching from sever ");
+      console.log(ChatObject.activeChatId);
+      console.log(id);
       let q;
       if (type === "group") {
-        q = query(collection(db, "groups", id, "messages"));
+        q = query(
+          collection(db, "groups", ChatObject.activeChatId, "messages")
+        );
       } else if (type === "personal") {
-        q = query(collection(db, "conversations", id, "messages"));
+        q = query(
+          collection(db, "conversations", ChatObject.activeChatId, "messages")
+        );
       }
-      const unsubscribe = onSnapshot(q, async (snapshot) => {
-        let chats = [];
-        const promises = [];
-        for (const doc of snapshot.docs) {
-          let chat = doc.data();
-          const reactionsRef = collection(doc.ref, "reactions");
-          const promise = getDocs(reactionsRef).then((querySnapshot) => {
-            let reactionsArray = [];
-            querySnapshot.forEach((doc) => {
-              reactionsArray.push(doc.data());
-            });
-            chat.reactions = reactionsArray;
-          });
-          promises.push(promise);
-          chats.push(chat);
-        }
-        await Promise.all(promises);
-        setChats(chats);
-      });
-      setLoading(false);
-      return () => unsubscribe();
-    }
-    console.log("end");
 
-    const myChatsString = JSON.stringify(myArray);
-    localStorage.setItem("Chats", myChatsString);
-  };
-  const [invalidURL, setinvalidURL] = useState(true);
- 
+      const fetchChats = async () => {
+        console.log(ChatObject.activeChatId);
+        try {
+          const unsubscribe = onSnapshot(q, async (snapshot) => {
+            let chats = [];
+            const promises = [];
+            for (const doc of snapshot.docs) {
+              let chat = doc.data();
+              const reactionsRef = collection(doc.ref, "reactions");
+              const promise = getDocs(reactionsRef).then((querySnapshot) => {
+                let reactionsArray = [];
+                querySnapshot.forEach((doc) => {
+                  reactionsArray.push(doc.data());
+                });
+                chat.reactions = reactionsArray;
+              });
+              promises.push(promise);
+              chats.push(chat);
+            }
+            await Promise.all(promises);
+            setChats(chats);
+            console.log(ChatObject.activeChatId);
+            localStorage.setItem(
+              `${ChatObject.activeChatId}`,
+              JSON.stringify(chats)
+            );
+          });
+          return () => unsubscribe();
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      fetchChats();
+    }
+  }, [ChatObject]);
+
   return (
     <div
       className={`${
@@ -97,7 +119,7 @@ const ChatCard = ({
               src={img}
               alt="profile pic"
               className="rounded-full object-cover h-full w-full"
-              onError={()=>setinvalidURL(false)}
+              onError={() => setinvalidURL(false)}
             />
           ) : type === "group" ? (
             <MdGroup size={35} />

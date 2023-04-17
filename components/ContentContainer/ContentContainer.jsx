@@ -10,7 +10,7 @@ import reactTomessage from "@/utils/messagesUtils/reactToMessage";
 import getMessageReactions from "@/utils/messagesUtils/getMessageReactions";
 import { GiCancel } from "react-icons/gi";
 import { AiOutlineSearch } from "react-icons/ai";
-import {BiArrowBack} from "react-icons/bi"
+import { BiArrowBack } from "react-icons/bi";
 
 const MessageCard = ({ chat }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
@@ -35,7 +35,7 @@ const MessageCard = ({ chat }) => {
     <div
       className={`flex items-center my-2 justify-start ${
         chat.senderId === currentId ? " flex-row-reverse" : " "
-      } ${chat.reactions.length === 0 ? "" : "mb-[30px]"} `}
+      } ${ chat.reactions.length === 0 ? "" : "mb-[30px]"} `}
       key={chat.id}
     >
       <div
@@ -90,9 +90,14 @@ const MessageCard = ({ chat }) => {
 };
 
 const ContentContainer = () => {
-  const { Chats, Loading, ChatObject, showChats, setshowChats } = useContext(
-    SelectedChannelContext
-  );
+  const {
+    Chats,
+    ChatObject,
+    setChatObject,
+    showChats,
+    setshowChats,
+  } = useContext(SelectedChannelContext);
+  console.log(Chats)
 
   const [sortedChats, setSortedChats] = useState([]);
   const [photoUrl, setPhotoUrl] = useState(null);
@@ -124,9 +129,10 @@ const ContentContainer = () => {
   }, [IsMobile]);
 
   useMemo(() => {
-    setSortedChats(Chats.sort((a, b) => a.timestamp - b.timestamp));
+    if (Chats) {
+      setSortedChats(Chats.sort((a, b) => a.timestamp - b.timestamp));
+    }
   }, [Chats]);
-
   if (ChatObject.activeChatId == "") {
     return (
       <div className="bg-gray-300 dark:bg-[#12171d]  flex-1 overflow-hidden hidden items-center justify-center md:flex">
@@ -160,12 +166,14 @@ const ContentContainer = () => {
           >
             <div className="flex items-center">
               {IsMobile && (
-                <div className="mr-[15px]"
+                <div
+                  className="mr-[15px]"
                   onClick={() => {
                     setshowChats(false);
+                    setChatObject({...ChatObject, activeChatId: ""})
                   }}
                 >
-                  <BiArrowBack size={20}/>
+                  <BiArrowBack size={20} />
                 </div>
               )}
               <div
@@ -198,12 +206,12 @@ const ContentContainer = () => {
             </div>
           </div>
           <main className="h-[calc(100vh-123px)] flex flex-col justify-end">
-            {Loading ? (
+            {Chats == null ? (
               <div className="text-center text-2xl">Loading</div>
             ) : (
               <div
                 className="my-[20px] w-full  my-element overflow-y-auto scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
-              scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar- transition-all duration-300"
+              scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar- "
               >
                 {sortedChats &&
                   sortedChats.map((chat) => <MessageCard chat={chat} />)}

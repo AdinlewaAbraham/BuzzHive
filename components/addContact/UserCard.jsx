@@ -3,14 +3,13 @@ import { useContext } from "react";
 import { UserContext } from "../App";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
-import { images } from "@/next.config";
 const UserCard = ({ name, id, image }) => {
-  const { setChats, setLoading, ChatObject, setChatObject } = useContext(
+  const { setChats, setIsChatsLoading, ChatObject, setChatObject } = useContext(
     SelectedChannelContext
   );
   const { User } = useContext(UserContext);
   const handleUserClick = async () => {
-    setLoading(true);
+    setIsChatsLoading(true);
     const activeChatId = User.id > id ? User.id + id : id + User.id;
      setChatObject({
       ...ChatObject,
@@ -28,9 +27,7 @@ const UserCard = ({ name, id, image }) => {
       });
       setChats(chats); // Update the state with the latest data
     });
-    setLoading(false);
-
-    setLoading(false);
+    setIsChatsLoading(false);
   };
 
   return (

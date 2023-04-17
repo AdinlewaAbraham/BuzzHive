@@ -43,13 +43,13 @@ const Chats = () => {
     const storedChats = getStoredChats();
     if (storedChats && storedChats.length) {
       setChats(storedChats);
-      setLoading(false); // Set loading to false after setting the stored chats
+      setLoading(false); 
     } else {
       setChats(chats);
       chats == null
         ? 0
         : localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
-      setLoading(false); // Set loading to false after fetching new chats
+      setLoading(false); 
     }
     if ((chats == null || chats.length == 0) && !loading) {
       setChats(null);
@@ -58,7 +58,6 @@ const Chats = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Check if the chat data has changed
       if (
         JSON.stringify(chats) !== JSON.stringify(getStoredChats()) &&
         !loading &&
@@ -69,9 +68,6 @@ const Chats = () => {
       }
     };
     fetchData();
-    // Fetch new data every 10 minutes
-    const interval = setInterval(fetchData, 600000);
-    return () => clearInterval(interval);
   }, [User.id, chats, loading]);
 
   useMemo(() => {
