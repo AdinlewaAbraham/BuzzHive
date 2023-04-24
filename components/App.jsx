@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext, useMemo } from "react";
+import React, { useEffect, useState, createContext, useMemo, use } from "react";
 import SideBar from "./sidebar/SideBar";
 import ChannelBar from "./ChannelBar/ChannelBar";
 import ContentContainer from "./ContentContainer/ContentContainer";
@@ -8,7 +8,7 @@ import { SelectedChannelProvider } from "@/context/SelectedChannelContext ";
 import { SigninWithGoogle } from "@/utils/userAuthentication/SigninWithGoogle";
 
 import { createUser } from "@/utils/userUtils/createUser";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 
 export const UserContext = createContext();
@@ -45,8 +45,25 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    console.log(User);
+    if (!User) {
+      return;
+    }
+    const q = doc(db, "users", User.id);
+    const unsub = onSnapshot(q, async (doc) => {
+      console.log(doc.data());
+      setUser(doc.data());
+      localStorage.setItem("user", JSON.stringify(doc.data()));
+      console.log(localStorage.getItem("user"));
+    });
+    return () => {
+      unsub();
+    };
+  }, []);
+
+  useEffect(() => {
     const userData = localStorage.getItem("user");
-    if (userData) {
+    if (userData !== "undefined" && userData.length !== "undefined") {
       setUser(JSON.parse(userData));
       setIsAuthed(true);
     }
@@ -69,7 +86,7 @@ const App = () => {
             </div>
           </SelectedChannelProvider>
         </UserContext.Provider>
-      ) : null} 
+      ) : null}
       {!isAuthed ? (
         <div className="h-screen flex justify-center items-center">
           <button

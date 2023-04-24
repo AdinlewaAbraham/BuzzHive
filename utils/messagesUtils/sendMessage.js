@@ -14,6 +14,7 @@ export async function sendMessage(
     text: messageText,
     senderId: senderId,
     timestamp: time,
+    reactions: [],
   };
 
   try {
@@ -28,6 +29,7 @@ export async function sendMessage(
       senderId: senderId,
       senderDisplayName: user.name,
       timestamp: time,
+      readBy: [],
     };
     await setDoc(newConversationRef, newConversationData);
 

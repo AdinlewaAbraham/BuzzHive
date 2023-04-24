@@ -5,9 +5,6 @@ import { useContext } from "react";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
 export const getGroupMessages = async (groupId) => {
-  const { setChats, setLoading, ChatObject } = useContext(
-    SelectedChannelContext
-  );
   const q = query(collection(db, "groups", groupId, "messages"));
   const [chats, setchats] = useState([]);
   let s = [];

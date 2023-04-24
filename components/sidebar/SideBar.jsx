@@ -9,6 +9,8 @@ import { getAuth, signOut } from "firebase/auth";
 import { UserContext } from "../App";
 
 import { BiLogOut } from "react-icons/bi";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/utils/firebaseUtils/firebase";
 
 const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
   const { setSelectedChannel, selectedChannel } = useContext(
@@ -102,6 +104,13 @@ const SideBar = () => {
         {renderThemeChanger()}
         <SideBarIcon icon={<AiOutlineSetting size={22} />} />
       </i>
+      <button className="text-white" onClick={async()=>{
+        console.log(User)
+        const userref = doc(db, "users", User.id)
+        await updateDoc(userref, {darkMode: Math.random()})
+      }}>
+        modify user
+      </button>
       <div className=" flex justify-center items-center cursor-pointer">
         <img src={User.photoUrl} alt="" className="rounded-lg w-[30px] h-[30px] " />
       </div>

@@ -4,17 +4,25 @@ import ChatCard from "./ChatCard";
 import { MdGroupAdd } from "react-icons/md";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
+import {
+  onSnapshot,
+  doc,
+} from "firebase/firestore";
+import { db } from "@/utils/firebaseUtils/firebase";
 import { UserContext } from "../App";
 
 const Chats = () => {
   const { User } = useContext(UserContext);
   const { loading, whatToReturn } = useGetChats(User.id);
-  const [Chats, setChats] = useState(null);
+  const [Chats, set_Chats] = useState(null);
   const [sortedChats, setSortedChats] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
 
   const chats = whatToReturn;
+  const { setSelectedChannel} = useContext(
+    SelectedChannelContext
+  );
 
   const getStoredChats = () => {
     const storedData = localStorage.getItem(`${User.id}_userChats`);
@@ -38,21 +46,25 @@ const Chats = () => {
       window.removeEventListener("offline", handleOffline);
     };
   }, []);
-
+  console.log(JSON.parse(localStorage.getItem(`${User.id}_userChats`)));
   useEffect(() => {
     const storedChats = getStoredChats();
+    console.log(storedChats);
     if (storedChats && storedChats.length) {
-      setChats(storedChats);
-      setLoading(false); 
+      console.log(storedChats);
+      set_Chats(storedChats);
+      setLoading(false);
     } else {
-      setChats(chats);
+      console.log("ranning")
+      console.log(chats);
+      set_Chats(chats);
       chats == null
         ? 0
         : localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
-      setLoading(false); 
+      setLoading(false);
     }
     if ((chats == null || chats.length == 0) && !loading) {
-      setChats(null);
+      set_Chats(null);
     }
   }, [chats, User.id, whatToReturn]);
 
@@ -64,23 +76,32 @@ const Chats = () => {
         isOnline
       ) {
         localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
-        setChats(chats);
+        set_Chats(chats);
       }
     };
     fetchData();
-  }, [User.id, chats, loading]);
 
-  useMemo(() => {
+    const q = doc(db, "users", User.id);
+    const unsub = onSnapshot(q, async (doc) => {
+      localStorage.setItem("user", JSON.stringify(doc.data()));
+    });
+    return () => {
+      unsub();
+    };
+  }, [User, chats, loading]);
+
+  useEffect(() => {}, []);
+
+  useMemo(async () => {
     if (!Chats) return;
     const sortedChats = Chats.slice().sort(
       (a, b) => b.timestamp.seconds - a.timestamp.seconds
     );
     setSortedChats(sortedChats);
   }, [Chats]);
+  console.log(Chats);
+  console.log(sortedChats);
 
-  const { ShowAddGroup, setShowAddGroup, setSelectedChannel } = useContext(
-    SelectedChannelContext
-  );
   return (
     <div className="">
       <div className="h-[95px]">
@@ -110,8 +131,10 @@ const Chats = () => {
       ) : (
         <>
           {sortedChats.length !== 0 ? (
-            <div className="flex flex-col items-center overflow-y-auto pt-[2px] pr-[2px] overflow-x-hidden md:h-[calc(100vh-125px)] h-[calc(100vh-195px)] mt-2 my-element scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
-            scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar-">
+            <div
+              className="flex flex-col items-center overflow-y-auto pt-[2px] pr-[2px] overflow-x-hidden md:h-[calc(100vh-125px)] h-[calc(100vh-195px)] mt-2 my-element scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
+            scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar-"
+            >
               {sortedChats.map((chat) => (
                 <ChatCard
                   key={chat.id}
@@ -126,6 +149,7 @@ const Chats = () => {
                       : chat.lastMessageSenderName
                   }
                   message={chat.lastMessage}
+                  unReadCount={chat.unReadmessagesCount}
                   //  timestamp={chat.timestamp}
                 />
               ))}

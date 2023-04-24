@@ -30,7 +30,7 @@ const MessageCard = ({ chat }) => {
       ChatObject.activeChatType
     );
   };
-
+  console.log(chat);
   return (
     <div
       className={`flex items-center my-2 justify-start ${
@@ -90,14 +90,9 @@ const MessageCard = ({ chat }) => {
 };
 
 const ContentContainer = () => {
-  const {
-    Chats,
-    ChatObject,
-    setChatObject,
-    showChats,
-    setshowChats,
-  } = useContext(SelectedChannelContext);
-  console.log(Chats)
+  const { Chats, ChatObject, setChatObject, showChats, setshowChats } =
+    useContext(SelectedChannelContext);
+  console.log(Chats);
 
   const [sortedChats, setSortedChats] = useState([]);
   const [photoUrl, setPhotoUrl] = useState(null);
@@ -129,6 +124,7 @@ const ContentContainer = () => {
   }, [IsMobile]);
 
   useMemo(() => {
+    if(Chats == []) return
     if (Chats) {
       setSortedChats(Chats.sort((a, b) => a.timestamp - b.timestamp));
     }
@@ -140,6 +136,7 @@ const ContentContainer = () => {
       </div>
     );
   }
+  console.log(Chats);
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
@@ -170,7 +167,7 @@ const ContentContainer = () => {
                   className="mr-[15px]"
                   onClick={() => {
                     setshowChats(false);
-                    setChatObject({...ChatObject, activeChatId: ""})
+                    setChatObject({ ...ChatObject, activeChatId: "" });
                   }}
                 >
                   <BiArrowBack size={20} />
@@ -208,13 +205,15 @@ const ContentContainer = () => {
           <main className="h-[calc(100vh-123px)] flex flex-col justify-end">
             {Chats == null ? (
               <div className="text-center text-2xl">Loading</div>
+            ) : Chats.length == 0 ? (
+              <>you have nothing </>
             ) : (
               <div
                 className="my-[20px] w-full  my-element overflow-y-auto scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
               scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar- "
               >
                 {sortedChats &&
-                  sortedChats.map((chat) => <MessageCard chat={chat} />)}
+                  Chats.map((chat) => <MessageCard chat={chat} />)}
               </div>
             )}
             <div id="scrollToMe"></div>

@@ -15,6 +15,7 @@ export const sendGroupMessage = async (
     timestamp: time,
     senderId: senderId,
     groupID: groupID,
+    reactions: [],
   };
   const user = await getUser(senderId);
   const newMessage = {
@@ -23,6 +24,7 @@ export const sendGroupMessage = async (
     senderId: senderId,
     senderDisplayName: user.name,
     senderDisplayImg: user.photoUrl,
+    readBy: [],
   };
   try {
     const messagesRef = collection(groupRef, "messages");

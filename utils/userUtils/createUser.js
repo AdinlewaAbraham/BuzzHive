@@ -18,6 +18,7 @@ export const createUser = async (uid, displayname, email, photoUrl, bio) => {
       sentFriendRequests: [],
       receivedFriendRequests: [],
       darkMode: false,
+      unReadMessages: {}
     });
     console.log("User added to Firebase successfully");
   } catch (error) {

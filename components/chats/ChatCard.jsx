@@ -1,9 +1,22 @@
-import { useContext, useEffect, useState, useRef } from "react";
-import { collection, onSnapshot, query, getDocs } from "firebase/firestore";
+import { useContext, useEffect, useState, useRef, useMemo } from "react";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  doc,
+  updateDoc,
+  getDoc,
+  Timestamp,
+} from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
+import Chats from "./Chats";
+import { UserContext } from "../App";
 const ChatCard = ({
   img,
   name,
@@ -13,11 +26,18 @@ const ChatCard = ({
   id,
   type,
   otherUserId,
+  unReadCount,
 }) => {
   const { setChats, ChatObject, setChatObject, setshowChats } = useContext(
     SelectedChannelContext
   );
+  const { User } = useContext(UserContext);
   const [invalidURL, setinvalidURL] = useState(true);
+
+  const getStoredChats = () => {
+    const storedData = localStorage.getItem(`${User.id}_userChats`);
+    return storedData ? JSON.parse(storedData) : null;
+  };
 
   const handleChatClick = async () => {
     if (ChatObject.activeChatId === id) {
@@ -31,75 +51,156 @@ const ChatCard = ({
       displayName: name,
     });
     setshowChats(true);
+    const userRef = doc(db, "users", User.id);
+
+    const messages = JSON.parse(localStorage.getItem(id));
+    console.log(messages);
+    if (messages || JSON.stringify(message == "[]")) {
+      return;
+    }
+    const lastMessage = messages[messages.length - 1];
+    console.log(lastMessage);
+    const Chats = getStoredChats();
+    console.log(Chats);
+
+    const updatedArr = Chats.map((obj) => {
+      if (obj.id == id) {
+        return { ...obj, unReadmessagesCount: 0 };
+      } else {
+        return obj;
+      }
+    });
+
+    localStorage.setItem(
+      `${User.id}_userChats`,
+      JSON.stringify(
+        updatedArr.sort((a, b) => {
+          a.timestamp - b.timestamp;
+        })
+      )
+    );
+
+    if (lastMessage) {
+      await updateDoc(userRef, {
+        [`unReadMessages.${id}`]: lastMessage.timestamp,
+      }).then(async () => {
+        const userSnapshot = await getDoc(userRef);
+        localStorage.setItem("user", JSON.stringify(userSnapshot.data()));
+      });
+    }
   };
 
   useEffect(() => {
+    console.log("ran");
+    if (ChatObject.activeChatId === "") return;
+
+    setChats(null);
+
     if (
       localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&
+      localStorage.getItem(`${ChatObject.activeChatId}`) !== "{}" &&
+      localStorage.getItem(`${ChatObject.activeChatId}`) !== "undefined" &&
+      localStorage.getItem(`${ChatObject.activeChatId}`) !== "null" &&
       localStorage.getItem(`${ChatObject.activeChatId}`)
     ) {
-      console.log(ChatObject.activeChatId);
-      console.log(localStorage.getItem(`${ChatObject.activeChatId}`));
-      console.log("checking local storage");
       const ChatString = localStorage.getItem(`${ChatObject.activeChatId}`);
       const Chat = JSON.parse(ChatString);
+      console.log(Chat);
       setChats(Chat);
     } else {
-      setChats(null);
-      if (ChatObject.activeChatId == [""]) {
-        return;
-      }
-      console.log("fetching from sever ");
-      console.log(ChatObject.activeChatId);
-      console.log(id);
-      let q;
-      if (type === "group") {
-        q = query(
-          collection(db, "groups", ChatObject.activeChatId, "messages")
+      const getMessage = async () => {
+        const CollectionName =
+          ChatObject.activeChatType === "group" ? "groups" : "conversations";
+        console.log(CollectionName);
+        const query = collection(
+          db,
+          CollectionName,
+          ChatObject.activeChatId,
+          "messages"
         );
-      } else if (type === "personal") {
-        q = query(
-          collection(db, "conversations", ChatObject.activeChatId, "messages")
-        );
-      }
 
-      const fetchChats = async () => {
-        console.log(ChatObject.activeChatId);
-        try {
-          const unsubscribe = onSnapshot(q, async (snapshot) => {
-            let chats = [];
-            const promises = [];
-            for (const doc of snapshot.docs) {
-              let chat = doc.data();
-              const reactionsRef = collection(doc.ref, "reactions");
-              const promise = getDocs(reactionsRef).then((querySnapshot) => {
-                let reactionsArray = [];
-                querySnapshot.forEach((doc) => {
-                  reactionsArray.push(doc.data());
-                });
-                chat.reactions = reactionsArray;
-              });
-              promises.push(promise);
-              chats.push(chat);
-            }
-            await Promise.all(promises);
-            setChats(chats);
-            console.log(ChatObject.activeChatId);
-            localStorage.setItem(
-              `${ChatObject.activeChatId}`,
-              JSON.stringify(chats)
-            );
-          });
-          return () => unsubscribe();
-        } catch (error) {
-          console.error(error);
-        }
+        const snapshot = await getDocs(query);
+        const messages = await snapshot.docs.map((doc) => doc.data());
+
+        console.log(messages);
+        const sortedMessages = messages.sort((a, b) => {
+          a.timestamp - b.timestamp;
+        });
+        setChats(sortedMessages);
+        localStorage.setItem(
+          `${ChatObject.activeChatId}`,
+          JSON.stringify(sortedMessages)
+        );
       };
-
-      fetchChats();
+      getMessage();
     }
-  }, [ChatObject]);
+  }, [ChatObject.activeChatId]);
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  const lastMessagesObject = useMemo(() => {
+    return JSON.parse(localStorage.getItem(id));
+  }, [id]);
+  console.log(lastMessagesObject);
+  const Chats = getStoredChats();
+  console.log(Chats);
+  console.log(id);
+  console.log(type);
+
+  useEffect(() => {
+    if (!lastMessagesObject) {
+      return;
+    }
+    const lastMessageTimestamp = lastMessagesObject[
+      lastMessagesObject.length - 1
+    ]
+      ? lastMessagesObject[lastMessagesObject.length - 1].timestamp
+      : { seconds: 0, nanoseconds: 0 };
+    if (!lastMessageTimestamp) {
+      return;
+    }
+    console.log(lastMessageTimestamp);
+    if (!lastMessageTimestamp) {
+      return;
+    }
+
+    const qt = new Timestamp(
+      lastMessageTimestamp.seconds,
+      lastMessageTimestamp.nanoseconds
+    );
+    const CollectionName = type === "group" ? "groups" : "conversations";
+    console.log(CollectionName);
+    const q = query(
+      collection(db, CollectionName, id, "messages"),
+      where("timestamp", ">", qt)
+    );
+    const chats = [];
+    const unsub = onSnapshot(q, (snapshot) => {
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (id == ChatObject.activeChatId) {
+          setChats(doc.data());
+        }
+        const isNewMessage = data.timestamp > lastMessageTimestamp;
+        if (isNewMessage) {
+          chats.push(data);
+        }
+        //localStorage.setItem(id,)
+        console.log(doc.data());
+      });
+      console.log(chats);
+      if (chats.length > 0) {
+        const updatedMessages = [...lastMessagesObject, ...chats];
+        localStorage.setItem(id, JSON.stringify(updatedMessages));
+      }
+    });
+    console.log(chats);
+    return () => {
+      unsub();
+    };
+  }, []);
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <div
       className={`${
@@ -135,6 +236,9 @@ const ChatCard = ({
         </div>
       </div>
       <p className="">{timestamp}</p>
+      <p className="flex justify-center items-center h-6 w-6 rounded-full bg-blue-500">
+        {unReadCount}
+      </p>
     </div>
   );
 };
