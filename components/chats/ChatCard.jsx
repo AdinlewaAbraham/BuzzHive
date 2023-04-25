@@ -4,7 +4,6 @@ import {
   onSnapshot,
   query,
   where,
-  orderBy,
   getDocs,
   doc,
   updateDoc,
@@ -33,6 +32,17 @@ const ChatCard = ({
   );
   const { User } = useContext(UserContext);
   const [invalidURL, setinvalidURL] = useState(true);
+  const [currentChatId, setcurrentChatId] = useState();
+
+  const activeChatIdRef = useRef(ChatObject.activeChatId);
+
+  useEffect(() => {
+    activeChatIdRef.current = ChatObject.activeChatId;
+  }, [ChatObject.activeChatId]);
+
+  useEffect(() => {
+    setcurrentChatId(activeChatIdRef.current);
+  }, [activeChatIdRef.current]);
 
   const getStoredChats = () => {
     const storedData = localStorage.getItem(`${User.id}_userChats`);
@@ -41,8 +51,10 @@ const ChatCard = ({
 
   const handleChatClick = async () => {
     if (ChatObject.activeChatId === id) {
+      console.log("true");
       return;
     }
+    console.log(JSON.parse(localStorage.getItem("user")));
     setChatObject({
       activeChatId: id,
       activeChatType: type,
@@ -70,7 +82,6 @@ const ChatCard = ({
         return obj;
       }
     });
-
     localStorage.setItem(
       `${User.id}_userChats`,
       JSON.stringify(
@@ -81,6 +92,7 @@ const ChatCard = ({
     );
 
     if (lastMessage) {
+      console.log("trre")
       await updateDoc(userRef, {
         [`unReadMessages.${id}`]: lastMessage.timestamp,
       }).then(async () => {
@@ -89,7 +101,7 @@ const ChatCard = ({
       });
     }
   };
-
+////////////////////////////////////////////////////////////////
   useEffect(() => {
     console.log("ran");
     if (ChatObject.activeChatId === "") return;
@@ -136,16 +148,9 @@ const ChatCard = ({
     }
   }, [ChatObject.activeChatId]);
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   const lastMessagesObject = useMemo(() => {
     return JSON.parse(localStorage.getItem(id));
   }, [id]);
-  console.log(lastMessagesObject);
-  const Chats = getStoredChats();
-  console.log(Chats);
-  console.log(id);
-  console.log(type);
 
   useEffect(() => {
     if (!lastMessagesObject) {
@@ -159,7 +164,6 @@ const ChatCard = ({
     if (!lastMessageTimestamp) {
       return;
     }
-    console.log(lastMessageTimestamp);
     if (!lastMessageTimestamp) {
       return;
     }
@@ -169,7 +173,6 @@ const ChatCard = ({
       lastMessageTimestamp.nanoseconds
     );
     const CollectionName = type === "group" ? "groups" : "conversations";
-    console.log(CollectionName);
     const q = query(
       collection(db, CollectionName, id, "messages"),
       where("timestamp", ">", qt)
@@ -178,29 +181,44 @@ const ChatCard = ({
     const unsub = onSnapshot(q, (snapshot) => {
       snapshot.forEach((doc) => {
         const data = doc.data();
-        if (id == ChatObject.activeChatId) {
-          setChats(doc.data());
+        const localTS =
+          data.timestamp.seconds + data.timestamp.nanoseconds / 1000000000;
+        const severTS =
+          lastMessageTimestamp.seconds +
+          lastMessageTimestamp.nanoseconds / 1000000000;
+        const isNewMessage = localTS > severTS;
+
+        console.log(localTS);
+        console.log(severTS);
+        console.log(data.id);
+        if (isNewMessage && data.id !== null) {
+          console.log(data);
+          if (!chats.some((chat) => chat.id === data.id)) {
+            console.log(data);
+            chats.push(data);
+          }
         }
-        const isNewMessage = data.timestamp > lastMessageTimestamp;
-        if (isNewMessage) {
-          chats.push(data);
-        }
-        //localStorage.setItem(id,)
-        console.log(doc.data());
       });
-      console.log(chats);
       if (chats.length > 0) {
-        const updatedMessages = [...lastMessagesObject, ...chats];
+        const updatedMessages = [...lastMessagesObject, ...chats].sort(
+          (a, b) => a.timestamp - b.timestamp
+        );
         localStorage.setItem(id, JSON.stringify(updatedMessages));
+        console.log(true);
+        console.log(id);
+        console.log(currentChatId);
+        console.log(updatedMessages);
+        if (id == currentChatId) {
+          setChats(updatedMessages);
+          console.log(true);
+        }
       }
     });
-    console.log(chats);
     return () => {
       unsub();
     };
-  }, []);
+  }, [currentChatId]);
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <div
       className={`${

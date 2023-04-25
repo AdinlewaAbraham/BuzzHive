@@ -4,10 +4,7 @@ import ChatCard from "./ChatCard";
 import { MdGroupAdd } from "react-icons/md";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
-import {
-  onSnapshot,
-  doc,
-} from "firebase/firestore";
+import { onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import { UserContext } from "../App";
 
@@ -20,9 +17,7 @@ const Chats = () => {
   const [isOnline, setIsOnline] = useState(true);
 
   const chats = whatToReturn;
-  const { setSelectedChannel} = useContext(
-    SelectedChannelContext
-  );
+  const { setSelectedChannel } = useContext(SelectedChannelContext);
 
   const getStoredChats = () => {
     const storedData = localStorage.getItem(`${User.id}_userChats`);
@@ -55,7 +50,7 @@ const Chats = () => {
       set_Chats(storedChats);
       setLoading(false);
     } else {
-      console.log("ranning")
+      console.log("ranning");
       console.log(chats);
       set_Chats(chats);
       chats == null

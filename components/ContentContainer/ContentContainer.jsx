@@ -213,7 +213,7 @@ const ContentContainer = () => {
               scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar- "
               >
                 {sortedChats &&
-                  Chats.map((chat) => <MessageCard chat={chat} />)}
+                  sortedChats.map((chat) => <MessageCard chat={chat} />)}
               </div>
             )}
             <div id="scrollToMe"></div>
