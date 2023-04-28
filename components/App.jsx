@@ -63,7 +63,8 @@ const App = () => {
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
-    if (userData !== "undefined" && userData.length !== "undefined") {
+    console.log(userData)
+    if (userData !== "undefined" && JSON.parse(userData)) {
       setUser(JSON.parse(userData));
       setIsAuthed(true);
     }

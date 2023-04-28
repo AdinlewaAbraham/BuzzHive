@@ -6,10 +6,12 @@ export const sendGroupMessage = async (
   senderId,
   groupID,
   messageText,
+  type,
   time
 ) => {
   const groupRef = doc(db, "groups", groupID);
   const message = {
+    type: type,
     id: null,
     text: messageText,
     timestamp: time,

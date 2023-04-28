@@ -27,7 +27,13 @@ const Input = () => {
         reactions: [],
       };
       setChats((prevChats) => [...prevChats, messageObj]);
-      sendGroupMessage(User.id, ChatObject.activeChatId, message, time);
+      sendGroupMessage(
+        User.id,
+        ChatObject.activeChatId,
+        message,
+        "regular",
+        time
+      );
     } else if (ChatObject.activeChatType == "personal") {
       const time = new Date();
       const messageObj = {
@@ -37,7 +43,14 @@ const Input = () => {
         reactions: [],
       };
       setChats((prevChats) => [...prevChats, messageObj]);
-      sendMessage(senderid, ChatObject.otherUserId, message, senderid, time);
+      sendMessage(
+        senderid,
+        ChatObject.otherUserId,
+        message,
+        senderid,
+        "regular",
+        time
+      );
     }
     //location.href = "#scrollToMe"
     document
@@ -104,7 +117,7 @@ const Input = () => {
           className="bg-transparent p-[10px] text-[#aaabaf] hover:text-white "
         >
           {" "}
-          <AiOutlineSend/>
+          <AiOutlineSend />
         </div>
       </div>
     </>

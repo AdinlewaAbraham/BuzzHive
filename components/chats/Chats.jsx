@@ -145,6 +145,7 @@ const Chats = () => {
                   }
                   message={chat.lastMessage}
                   unReadCount={chat.unReadmessagesCount}
+                  set_Chats={set_Chats}
                   //  timestamp={chat.timestamp}
                 />
               ))}

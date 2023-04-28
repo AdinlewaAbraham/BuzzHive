@@ -7,9 +7,11 @@ export async function sendMessage(
   user2Id,
   messageText,
   senderId,
+  type,
   time
 ) {
   const message = {
+    type: type,
     id: null,
     text: messageText,
     senderId: senderId,

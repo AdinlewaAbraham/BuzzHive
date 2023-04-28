@@ -30,7 +30,9 @@ const MessageCard = ({ chat }) => {
       ChatObject.activeChatType
     );
   };
-  console.log(chat);
+  if (chat.type == "unread"){
+    return(<div className="bg-red-500 text-center">you neva read this one boss</div>)
+  }
   return (
     <div
       className={`flex items-center my-2 justify-start ${
@@ -136,7 +138,6 @@ const ContentContainer = () => {
       </div>
     );
   }
-  console.log(Chats);
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
@@ -209,7 +210,7 @@ const ContentContainer = () => {
               <>you have nothing </>
             ) : (
               <div
-                className="my-[20px] w-full  my-element overflow-y-auto scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
+                className="w-full  my-element overflow-y-auto scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
               scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar- "
               >
                 {sortedChats &&

@@ -17,17 +17,13 @@ import { getUser } from "@/utils/userUtils/getUser";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
 export const useGetChats = (currentUserId) => {
-  const [chats, setChats] = useState([]);
   const [returnChats, setreturnChats] = useState([]);
-  const [groupChats, setGroupChats] = useState([]);
   const [returnGroupChats, setreturnGroupChats] = useState([]);
   const [isPersonalChatLoading, setisPersonalChatLoading] = useState(true);
   const [isGroupChatsLoading, setisGroupChatsLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const { ChatObject } = useContext(SelectedChannelContext);
-
-  const user = localStorage.getItem("user");
 
   useEffect(() => {
     console.log("ran");
@@ -45,11 +41,11 @@ export const useGetChats = (currentUserId) => {
     if (JSON.parse(localStorage.getItem("user")) == undefined) {
       return;
     }
-    const lastMessagesObject = JSON.parse(
-      localStorage.getItem("user")
-    ).unReadMessages;
-
+    console.log(JSON.parse(localStorage.getItem("user")));
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+      const lastMessagesObject = JSON.parse(
+        localStorage.getItem("user")
+      ).unReadMessages;
       console.log("ran");
       const chats = [];
       for (const doc of querySnapshot.docs) {
@@ -65,6 +61,29 @@ export const useGetChats = (currentUserId) => {
         const user = await getUser(otherParticipant);
         const lastMessage = conversation.lastMessage;
         const timestamp = conversation.timestamp;
+        let unReadmessagesCount;
+
+        const lastMessageTimestamp = lastMessagesObject[doc.id];
+        if (lastMessageTimestamp /* && doc.id == ChatObject.activeChatId*/) {
+          console.log(lastMessageTimestamp);
+          const qT = new Timestamp(
+            lastMessageTimestamp.seconds,
+            lastMessageTimestamp.nanoseconds
+          );
+          console.log(qT);
+          const unReadMessagesQuery = query(
+            collection(db, "conversations", doc.id, "messages"),
+            where("timestamp", ">", qT),
+            orderBy("timestamp", "desc")
+          );
+          const unReadMessagequerySnapshot = await getDocs(unReadMessagesQuery);
+
+          unReadmessagesCount = unReadMessagequerySnapshot.size;
+          console.log("this is for " + doc.id + " " + unReadmessagesCount);
+        } else {
+          unReadmessagesCount = 0;
+          console.log("this is for " + doc.id + " " + unReadmessagesCount);
+        }
         const chat = {
           id: doc.id,
           senderId: conversation.senderId,
@@ -75,61 +94,39 @@ export const useGetChats = (currentUserId) => {
           lastMessage: lastMessage,
           timestamp: timestamp,
           type: "personal",
-          unReadmessagesCount: 0,
+          unReadmessagesCount: unReadmessagesCount,
         };
         chats.push(chat);
       }
-      setChats(chats);
-      //////////////////////////////
-
-      function updateUnreadMessages(chatId, unReadmessagesCount) {
-        const chatToUpdate = chats.find((chat) => chat.id === chatId);
-        if (chatToUpdate) {
-          chatToUpdate.unReadmessagesCount = unReadmessagesCount;
-        }
-      }
-
-      let filteredChats = chats;
-      if (ChatObject.activeChatId !== "") {
-        if (chats == []) return;
-        filteredChats = chats.filter(
-          (chat) => chat.id !== ChatObject.activeChatId
-        );
-      }
-      for (const chatObject of filteredChats) {
-        const chatId = chatObject.id;
-
-        const lastMessageTimestamp = lastMessagesObject[chatId];
-
-        if (lastMessageTimestamp) {
-          console.log(lastMessageTimestamp);
-          const qT = new Timestamp(
-            lastMessageTimestamp.seconds,
-            lastMessageTimestamp.nanoseconds
-          );
-          console.log(qT);
-          const unReadMessagesQuery = query(
-            collection(db, "conversations", chatId, "messages"),
-            where("timestamp", ">", qT),
-            orderBy("timestamp", "desc")
-          );
-          const unReadMessagequerySnapshot = await getDocs(unReadMessagesQuery);
-
-          const unReadmessagesCount = unReadMessagequerySnapshot.size;
-          console.log("this is for " + chatId + " " + unReadmessagesCount);
-          updateUnreadMessages(chatId, unReadmessagesCount);
-        }
-      }
-
       setreturnChats([...chats]);
       ///////////////////////////////////////////
       setisPersonalChatLoading(false);
     });
 
     const unsub = onSnapshot(groupQuery, async (querySnapshot) => {
+      const lastMessagesObject = JSON.parse(
+        localStorage.getItem("user")
+      ).unReadMessages;
       const groupChats = [];
       for (const doc of querySnapshot.docs) {
         const group = doc.data();
+        const lastMessageTimestamp = lastMessagesObject[doc.id];
+        let unReadmessagesCount;
+        if (lastMessageTimestamp) {
+          const qT = new Timestamp(
+            lastMessageTimestamp.seconds,
+            lastMessageTimestamp.nanoseconds
+          );
+          const unReadMessagesQuery = query(
+            collection(db, "groups", doc.id, "messages"),
+            where("timestamp", ">", qT),
+            orderBy("timestamp", "desc")
+          );
+          const unReadMessagequerySnapshot = await getDocs(unReadMessagesQuery);
+          unReadmessagesCount = unReadMessagequerySnapshot.size;
+        } else {
+          unReadmessagesCount = 0;
+        }
         const groupChat = {
           id: doc.id,
           senderId: group.lastMessage.senderId,
@@ -140,52 +137,12 @@ export const useGetChats = (currentUserId) => {
           lastMessage: group.lastMessage.lastMessage,
           timestamp: group.lastMessage.timestamp,
           type: "group",
-          unReadmessagesCount: 0,
+          unReadmessagesCount: unReadmessagesCount,
         };
         groupChats.push(groupChat);
       }
-      setGroupChats(groupChats);
 
       ////////////////////////////////
-      function updateUnreadMessages(chatId, unReadmessagesCount) {
-        const chatToUpdate = groupChats.find((chat) => chat.id === chatId);
-        if (chatToUpdate) {
-          chatToUpdate.unReadmessagesCount = unReadmessagesCount;
-        }
-      }
-
-      let filteredChats = groupChats;
-      if (ChatObject.activeChatId !== "") {
-        if (groupChats == []) return;
-        filteredChats = groupChats.filter(
-          (groupChat) => groupChat.id !== ChatObject.activeChatId
-        );
-      }
-
-      for (const chatObject of filteredChats) {
-        const chatId = chatObject.id;
-
-        const lastMessageTimestamp = lastMessagesObject[chatId];
-
-        if (lastMessageTimestamp) {
-          console.log(lastMessageTimestamp);
-          const qT = new Timestamp(
-            lastMessageTimestamp.seconds,
-            lastMessageTimestamp.nanoseconds
-          );
-          console.log(qT);
-          const unReadMessagesQuery = query(
-            collection(db, "groups", chatId, "messages"),
-            where("timestamp", ">", qT),
-            orderBy("timestamp", "desc")
-          );
-          const unReadMessagequerySnapshot = await getDocs(unReadMessagesQuery);
-
-          const unReadmessagesCount = unReadMessagequerySnapshot.size;
-          console.log("this is for " + chatId + " " + unReadmessagesCount);
-          updateUnreadMessages(chatId, unReadmessagesCount);
-        }
-      }
 
       setreturnGroupChats([...groupChats]);
 

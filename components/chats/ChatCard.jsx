@@ -26,6 +26,7 @@ const ChatCard = ({
   type,
   otherUserId,
   unReadCount,
+  set_Chats,
 }) => {
   const { setChats, ChatObject, setChatObject, setshowChats } = useContext(
     SelectedChannelContext
@@ -43,7 +44,7 @@ const ChatCard = ({
   useEffect(() => {
     setcurrentChatId(activeChatIdRef.current);
   }, [activeChatIdRef.current]);
-
+  // onsnapshot
   const getStoredChats = () => {
     const storedData = localStorage.getItem(`${User.id}_userChats`);
     return storedData ? JSON.parse(storedData) : null;
@@ -67,14 +68,14 @@ const ChatCard = ({
 
     const messages = JSON.parse(localStorage.getItem(id));
     console.log(messages);
-    if (messages || JSON.stringify(message == "[]")) {
+    if (!messages || JSON.stringify(message) == "[]") {
       return;
     }
     const lastMessage = messages[messages.length - 1];
     console.log(lastMessage);
     const Chats = getStoredChats();
     console.log(Chats);
-
+    console.log(Chats);
     const updatedArr = Chats.map((obj) => {
       if (obj.id == id) {
         return { ...obj, unReadmessagesCount: 0 };
@@ -82,6 +83,12 @@ const ChatCard = ({
         return obj;
       }
     });
+    console.log(updatedArr);
+    set_Chats(
+      updatedArr.sort((a, b) => {
+        a.timestamp - b.timestamp;
+      })
+    );
     localStorage.setItem(
       `${User.id}_userChats`,
       JSON.stringify(
@@ -92,65 +99,27 @@ const ChatCard = ({
     );
 
     if (lastMessage) {
-      console.log("trre")
+      console.log("trre");
+      console.log(User.id);
+      console.log(userRef);
+      console.log(lastMessage);
       await updateDoc(userRef, {
         [`unReadMessages.${id}`]: lastMessage.timestamp,
-      }).then(async () => {
-        const userSnapshot = await getDoc(userRef);
-        localStorage.setItem("user", JSON.stringify(userSnapshot.data()));
       });
+      const prev = JSON.parse(localStorage.getItem("user"));
+      const newObj = {
+        ...prev,
+        unReadMessages: {
+          ...prev.unReadMessages,
+          [id]: lastMessage.timestamp,
+        },
+      };
+      console.log(newObj);
+      localStorage.setItem("user", JSON.stringify(newObj));
+      console.log(JSON.parse(localStorage.getItem("user")));
     }
   };
-////////////////////////////////////////////////////////////////
-  useEffect(() => {
-    console.log("ran");
-    if (ChatObject.activeChatId === "") return;
-
-    setChats(null);
-
-    if (
-      localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&
-      localStorage.getItem(`${ChatObject.activeChatId}`) !== "{}" &&
-      localStorage.getItem(`${ChatObject.activeChatId}`) !== "undefined" &&
-      localStorage.getItem(`${ChatObject.activeChatId}`) !== "null" &&
-      localStorage.getItem(`${ChatObject.activeChatId}`)
-    ) {
-      const ChatString = localStorage.getItem(`${ChatObject.activeChatId}`);
-      const Chat = JSON.parse(ChatString);
-      console.log(Chat);
-      setChats(Chat);
-    } else {
-      const getMessage = async () => {
-        const CollectionName =
-          ChatObject.activeChatType === "group" ? "groups" : "conversations";
-        console.log(CollectionName);
-        const query = collection(
-          db,
-          CollectionName,
-          ChatObject.activeChatId,
-          "messages"
-        );
-
-        const snapshot = await getDocs(query);
-        const messages = await snapshot.docs.map((doc) => doc.data());
-
-        console.log(messages);
-        const sortedMessages = messages.sort((a, b) => {
-          a.timestamp - b.timestamp;
-        });
-        setChats(sortedMessages);
-        localStorage.setItem(
-          `${ChatObject.activeChatId}`,
-          JSON.stringify(sortedMessages)
-        );
-      };
-      getMessage();
-    }
-  }, [ChatObject.activeChatId]);
-
-  const lastMessagesObject = useMemo(() => {
-    return JSON.parse(localStorage.getItem(id));
-  }, [id]);
+  ////////////////////////////////////////////////////////////////
 
   useEffect(() => {
     if (!lastMessagesObject) {
@@ -178,7 +147,16 @@ const ChatCard = ({
       where("timestamp", ">", qt)
     );
     const chats = [];
+    const lastUnReadMessagesObject = JSON.parse(
+      localStorage.getItem("user")
+    ).unReadMessages;
     const unsub = onSnapshot(q, (snapshot) => {
+      if (!lastUnReadMessagesObject[id]) return;
+      const lastUnReadTimestamp =
+        lastUnReadMessagesObject[id].seconds +
+        lastUnReadMessagesObject[id].nanoseconds / 1000000000;
+      console.log(lastUnReadTimestamp);
+
       snapshot.forEach((doc) => {
         const data = doc.data();
         const localTS =
@@ -199,25 +177,103 @@ const ChatCard = ({
           }
         }
       });
-      if (chats.length > 0) {
-        const updatedMessages = [...lastMessagesObject, ...chats].sort(
+      const sortedLastMessage = lastMessagesObject.sort(
+        (a, b) => a.timestamp - b.timestamp
+      );
+      const sortedChats = chats.sort((a, b) => a.timestamp - b.timestamp);
+      console.log(sortedChats);
+      if (sortedChats.length !== 0) {
+        const updatedMessages = [...sortedLastMessage, ...sortedChats];
+        const newObject = {
+          type: "unread",
+        };
+        const filteredMessages = [...updatedMessages].sort(
           (a, b) => a.timestamp - b.timestamp
         );
-        localStorage.setItem(id, JSON.stringify(updatedMessages));
-        console.log(true);
-        console.log(id);
-        console.log(currentChatId);
-        console.log(updatedMessages);
-        if (id == currentChatId) {
-          setChats(updatedMessages);
-          console.log(true);
+        console.log("this is for " + name + " " + unReadCount);
+        console.log(unReadCount);
+          const existingUnreadIndex = filteredMessages.findIndex((message) => message.type === "unread");
+        if (unReadCount !== 0) {
+          if (existingUnreadIndex !== -1) {
+            filteredMessages.splice(existingUnreadIndex, 1);
+          }
+          const index = filteredMessages.length - unReadCount;
+          console.log(existingUnreadIndex)
+          console.log(index)
+          const newArray = [
+            ...filteredMessages.slice(0, index),
+            newObject,
+            ...filteredMessages.slice(index),
+          ];
+
+          console.log(newArray);
+          localStorage.setItem(id, JSON.stringify(newArray));
+          if (id == currentChatId) {
+            console.log(newArray);
+            setChats(newArray);
+          }
+        }else{
         }
       }
     });
     return () => {
       unsub();
     };
-  }, [currentChatId]);
+  }, [currentChatId, unReadCount]);
+  const getStoredMessages = () => {
+    const str = localStorage.getItem(`${ChatObject.activeChatId}`);
+    return JSON.parse(str);
+  };
+
+  useEffect(() => {
+    console.log("ran");
+    if (ChatObject.activeChatId === "") return;
+
+    setChats(null);
+
+    if (
+      localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&
+      localStorage.getItem(`${ChatObject.activeChatId}`) !== "{}" &&
+      localStorage.getItem(`${ChatObject.activeChatId}`) !== "undefined" &&
+      localStorage.getItem(`${ChatObject.activeChatId}`) !== "null" &&
+      localStorage.getItem(`${ChatObject.activeChatId}`)
+    ) {
+      const Chat = getStoredMessages();
+      console.log(Chat);
+      console.log("this is for " + name + " " + unReadCount);
+      setChats(Chat);
+    } else {
+      const getMessage = async () => {
+        const CollectionName =
+          ChatObject.activeChatType === "group" ? "groups" : "conversations";
+        console.log(CollectionName);
+        const query = collection(
+          db,
+          CollectionName,
+          ChatObject.activeChatId,
+          "messages"
+        );
+
+        const snapshot = await getDocs(query);
+        const messages = await snapshot.docs.map((doc) => doc.data());
+        console.log(messages);
+        const sortedMessages = messages.sort((a, b) => {
+          a.timestamp - b.timestamp;
+        });
+        console.log(sortedMessages);
+        setChats(sortedMessages);
+        localStorage.setItem(
+          `${ChatObject.activeChatId}`,
+          JSON.stringify(sortedMessages)
+        );
+      };
+      getMessage();
+    }
+  }, [ChatObject.activeChatId]);
+
+  const lastMessagesObject = useMemo(() => {
+    return JSON.parse(localStorage.getItem(id));
+  }, [id]);
 
   return (
     <div
