@@ -14,6 +14,12 @@ const SelectedChannelContext = createContext({
     displayName: "",
   },
   setChatObject: () => {},
+  ReplyObject: {
+    ReplyText: "",
+    ReplyTextId: "",
+    displayName: "",
+  },
+  setReplyObject: () => {},
   ShowAddGroup: false,
   setShowAddGroup: () => {},
   isPopupOpen: false,
@@ -21,7 +27,11 @@ const SelectedChannelContext = createContext({
   IsChatsLoading: false,
   setIsChatsLoading: () => {},
   showChats: false,
-  setshowChats:()=>{}
+  setshowChats: () => {},
+  activeId: "",
+  setactiveId: () => {},
+  replyDivHeight: "",
+  setreplyDivHeight: () => {},
 });
 
 export const SelectedChannelProvider = ({ children }) => {
@@ -31,11 +41,18 @@ export const SelectedChannelProvider = ({ children }) => {
   const [Chats, setChats] = useState([]);
   const [IsChatsLoading, setIsChatsLoading] = useState(false);
   const [showChats, setshowChats] = useState(true);
+  const [activeId, setactiveId] = useState("");
+  const [replyDivHeight, setreplyDivHeight] = useState("");
   const [ChatObject, setChatObject] = useState({
     activeChatId: "",
     activeChatType: "",
     otherUserId: "",
     message: "",
+  });
+  const [ReplyObject, setReplyObject] = useState({
+    ReplyText: "",
+    ReplyTextId: "",
+    displayName: "",
   });
 
   return (
@@ -55,6 +72,12 @@ export const SelectedChannelProvider = ({ children }) => {
         setisPopupOpen,
         showChats,
         setshowChats,
+        activeId,
+        setactiveId,
+        ReplyObject,
+        setReplyObject,
+        replyDivHeight,
+        setreplyDivHeight,
       }}
     >
       {children}

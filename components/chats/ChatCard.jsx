@@ -14,7 +14,6 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
-import Chats from "./Chats";
 import { UserContext } from "../App";
 const ChatCard = ({
   img,
@@ -28,7 +27,7 @@ const ChatCard = ({
   unReadCount,
   set_Chats,
 }) => {
-  const { setChats, ChatObject, setChatObject, setshowChats } = useContext(
+  const { setChats, ChatObject, setChatObject, setshowChats, setactiveId, activeId } = useContext(
     SelectedChannelContext
   );
   const { User } = useContext(UserContext);
@@ -36,8 +35,11 @@ const ChatCard = ({
   const [currentChatId, setcurrentChatId] = useState();
 
   const activeChatIdRef = useRef(ChatObject.activeChatId);
-
+  const LocalMessages = useMemo(() => {
+    return JSON.parse(localStorage.getItem(id));
+  }, [id]);
   useEffect(() => {
+    sessionStorage.setItem("activeChatId", JSON.stringify(ChatObject.activeChatId))
     activeChatIdRef.current = ChatObject.activeChatId;
   }, [ChatObject.activeChatId]);
 
@@ -50,12 +52,32 @@ const ChatCard = ({
     return storedData ? JSON.parse(storedData) : null;
   };
 
+
   const handleChatClick = async () => {
     if (ChatObject.activeChatId === id) {
-      console.log("true");
       return;
     }
+    if (unReadCount == 0) {
+      const data = JSON.parse(localStorage.getItem(id))
+      if (data) {
+        const filteredData = data.filter(message => message.type !== 'unread')
+        localStorage.setItem(id, JSON.stringify(filteredData))
+      };
+    } else {
+      const data = JSON.parse(localStorage.getItem(id))
+      const unreadObj = {
+        type: "unread",
+      };
+      if (data) {
+        const filteredData = data.filter(message => message.type !== 'unread')
+        const index = filteredData.length - unReadCount
+        const modifiedArr = [...filteredData.slice(0, index), unreadObj, ...filteredData.slice(index)]
+        localStorage.setItem(id, JSON.stringify(modifiedArr))
+      }
+    }
+    console.log(unReadCount)
     console.log(JSON.parse(localStorage.getItem("user")));
+    setactiveId(id)
     setChatObject({
       activeChatId: id,
       activeChatType: type,
@@ -120,15 +142,14 @@ const ChatCard = ({
     }
   };
   ////////////////////////////////////////////////////////////////
-
   useEffect(() => {
-    if (!lastMessagesObject) {
+    if (!LocalMessages) {
       return;
     }
-    const lastMessageTimestamp = lastMessagesObject[
-      lastMessagesObject.length - 1
+    const lastMessageTimestamp = LocalMessages[
+      LocalMessages.length - 1
     ]
-      ? lastMessagesObject[lastMessagesObject.length - 1].timestamp
+      ? LocalMessages[LocalMessages.length - 1].timestamp
       : { seconds: 0, nanoseconds: 0 };
     if (!lastMessageTimestamp) {
       return;
@@ -150,70 +171,44 @@ const ChatCard = ({
     const lastUnReadMessagesObject = JSON.parse(
       localStorage.getItem("user")
     ).unReadMessages;
+    if (id == "w6AHSRlOZ1Tje6L8q3ZA05Le78B3eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2") {
+      console.log(qt)
+    }
+    const LocallyStoredMessages = JSON.parse(localStorage.getItem(id));
     const unsub = onSnapshot(q, (snapshot) => {
+      console.log("ran")
       if (!lastUnReadMessagesObject[id]) return;
-      const lastUnReadTimestamp =
-        lastUnReadMessagesObject[id].seconds +
-        lastUnReadMessagesObject[id].nanoseconds / 1000000000;
-      console.log(lastUnReadTimestamp);
-
       snapshot.forEach((doc) => {
         const data = doc.data();
-        const localTS =
-          data.timestamp.seconds + data.timestamp.nanoseconds / 1000000000;
         const severTS =
+          data.timestamp.seconds + data.timestamp.nanoseconds / 1000000000;
+        const localTS =
           lastMessageTimestamp.seconds +
           lastMessageTimestamp.nanoseconds / 1000000000;
-        const isNewMessage = localTS > severTS;
-
-        console.log(localTS);
-        console.log(severTS);
-        console.log(data.id);
+        const isNewMessage = severTS > localTS;
+        console.log(isNewMessage)
+        console.log(data)
         if (isNewMessage && data.id !== null) {
           console.log(data);
-          if (!chats.some((chat) => chat.id === data.id)) {
-            console.log(data);
+          if (!chats.some((chat) => chat.id === data.id) && !LocallyStoredMessages.some((chat) => chat.id === data.id)) {
             chats.push(data);
+            console.log(data)
           }
         }
       });
-      const sortedLastMessage = lastMessagesObject.sort(
+      console.log(LocallyStoredMessages)
+      if (chats.length == 0) return
+      const sortedChats = [...chats].sort(
         (a, b) => a.timestamp - b.timestamp
       );
-      const sortedChats = chats.sort((a, b) => a.timestamp - b.timestamp);
-      console.log(sortedChats);
-      if (sortedChats.length !== 0) {
-        const updatedMessages = [...sortedLastMessage, ...sortedChats];
-        const newObject = {
-          type: "unread",
-        };
-        const filteredMessages = [...updatedMessages].sort(
-          (a, b) => a.timestamp - b.timestamp
-        );
-        console.log("this is for " + name + " " + unReadCount);
-        console.log(unReadCount);
-          const existingUnreadIndex = filteredMessages.findIndex((message) => message.type === "unread");
-        if (unReadCount !== 0) {
-          if (existingUnreadIndex !== -1) {
-            filteredMessages.splice(existingUnreadIndex, 1);
-          }
-          const index = filteredMessages.length - unReadCount;
-          console.log(existingUnreadIndex)
-          console.log(index)
-          const newArray = [
-            ...filteredMessages.slice(0, index),
-            newObject,
-            ...filteredMessages.slice(index),
-          ];
 
-          console.log(newArray);
-          localStorage.setItem(id, JSON.stringify(newArray));
-          if (id == currentChatId) {
-            console.log(newArray);
-            setChats(newArray);
-          }
-        }else{
-        }
+      console.log(sortedChats);
+
+      const updatedMessages = [...LocallyStoredMessages, ...sortedChats];
+      console.log(updatedMessages);
+      localStorage.setItem(id, JSON.stringify(updatedMessages));
+      if (id == currentChatId) {
+        setChats(updatedMessages);
       }
     });
     return () => {
@@ -224,7 +219,6 @@ const ChatCard = ({
     const str = localStorage.getItem(`${ChatObject.activeChatId}`);
     return JSON.parse(str);
   };
-
   useEffect(() => {
     console.log("ran");
     if (ChatObject.activeChatId === "") return;
@@ -271,17 +265,14 @@ const ChatCard = ({
     }
   }, [ChatObject.activeChatId]);
 
-  const lastMessagesObject = useMemo(() => {
-    return JSON.parse(localStorage.getItem(id));
-  }, [id]);
+
 
   return (
     <div
-      className={`${
-        ChatObject.activeChatId == id
-          ? "bg-gray-600 hover:bg-gray-600"
-          : "hover:bg-gray-700 "
-      } flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
+      className={`${ChatObject.activeChatId == id
+        ? "bg-gray-600 hover:bg-gray-600"
+        : "hover:bg-gray-700 "
+        } flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
         rounded-xl w-[100%] hover: relative`}
       onClick={() => {
         handleChatClick();
@@ -310,9 +301,11 @@ const ChatCard = ({
         </div>
       </div>
       <p className="">{timestamp}</p>
-      <p className="flex justify-center items-center h-6 w-6 rounded-full bg-blue-500">
-        {unReadCount}
-      </p>
+      {unReadCount !== 0 && (
+        <p className="flex justify-center items-center h-6 w-6 rounded-full bg-blue-500">
+          {unReadCount}
+        </p>
+      )}
     </div>
   );
 };

@@ -7,16 +7,20 @@ export async function sendMessage(
   user2Id,
   messageText,
   senderId,
+  senderDisplayName,
   type,
-  time
+  time,
+  replyObj
 ) {
   const message = {
     type: type,
     id: null,
     text: messageText,
     senderId: senderId,
+    senderDisplayName: senderDisplayName,
     timestamp: time,
     reactions: [],
+    replyObject: replyObj,
   };
 
   try {

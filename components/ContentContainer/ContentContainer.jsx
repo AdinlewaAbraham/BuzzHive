@@ -1,116 +1,48 @@
-import { useContext, useState, useMemo, useEffect } from "react";
+import { useContext, useState, useMemo, useEffect, useRef } from "react";
 import Input from "../input/Input";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";
 import { IoMdPerson } from "react-icons/io";
-import { UserContext } from "../App";
-import { BsEmojiSmile } from "react-icons/bs";
-import { Emoji } from "emoji-picker-react";
-import reactTomessage from "@/utils/messagesUtils/reactToMessage";
-import getMessageReactions from "@/utils/messagesUtils/getMessageReactions";
 import { GiCancel } from "react-icons/gi";
 import { AiOutlineSearch } from "react-icons/ai";
 import { BiArrowBack } from "react-icons/bi";
-
-const MessageCard = ({ chat }) => {
-  const { ChatObject } = useContext(SelectedChannelContext);
-  const { User } = useContext(UserContext);
-
-  const [showReactEmojiTray, setshowReactEmojiTray] = useState(false);
-
-  const currentId = User.id;
-  const timestamp = chat.timestamp;
-
-  const handleEmojiClick = (emoji) => {
-    reactTomessage(
-      emoji,
-      chat.id,
-      ChatObject.activeChatId,
-      User,
-      ChatObject.activeChatType
-    );
-  };
-  if (chat.type == "unread"){
-    return(<div className="bg-red-500 text-center">you neva read this one boss</div>)
-  }
-  return (
-    <div
-      className={`flex items-center my-2 justify-start ${
-        chat.senderId === currentId ? " flex-row-reverse" : " "
-      } ${ chat.reactions.length === 0 ? "" : "mb-[30px]"} `}
-      key={chat.id}
-    >
-      <div
-        className={`text-left rounded-lg p-2 max-w-[80%] relative ${
-          chat.senderId === currentId
-            ? " text-white text-right ml-2 dark:bg-[#296eff] mr-5"
-            : "dark:bg-[#252d35] text-white text-left mr-2 ml-5"
-        }  `}
-      >
-        {chat.text}
-        <p>{}</p>
-        {chat.reactions.length > 0 && (
-          <div
-            className={`rounded-lg max-w-[500px] flex absolute bottom-[-20px] right-0  bg-white p-[5px]`}
-          >
-            {chat.reactions.map(({ emoji }) => (
-              <Emoji unified={emoji} size="15" />
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div
-        className={` flex ${
-          chat.senderId === currentId ? "left-0 " : "right-0 "
-        }`}
-      >
-        <div className="relative">
-          {showReactEmojiTray && (
-            <div className=" flex bg-blue-700 absolute bottom-[25px] left-[-100px] w-[200px] p-[20px] rounded-lg z-20">
-              {["1f423", "1f423", "1f433", "1f423", "1f423"].map((emoji) => (
-                <div
-                  className="mx-[5px]"
-                  onClick={() => handleEmojiClick(emoji)}
-                >
-                  <Emoji unified={emoji} size="25" />
-                </div>
-              ))}
-            </div>
-          )}
-          <div
-            onClick={() => {
-              setshowReactEmojiTray(!showReactEmojiTray);
-            }}
-          >
-            <BsEmojiSmile />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+import { AiOutlineArrowDown } from "react-icons/ai";
+import MessageCard from "./MessageCard";
 
 const ContentContainer = () => {
-  const { Chats, ChatObject, setChatObject, showChats, setshowChats } =
-    useContext(SelectedChannelContext);
+  const {
+    Chats,
+    ChatObject,
+    setChatObject,
+    showChats,
+    setshowChats,
+    ReplyObject,
+    replyDivHeight,
+  } = useContext(SelectedChannelContext);
   console.log(Chats);
 
   const [sortedChats, setSortedChats] = useState([]);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [showProfile, setshowProfile] = useState(false);
   const [IsMobile, setIsMobile] = useState(false);
+  const secondDivRef = useRef(null);
 
+  useEffect(() => {
+    const retard = () => {
+      console.log(replyDivHeight);
+    };
+    return () => {
+      retard();
+    };
+  }, [replyDivHeight]);
   useEffect(() => {
     function widthResizer() {
       const width = window.innerWidth < 768;
       setIsMobile(width);
     }
 
-    // Getting the width of the browser on load
     widthResizer();
 
-    // Getting the width of the browser whenever the screen resolution changes.
     window.addEventListener("resize", widthResizer);
 
     return () => window.removeEventListener("resize", widthResizer);
@@ -126,7 +58,7 @@ const ContentContainer = () => {
   }, [IsMobile]);
 
   useMemo(() => {
-    if(Chats == []) return
+    if (Chats == []) return;
     if (Chats) {
       setSortedChats(Chats.sort((a, b) => a.timestamp - b.timestamp));
     }
@@ -138,6 +70,17 @@ const ContentContainer = () => {
       </div>
     );
   }
+  console.log(ReplyObject.divHeight);
+
+  const mainContentStyle = {
+    overflowY: "auto",
+    height: `calc(100vh - 123px${
+      ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
+    })`,
+  };
+
+  console.log(replyDivHeight);
+
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
@@ -157,7 +100,7 @@ const ContentContainer = () => {
             </div>
           )}
           <div
-            className="flex justify-between  items-center dark:bg-[#1d232a] w-full p-[13px] max-h-[66px] z-20 cursor-pointer"
+            className="flex justify-between md:ml-[1px] items-center dark:bg-[#1d232a] p-[13px] max-h-[66px] z-20 cursor-pointer"
             onClick={() => {
               //setshowProfile(true);
             }}
@@ -203,7 +146,10 @@ const ContentContainer = () => {
               <AiOutlineSearch />
             </div>
           </div>
-          <main className="h-[calc(100vh-123px)] flex flex-col justify-end">
+          <main
+            style={mainContentStyle}
+            className="h-[calc(100vh-123px)] flex flex-col justify-end"
+          >
             {Chats == null ? (
               <div className="text-center text-2xl">Loading</div>
             ) : Chats.length == 0 ? (
@@ -215,9 +161,28 @@ const ContentContainer = () => {
               >
                 {sortedChats &&
                   sortedChats.map((chat) => <MessageCard chat={chat} />)}
+                <div ref={secondDivRef} id="scrollToMe"></div>
               </div>
             )}
-            <div id="scrollToMe"></div>
+            {
+              <div
+                onClick={() => {
+                  console.log("click");
+                  secondDivRef.current.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="absolute right-[20px] cursor-pointer p-3 dark:bg-[#1d232a] rounded-lg"
+                style={{
+                  bottom: `${
+                    ReplyObject.ReplyTextId
+                      ? `${replyDivHeight + 70}px`
+                      : "70px"
+                  }`,
+                }}
+                //ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
+              >
+                <AiOutlineArrowDown size={23} />
+              </div>
+            }
           </main>
           <Input />
         </div>

@@ -6,6 +6,7 @@ export const sendGroupMessage = async (
   senderId,
   groupID,
   messageText,
+  senderDisplayName,
   type,
   time
 ) => {
@@ -16,6 +17,7 @@ export const sendGroupMessage = async (
     text: messageText,
     timestamp: time,
     senderId: senderId,
+    senderDisplayName: senderDisplayName,
     groupID: groupID,
     reactions: [],
   };

@@ -4,17 +4,26 @@ import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 import { UserContext } from "../App";
 import { BsEmojiSmile } from "react-icons/bs";
+import { ImAttachment } from "react-icons/im";
 
 import EmojiPicker from "emoji-picker-react";
 import { AiOutlineSend } from "react-icons/ai";
+import { ImCross } from "react-icons/im";
 
 const Input = () => {
   const { User } = useContext(UserContext);
-  const { ChatObject, setChatObject, setChats } = useContext(
-    SelectedChannelContext
-  );
+  const {
+    ChatObject,
+    setChatObject,
+    setChats,
+    ReplyObject,
+    setReplyObject,
+    setreplyDivHeight,
+  } = useContext(SelectedChannelContext);
   const [message, setmessage] = useState("");
+  const [showMediaPicker, setshowMediaPicker] = useState(false);
   const senderid = User.id;
+  const elementRef = useRef(null);
 
   function handleSend() {
     if (!message || message.trim().length === 0) return;
@@ -31,8 +40,16 @@ const Input = () => {
         User.id,
         ChatObject.activeChatId,
         message,
-        "regular",
-        time
+        User.name,
+        ReplyObject.ReplyTextId ? "reply" : "regular",
+        time,
+        ReplyObject.ReplyTextId
+          ? {
+              replyText: ReplyObject.ReplyText,
+              replyTextId: ReplyObject.ReplyTextId,
+              replyDisplayName: ReplyObject.displayName,
+            }
+          : {}
       );
     } else if (ChatObject.activeChatType == "personal") {
       const time = new Date();
@@ -43,13 +60,23 @@ const Input = () => {
         reactions: [],
       };
       setChats((prevChats) => [...prevChats, messageObj]);
+      console.log(User);
+      console.log("ran");
       sendMessage(
         senderid,
         ChatObject.otherUserId,
         message,
         senderid,
-        "regular",
-        time
+        User.name,
+        ReplyObject.ReplyTextId ? "reply" : "regular",
+        time,
+        ReplyObject.ReplyTextId
+          ? {
+              replyText: ReplyObject.ReplyText,
+              replyTextId: ReplyObject.ReplyTextId,
+              replyDisplayName: ReplyObject.displayName,
+            }
+          : {}
       );
     }
     //location.href = "#scrollToMe"
@@ -77,16 +104,70 @@ const Input = () => {
       handleSend();
     }
   }
+  useEffect(() => {
+    console.log(ReplyObject);
+  }, [ReplyObject]);
+
+  useEffect(() => {
+    console.log(elementRef.current);
+    if (elementRef.current) {
+      const height = elementRef.current.offsetHeight;
+      console.log("Element height:", height);
+      setreplyDivHeight(height);
+    }
+  }, [ReplyObject]);
   return (
     <>
-      <div className="flex dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px] w-full">
-        <div className="relative">
-          <div
-            className="detectme bg-red-600 p-[10px] bg-transparent text-[#aaabaf] hover:text-white "
-            onClick={() => setshowEmojiPicker(!showEmojiPicker)}
-          >
-            <BsEmojiSmile />
+      {ReplyObject.ReplyTextId && (
+        <div
+          className="px-10 py-2 dark:bg-[#1d232a] max-h-[90px] truncate ml-[1px]"
+          ref={elementRef}
+        >
+          <div className="bg-gray-500 p-1 flex justify-between items-center rounded-lg ">
+            <div>
+              <p>{ReplyObject.displayName}</p>
+              <p>{ReplyObject.ReplyText}</p>
+            </div>
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                setReplyObject({
+                  ReplyText: "",
+                  ReplyTextId: "",
+                  displayName: "",
+                });
+              }}
+            >
+              <ImCross />
+            </div>
           </div>
+        </div>
+      )}
+      <div className="flex md:ml-[1px] dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px]">
+        <div className="relative flex">
+          {[
+            {
+              icon: <BsEmojiSmile />,
+              onclick: () => {
+                setshowEmojiPicker(!showEmojiPicker);
+              },
+            },
+            {
+              icon: <ImAttachment />,
+              onclick: () => {
+                setshowMediaPicker(!showMediaPicker);
+              },
+            },
+          ].map(({ icon, onclick }) => {
+            return (
+              <div
+                className="detectme bg-red-600 p-[10px] bg-transparent text-[#aaabaf] hover:text-white cursor-pointer"
+                onClick={onclick}
+              >
+                {icon}
+              </div>
+            );
+          })}
           {showEmojiPicker && (
             <div className="fixed bottom-[60px] left-[20%] detectme ">
               <EmojiPicker
@@ -98,6 +179,15 @@ const Input = () => {
                 }} /*width={}*/
               />
             </div>
+          )}
+          {showMediaPicker && (
+            <ul className="absolute bottom-[65px] border w-[120px]">
+              {["file", "Photo or Video", "Poll", "Contact", "Drawing"].map(
+                (t) => (
+                  <li>{t}</li>
+                )
+              )}
+            </ul>
           )}
         </div>
         <input
