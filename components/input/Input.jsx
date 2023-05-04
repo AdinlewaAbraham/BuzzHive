@@ -5,11 +5,14 @@ import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 import { UserContext } from "../App";
 import { BsEmojiSmile } from "react-icons/bs";
 import { ImAttachment } from "react-icons/im";
-
+import { RiGalleryLine } from "react-icons/ri";
+import { TiChartBarOutline } from "react-icons/ti";
+import { CiUser } from "react-icons/ci";
 import EmojiPicker from "emoji-picker-react";
-import { AiOutlineSend } from "react-icons/ai";
+import { AiOutlineSend, AiOutlineFile } from "react-icons/ai";
 import { ImCross } from "react-icons/im";
-
+import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
+import MediaInput from "./MediaInput";
 const Input = () => {
   const { User } = useContext(UserContext);
   const {
@@ -19,6 +22,8 @@ const Input = () => {
     ReplyObject,
     setReplyObject,
     setreplyDivHeight,
+    setpicVidmedia,
+    picVidmedia,
   } = useContext(SelectedChannelContext);
   const [message, setmessage] = useState("");
   const [showMediaPicker, setshowMediaPicker] = useState(false);
@@ -116,6 +121,7 @@ const Input = () => {
       setreplyDivHeight(height);
     }
   }, [ReplyObject]);
+
   return (
     <>
       {ReplyObject.ReplyTextId && (
@@ -144,6 +150,7 @@ const Input = () => {
         </div>
       )}
       <div className="flex md:ml-[1px] dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px]">
+        {picVidmedia && <MediaInput />}
         <div className="relative flex">
           {[
             {
@@ -181,13 +188,50 @@ const Input = () => {
             </div>
           )}
           {showMediaPicker && (
-            <ul className="absolute bottom-[65px] border w-[120px]">
-              {["file", "Photo or Video", "Poll", "Contact", "Drawing"].map(
-                (t) => (
-                  <li>{t}</li>
-                )
-              )}
-            </ul>
+            <div
+              //  onClick={() => setshowMediaPicker(false)}
+              className="absolute bottom-[65px] dark:bg-black w-[160px] px-1 py-2 rounded-lg
+                hover:[&>div]:bg-gray-500 [&>div]:cursor-pointer [&>div]:rounded-md
+            text-[15px] [&>div>div]:flex [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 [&>div>div>svg]:mr-2 [&>div>label>svg]:mr-2"
+            >
+              <div className="px-0 py-0">
+                <label className="flex items-center w-full h-full cursor-pointer py-1 px-2">
+                  <AiOutlineFile />
+                  File
+                  <input
+                    type="file"
+                    className="hidden w-full h-full cursor-pointer"
+                  />
+                </label>
+              </div>
+              <div>
+                <label className="flex items-center w-full h-full cursor-pointer py-1 px-2">
+                  <RiGalleryLine />
+                  Photo or video
+                  <input
+                    type="file"
+                    className="hidden w-full h-full cursor-pointer"
+                    onChange={async (e) => {
+                      const blob = await downScalePicVid(e.target.files[0]);
+                      console.log(blob);
+                      setpicVidmedia(blob);
+                    }}
+                    accept="image/png, image/jpeg, video/mp4"
+                  />
+                </label>
+              </div>
+              <div>
+                <div>
+                  <TiChartBarOutline /> Poll
+                </div>
+              </div>
+              <div>
+                <div>
+                  <CiUser />
+                  Contact
+                </div>
+              </div>
+            </div>
           )}
         </div>
         <input
