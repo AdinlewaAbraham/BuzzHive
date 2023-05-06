@@ -19,10 +19,10 @@ const MediaInput = () => {
       </button>
       {picVidmedia.type.startsWith("image/") ? (
         <img src={URL.createObjectURL(picVidmedia)} alt="Downscaled media" />
-      ) : (<> <iframe src={URL.createObjectURL(picVidmedia)}  frameborder="0"></iframe>
-        <video controls className="w-full block mx-auto">
+      ) : (
+        <video controls className="w-full block mx-auto bg-red-800 fff">
           <source src={URL.createObjectURL(picVidmedia)} type="video/mp4" />
-        </video></>
+        </video>
       )}
 
       <div className="flex bg-black justify-between items-center p-2">

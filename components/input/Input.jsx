@@ -13,6 +13,7 @@ import { AiOutlineSend, AiOutlineFile } from "react-icons/ai";
 import { ImCross } from "react-icons/im";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import MediaInput from "./MediaInput";
+import PollInput from "./PollInput";
 const Input = () => {
   const { User } = useContext(UserContext);
   const {
@@ -27,9 +28,10 @@ const Input = () => {
   } = useContext(SelectedChannelContext);
   const [message, setmessage] = useState("");
   const [showMediaPicker, setshowMediaPicker] = useState(false);
+  const [showPollInput, setshowPollInput] = useState(false);
   const senderid = User.id;
   const elementRef = useRef(null);
-
+  //MediaInput
   function handleSend() {
     if (!message || message.trim().length === 0) return;
     if (ChatObject.activeChatType == "group") {
@@ -151,6 +153,15 @@ const Input = () => {
       )}
       <div className="flex md:ml-[1px] dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px]">
         {picVidmedia && <MediaInput />}
+        <button
+          onClick={() => {
+            setshowPollInput(!showPollInput);
+          }}
+          className="bg-red-600 fixed top-[200px] z-50 p-4"
+        >
+          toggle
+        </button>
+        {showPollInput && <PollInput />}
         <div className="relative flex">
           {[
             {
@@ -220,7 +231,12 @@ const Input = () => {
                   />
                 </label>
               </div>
-              <div>
+              <div
+                onClick={() => {
+                  setshowPollInput(true);
+                  setshowMediaPicker(false);
+                }}
+              >
                 <div>
                   <TiChartBarOutline /> Poll
                 </div>
