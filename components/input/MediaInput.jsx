@@ -1,28 +1,33 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { AiOutlineSend } from "react-icons/ai";
 import { BsEmojiSmile } from "react-icons/bs";
 import { handlePicVidUpload } from "@/utils/messagesUtils/handlePicVidUpload";
+import VideoPlayer from "./VideoPlayer";
 
 const MediaInput = () => {
   const { picVidmedia, ChatObject, setpicVidmedia } = useContext(
     SelectedChannelContext
   );
   console.log(picVidmedia);
+
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(".media-container")) {
+      setpicVidmedia(null);
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   return (
-    <div className="absolute bottom-2 left-2 w-[80%] z-10">
-      <button
-        className="bg-red-500 top-[70px] fixed"
-        onClick={() => setpicVidmedia(null)}
-      >
-        cancel
-      </button>
+    <div className="absolute bottom-2 left-2 w-[80%] z-10 media-container">
       {picVidmedia.type.startsWith("image/") ? (
         <img src={URL.createObjectURL(picVidmedia)} alt="Downscaled media" />
       ) : (
-        <video controls className="w-full block mx-auto bg-red-800 fff">
-          <source src={URL.createObjectURL(picVidmedia)} type="video/mp4" />
-        </video>
+        <VideoPlayer src={URL.createObjectURL(picVidmedia)} />
       )}
 
       <div className="flex bg-black justify-between items-center p-2">

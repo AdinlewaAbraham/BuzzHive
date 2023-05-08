@@ -14,6 +14,9 @@ import { ImCross } from "react-icons/im";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import MediaInput from "./MediaInput";
 import PollInput from "./PollInput";
+import SendContact from "./SendContact";
+import FileInput from "./FileInput";
+import Modal from "../Modal";
 const Input = () => {
   const { User } = useContext(UserContext);
   const {
@@ -29,9 +32,11 @@ const Input = () => {
   const [message, setmessage] = useState("");
   const [showMediaPicker, setshowMediaPicker] = useState(false);
   const [showPollInput, setshowPollInput] = useState(false);
+  const [showSendContact, setshowSendContact] = useState(false);
+  const [file, setfile] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const senderid = User.id;
   const elementRef = useRef(null);
-  //MediaInput
   function handleSend() {
     if (!message || message.trim().length === 0) return;
     if (ChatObject.activeChatType == "group") {
@@ -86,7 +91,6 @@ const Input = () => {
           : {}
       );
     }
-    //location.href = "#scrollToMe"
     document
       .getElementById("scrollToMe")
       .scrollIntoView({ behavior: "smooth" });
@@ -111,12 +115,8 @@ const Input = () => {
       handleSend();
     }
   }
-  useEffect(() => {
-    console.log(ReplyObject);
-  }, [ReplyObject]);
 
   useEffect(() => {
-    console.log(elementRef.current);
     if (elementRef.current) {
       const height = elementRef.current.offsetHeight;
       console.log("Element height:", height);
@@ -124,8 +124,36 @@ const Input = () => {
     }
   }, [ReplyObject]);
 
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(".Poll-input")) {
+      // setshowPollInput(false);
+      setShowModal(true);
+    }
+    if (!e.target.closest(".file-input")) {
+      setfile(null);
+    }
+  };
+  const handleCancel = () => {
+    setShowModal(false);
+  };
+
+  const handleExit = () => {
+    console.log("Exiting...");
+  };
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   return (
-    <>
+    <>{console.log(showModal)}
+      {showModal && (
+        <Modal
+          onConfirm={handleExit}
+          onCancel={handleCancel}
+        />
+      )}
       {ReplyObject.ReplyTextId && (
         <div
           className="px-10 py-2 dark:bg-[#1d232a] max-h-[90px] truncate ml-[1px]"
@@ -153,15 +181,12 @@ const Input = () => {
       )}
       <div className="flex md:ml-[1px] dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px]">
         {picVidmedia && <MediaInput />}
-        <button
-          onClick={() => {
-            setshowPollInput(!showPollInput);
-          }}
-          className="bg-red-600 fixed top-[200px] z-50 p-4"
-        >
-          toggle
-        </button>
+        {console.log(file)}
+        {file && <FileInput file={file} />}
         {showPollInput && <PollInput />}
+        {showSendContact && (
+          <SendContact setshowSendContact={setshowSendContact} />
+        )}
         <div className="relative flex">
           {[
             {
@@ -200,18 +225,23 @@ const Input = () => {
           )}
           {showMediaPicker && (
             <div
-              //  onClick={() => setshowMediaPicker(false)}
               className="absolute bottom-[65px] dark:bg-black w-[160px] px-1 py-2 rounded-lg
                 hover:[&>div]:bg-gray-500 [&>div]:cursor-pointer [&>div]:rounded-md
             text-[15px] [&>div>div]:flex [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 [&>div>div>svg]:mr-2 [&>div>label>svg]:mr-2"
             >
-              <div className="px-0 py-0">
+              <div className="file-input px-0 py-0">
                 <label className="flex items-center w-full h-full cursor-pointer py-1 px-2">
                   <AiOutlineFile />
                   File
                   <input
                     type="file"
                     className="hidden w-full h-full cursor-pointer"
+                    onChange={(e) => {
+                      console.log(e.target.files[0]);
+                      setfile(e.target.files[0]);
+                      console.log(e.target.files[0]);
+                      setshowMediaPicker(false);
+                    }}
                   />
                 </label>
               </div>
@@ -226,12 +256,14 @@ const Input = () => {
                       const blob = await downScalePicVid(e.target.files[0]);
                       console.log(blob);
                       setpicVidmedia(blob);
+                      setshowMediaPicker(false);
                     }}
                     accept="image/png, image/jpeg, video/mp4"
                   />
                 </label>
               </div>
               <div
+                className="Poll-input"
                 onClick={() => {
                   setshowPollInput(true);
                   setshowMediaPicker(false);
@@ -241,7 +273,13 @@ const Input = () => {
                   <TiChartBarOutline /> Poll
                 </div>
               </div>
-              <div>
+              <div
+                className="sendContact"
+                onClick={() => {
+                  setshowSendContact(!showSendContact);
+                  setshowMediaPicker(false);
+                }}
+              >
                 <div>
                   <CiUser />
                   Contact

@@ -9,8 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@cyntler/react-doc-viewer": "^1.13.0",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
+    "@fluentui/react": "^8.109.2",
+    "@fluentui/react-cards": "^0.205.83",
     "@heroicons/react": "^2.0.16",
     "@next/font": "13.1.6",
     "emoji-mart": "^5.5.2",

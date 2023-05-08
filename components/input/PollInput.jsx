@@ -8,6 +8,8 @@ const PollInput = () => {
     { id: "2", value: "" },
   ]);
   const [currentDraggedOptionId, setcurrentDraggedOptionId] = useState(null);
+  const [dragIndex, setDragIndex] = useState(null);
+  const [overIndex, setOverIndex] = useState(null);
 
   const handleChange = (id, value) => {
     const newInputs = [...inputs];
@@ -31,6 +33,7 @@ const PollInput = () => {
 
   const handleDragStart = (e, id) => {
     e.dataTransfer.setData("text/plain", id);
+    setDragIndex(inputs.findIndex((input) => input.id === id));
   };
 
   const handleDrop = (e, id) => {
@@ -47,13 +50,13 @@ const PollInput = () => {
   };
 
   const handleDragOver = (e, id) => {
-    setcurrentDraggedOptionId(id);
     e.preventDefault();
-    console.log(e);
+    if (dragIndex !== null && overIndex !== null && overIndex !== dragIndex) {
+      setcurrentDraggedOptionId(id);
+    }
   };
-
   return (
-    <div className="absolute bottom-2 left-2 w-[50%] z-10 dark:bg-black min-w-[260px] flex flex-col p-4">
+    <div className="Poll-input absolute bottom-2 left-2 w-[50%] z-10 dark:bg-black min-w-[260px] flex flex-col p-4  rounded-lg">
       <input
         type="text"
         placeholder="Type poll question"
@@ -63,29 +66,40 @@ const PollInput = () => {
       <div className="rounded-lg px-1 pb-[6px] bg-gray-700">
         {inputs.map((input, index) => (
           <div
-            className={`${
-              currentDraggedOptionId == input.id && "pt-10"
-            } flex w-full  border-b items-center p-2`}
+            className={`flex w-full border-b items-center p-2 ${
+              currentDraggedOptionId === input.id
+                ? dragIndex < index
+                  ? "pb-10"
+                  : "pt-10"
+                : ""
+            } ${index !== inputs.length - 1 ? "cursor-grab" : ""}`}
             draggable={index !== inputs.length - 1}
             onDragStart={(e) => {
-              if (index == inputs.length - 1) return;
+              if (index === inputs.length - 1) return;
+              setDragIndex(index);
               handleDragStart(e, input.id);
             }}
             onDrop={(e) => {
-              if (index == inputs.length - 1) return;
+              if (index === inputs.length - 1) return;
               handleDrop(e, input.id);
             }}
-            onDragOver={(e) => handleDragOver(e, input.id)}
+            onDragOver={(e) => {
+              if (index !== inputs.length - 1) {
+                setOverIndex(index);
+              }
+              handleDragOver(e, input.id);
+            }}
           >
             <input
-              className={`w-full bg-inherit outline-none`}
+              className="w-full bg-inherit outline-none z-50"
               key={input.id}
               value={input.value}
               onChange={(e) => handleChange(input.id, e.target.value)}
               onBlur={() => handleBlur(input.id, index)}
               placeholder="+  Add Option"
+              draggable={false}
             />
-            <div className=" cursor-grab">
+            <div className={`flex items-center p-1`}>
               <RxHamburgerMenu />
             </div>
           </div>
@@ -96,7 +110,7 @@ const PollInput = () => {
         <div>
           <input type="checkbox" /> Allow multiple answers{" "}
         </div>
-        <div className="p-3 bg-blue-600 rounded-lg cursor-pointer">
+        <div className="bg-blue-600 flex items-center px-2 py-2 rounded-md">
           <AiOutlineSend />
         </div>
       </div>

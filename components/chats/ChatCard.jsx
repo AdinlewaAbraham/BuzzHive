@@ -27,9 +27,14 @@ const ChatCard = ({
   unReadCount,
   set_Chats,
 }) => {
-  const { setChats, ChatObject, setChatObject, setshowChats, setactiveId, activeId } = useContext(
-    SelectedChannelContext
-  );
+  const {
+    setChats,
+    ChatObject,
+    setChatObject,
+    setshowChats,
+    setactiveId,
+    activeId,
+  } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
   const [invalidURL, setinvalidURL] = useState(true);
   const [currentChatId, setcurrentChatId] = useState();
@@ -39,7 +44,10 @@ const ChatCard = ({
     return JSON.parse(localStorage.getItem(id));
   }, [id]);
   useEffect(() => {
-    sessionStorage.setItem("activeChatId", JSON.stringify(ChatObject.activeChatId))
+    sessionStorage.setItem(
+      "activeChatId",
+      JSON.stringify(ChatObject.activeChatId)
+    );
     activeChatIdRef.current = ChatObject.activeChatId;
   }, [ChatObject.activeChatId]);
 
@@ -52,32 +60,39 @@ const ChatCard = ({
     return storedData ? JSON.parse(storedData) : null;
   };
 
-
   const handleChatClick = async () => {
     if (ChatObject.activeChatId === id) {
       return;
     }
     if (unReadCount == 0) {
-      const data = JSON.parse(localStorage.getItem(id))
+      const data = JSON.parse(localStorage.getItem(id));
       if (data) {
-        const filteredData = data.filter(message => message.type !== 'unread')
-        localStorage.setItem(id, JSON.stringify(filteredData))
-      };
+        const filteredData = data.filter(
+          (message) => message.type !== "unread"
+        );
+        localStorage.setItem(id, JSON.stringify(filteredData));
+      }
     } else {
-      const data = JSON.parse(localStorage.getItem(id))
+      const data = JSON.parse(localStorage.getItem(id));
       const unreadObj = {
         type: "unread",
       };
       if (data) {
-        const filteredData = data.filter(message => message.type !== 'unread')
-        const index = filteredData.length - unReadCount
-        const modifiedArr = [...filteredData.slice(0, index), unreadObj, ...filteredData.slice(index)]
-        localStorage.setItem(id, JSON.stringify(modifiedArr))
+        const filteredData = data.filter(
+          (message) => message.type !== "unread"
+        );
+        const index = filteredData.length - unReadCount;
+        const modifiedArr = [
+          ...filteredData.slice(0, index),
+          unreadObj,
+          ...filteredData.slice(index),
+        ];
+        localStorage.setItem(id, JSON.stringify(modifiedArr));
       }
     }
-    console.log(unReadCount)
+    console.log(unReadCount);
     console.log(JSON.parse(localStorage.getItem("user")));
-    setactiveId(id)
+    setactiveId(id);
     setChatObject({
       activeChatId: id,
       activeChatType: type,
@@ -146,9 +161,7 @@ const ChatCard = ({
     if (!LocalMessages) {
       return;
     }
-    const lastMessageTimestamp = LocalMessages[
-      LocalMessages.length - 1
-    ]
+    const lastMessageTimestamp = LocalMessages[LocalMessages.length - 1]
       ? LocalMessages[LocalMessages.length - 1].timestamp
       : { seconds: 0, nanoseconds: 0 };
     if (!lastMessageTimestamp) {
@@ -172,11 +185,11 @@ const ChatCard = ({
       localStorage.getItem("user")
     ).unReadMessages;
     if (id == "w6AHSRlOZ1Tje6L8q3ZA05Le78B3eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2") {
-      console.log(qt)
+      console.log(qt);
     }
     const LocallyStoredMessages = JSON.parse(localStorage.getItem(id));
     const unsub = onSnapshot(q, (snapshot) => {
-      console.log("ran")
+      console.log("ran");
       if (!lastUnReadMessagesObject[id]) return;
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -186,21 +199,22 @@ const ChatCard = ({
           lastMessageTimestamp.seconds +
           lastMessageTimestamp.nanoseconds / 1000000000;
         const isNewMessage = severTS > localTS;
-        console.log(isNewMessage)
-        console.log(data)
+        console.log(isNewMessage);
+        console.log(data);
         if (isNewMessage && data.id !== null) {
           console.log(data);
-          if (!chats.some((chat) => chat.id === data.id) && !LocallyStoredMessages.some((chat) => chat.id === data.id)) {
+          if (
+            !chats.some((chat) => chat.id === data.id) &&
+            !LocallyStoredMessages.some((chat) => chat.id === data.id)
+          ) {
             chats.push(data);
-            console.log(data)
+            console.log(data);
           }
         }
       });
-      console.log(LocallyStoredMessages)
-      if (chats.length == 0) return
-      const sortedChats = [...chats].sort(
-        (a, b) => a.timestamp - b.timestamp
-      );
+      console.log(LocallyStoredMessages);
+      if (chats.length == 0) return;
+      const sortedChats = [...chats].sort((a, b) => a.timestamp - b.timestamp);
 
       console.log(sortedChats);
 
@@ -265,15 +279,14 @@ const ChatCard = ({
     }
   }, [ChatObject.activeChatId]);
 
-
-
   return (
     <div
-      className={`${ChatObject.activeChatId == id
-        ? "bg-gray-600 hover:bg-gray-600"
-        : "hover:bg-gray-700 "
-        } flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
-        rounded-xl w-[100%] hover: relative`}
+      className={`${
+        ChatObject.activeChatId == id
+          ? "bg-gray-600 hover:bg-gray-600"
+          : "hover:bg-gray-700 "
+      } flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
+        rounded-xl w-[100%] relative`}
       onClick={() => {
         handleChatClick();
       }}
