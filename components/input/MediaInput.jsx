@@ -5,23 +5,10 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { handlePicVidUpload } from "@/utils/messagesUtils/handlePicVidUpload";
 import VideoPlayer from "./VideoPlayer";
 
-const MediaInput = () => {
-  const { picVidmedia, ChatObject, setpicVidmedia } = useContext(
-    SelectedChannelContext
-  );
+const MediaInput = ({ picVidmedia, setpicVidmediaToNull }) => {
+  const { ChatObject } = useContext(SelectedChannelContext);
   console.log(picVidmedia);
 
-  const handleClickOutside = (e) => {
-    if (!e.target.closest(".media-container")) {
-      setpicVidmedia(null);
-    }
-  };
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
   return (
     <div className="absolute bottom-2 left-2 w-[80%] z-10 media-container">
       {picVidmedia.type.startsWith("image/") ? (
@@ -41,7 +28,7 @@ const MediaInput = () => {
           className="bg-blue-600 flex items-center px-2 py-2 rounded-md"
           onClick={async () => {
             await handlePicVidUpload(picVidmedia, ChatObject).then(() => {
-              setpicVidmedia(null);
+              setpicVidmediaToNull(null);
             });
           }}
         >

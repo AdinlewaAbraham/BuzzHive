@@ -8,7 +8,9 @@ export const sendGroupMessage = async (
   messageText,
   senderDisplayName,
   type,
-  time
+  time,
+  replyObj,
+  fileObj,
 ) => {
   const groupRef = doc(db, "groups", groupID);
   const message = {
@@ -20,6 +22,8 @@ export const sendGroupMessage = async (
     senderDisplayName: senderDisplayName,
     groupID: groupID,
     reactions: [],
+    replyObject: replyObj || {},
+    fileObject: fileObj || {},
   };
   const user = await getUser(senderId);
   const newMessage = {
@@ -32,6 +36,7 @@ export const sendGroupMessage = async (
   };
   try {
     const messagesRef = collection(groupRef, "messages");
+    console.log(message)
     const newMessageRef = await addDoc(messagesRef, message);
     console.log("newMessageRef", newMessageRef);
     const newMessageId = newMessageRef.id;

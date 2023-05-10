@@ -10,7 +10,8 @@ export async function sendMessage(
   senderDisplayName,
   type,
   time,
-  replyObj
+  replyObj,
+  fileObj,
 ) {
   const message = {
     type: type,
@@ -20,7 +21,8 @@ export async function sendMessage(
     senderDisplayName: senderDisplayName,
     timestamp: time,
     reactions: [],
-    replyObject: replyObj,
+    replyObject: replyObj || {},
+    fileObject: fileObj || {},
   };
 
   try {

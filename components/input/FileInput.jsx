@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   AiOutlineFilePdf,
   AiOutlineFileWord,
@@ -7,9 +7,16 @@ import {
   AiOutlineSend,
   AiOutlineFile,
 } from "react-icons/ai";
-import {BsEmojiSmile} from "react-icons/bs"
+import { BsEmojiSmile } from "react-icons/bs";
+import { handleFileUpload } from "@/utils/messagesUtils/handleFileUpload";
+import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
-const FileInput = ({ file }) => {
+
+
+
+const FileInput = ({ file, setfile }) => {
+  const { ChatObject } = useContext(SelectedChannelContext);
+  const [fileCaption, setfileCaption] = useState("");
   let fileType;
   if (file.type === "application/pdf") {
     fileType = <AiOutlineFilePdf size={100} />;
@@ -44,12 +51,14 @@ const FileInput = ({ file }) => {
           type="text"
           className="px-4 py-2 bg-transparent w-full outline-none placeholder-[#aaabaf]"
           placeholder="Caption (optional)"
+          onChange={(e)=>{setfileCaption(e.target.value)}}
         />
         <div
           className="bg-blue-600 flex items-center px-2 py-2 rounded-md"
           onClick={async () => {
-            await handlePicVidUpload(picVidmedia, ChatObject).then(() => {
-              setpicVidmedia(null);
+            await handleFileUpload(file, ChatObject, fileCaption).then(() => {
+              setfile(null);
+              console.log("ran");
             });
           }}
         >

@@ -32,8 +32,6 @@ const SelectedChannelContext = createContext({
   setactiveId: () => {},
   replyDivHeight: "",
   setreplyDivHeight: () => {},
-  picVidmedia: null,
-  setpicVidmedia: () => {},
 });
 
 export const SelectedChannelProvider = ({ children }) => {
@@ -56,7 +54,6 @@ export const SelectedChannelProvider = ({ children }) => {
     ReplyTextId: "",
     displayName: "",
   });
-  const [picVidmedia, setpicVidmedia] = useState(null);
 
   return (
     <SelectedChannelContext.Provider
@@ -81,8 +78,6 @@ export const SelectedChannelProvider = ({ children }) => {
         setReplyObject,
         replyDivHeight,
         setreplyDivHeight,
-        picVidmedia,
-        setpicVidmedia,
       }}
     >
       {children}

@@ -1,4 +1,11 @@
-import { useContext, useState, useRef, useEffect } from "react";
+import {
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
@@ -16,7 +23,6 @@ import MediaInput from "./MediaInput";
 import PollInput from "./PollInput";
 import SendContact from "./SendContact";
 import FileInput from "./FileInput";
-import Modal from "../Modal";
 const Input = () => {
   const { User } = useContext(UserContext);
   const {
@@ -26,19 +32,26 @@ const Input = () => {
     ReplyObject,
     setReplyObject,
     setreplyDivHeight,
-    setpicVidmedia,
-    picVidmedia,
   } = useContext(SelectedChannelContext);
   const [message, setmessage] = useState("");
   const [showMediaPicker, setshowMediaPicker] = useState(false);
   const [showPollInput, setshowPollInput] = useState(false);
   const [showSendContact, setshowSendContact] = useState(false);
   const [file, setfile] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+
+  const [picVidmedia, setpicVidmedia] = useState(null);
+
   const senderid = User.id;
   const elementRef = useRef(null);
   function handleSend() {
+    console.log(ReplyObject);
     if (!message || message.trim().length === 0) return;
+    const replyObject = {
+      replyText: ReplyObject.ReplyText,
+      replyTextId: ReplyObject.ReplyTextId,
+      replyDisplayName: ReplyObject.displayName,
+    };
     if (ChatObject.activeChatType == "group") {
       const time = new Date();
       const messageObj = {
@@ -55,13 +68,7 @@ const Input = () => {
         User.name,
         ReplyObject.ReplyTextId ? "reply" : "regular",
         time,
-        ReplyObject.ReplyTextId
-          ? {
-              replyText: ReplyObject.ReplyText,
-              replyTextId: ReplyObject.ReplyTextId,
-              replyDisplayName: ReplyObject.displayName,
-            }
-          : {}
+        ReplyObject.ReplyTextId ? replyObject : {}
       );
     } else if (ChatObject.activeChatType == "personal") {
       const time = new Date();
@@ -82,13 +89,7 @@ const Input = () => {
         User.name,
         ReplyObject.ReplyTextId ? "reply" : "regular",
         time,
-        ReplyObject.ReplyTextId
-          ? {
-              replyText: ReplyObject.ReplyText,
-              replyTextId: ReplyObject.ReplyTextId,
-              replyDisplayName: ReplyObject.displayName,
-            }
-          : {}
+        ReplyObject.ReplyTextId ? replyObject : {}
       );
     }
     document
@@ -123,36 +124,79 @@ const Input = () => {
       setreplyDivHeight(height);
     }
   }, [ReplyObject]);
+  const popupRef = useRef(null);
 
-  const handleClickOutside = (e) => {
-    if (!e.target.closest(".Poll-input")) {
-      // setshowPollInput(false);
-      setShowModal(true);
-    }
-    if (!e.target.closest(".file-input")) {
-      setfile(null);
-    }
-  };
-  const handleCancel = () => {
-    setShowModal(false);
-  };
+  const handleClickOutside = useCallback(
+    (file, picVidmedia, showPollInput, showSendContact, e) => {
+      if (
+        (file || picVidmedia || showPollInput || showSendContact) &&
+        !e.target.closest(".detectMe")
+      ) {
+        setShowPopup(true);
+      } else {
+        setShowPopup(false);
+      }
 
-  const handleExit = () => {
-    console.log("Exiting...");
-  };
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
+      if (!e.target.closest(".MediaPicker")) {
+        setshowMediaPicker(false);
+      }
+    },
+    []
+  );
+
+  useLayoutEffect(() => {
+    const handleClick = (e) => {
+      handleClickOutside(file, picVidmedia, showPollInput, showSendContact, e);
     };
-  }, []);
+
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [
+    handleClickOutside,
+    file,
+    picVidmedia,
+    showPollInput,
+    showSendContact,
+    showPopup,
+  ]);
+  function setpicVidmediafunc() {
+    setpicVidmedia(null);
+  }
   return (
-    <>{console.log(showModal)}
-      {showModal && (
-        <Modal
-          onConfirm={handleExit}
-          onCancel={handleCancel}
-        />
+    <>
+      {showPopup && (
+        <div
+          className="Poll-input fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50"
+          ref={popupRef}
+        >
+          <div className="bg-black absolute p-4 rounded-lg">
+            <p>Do you want to forfeit your input?</p>
+            <button
+              className="p-4 bg-blue-500"
+              onClick={() => {
+                setfile(null);
+                setpicVidmedia(null);
+                setShowPopup(false);
+                setshowPollInput(false);
+                setshowSendContact(false);
+              }}
+            >
+              Discard
+            </button>
+            <button
+              className="p-4 detectMe"
+              onClick={() => {
+                console.log("clicked");
+                setShowPopup(false);
+              }}
+            >
+              return to media
+            </button>
+          </div>
+        </div>
       )}
       {ReplyObject.ReplyTextId && (
         <div
@@ -180,13 +224,19 @@ const Input = () => {
         </div>
       )}
       <div className="flex md:ml-[1px] dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px]">
-        {picVidmedia && <MediaInput />}
-        {console.log(file)}
-        {file && <FileInput file={file} />}
+        <div className="detectMe">
+          {picVidmedia && (
+            <MediaInput
+              picVidmedia={picVidmedia}
+              setpicVidmediaToNull={() => {
+                setpicVidmedia(null);
+              }}
+            />
+          )}
+          {file && <FileInput file={file} setfile={setfile} />}
+        </div>
         {showPollInput && <PollInput />}
-        {showSendContact && (
-          <SendContact setshowSendContact={setshowSendContact} />
-        )}
+        {showSendContact && <SendContact />}
         <div className="relative flex">
           {[
             {
@@ -204,7 +254,7 @@ const Input = () => {
           ].map(({ icon, onclick }) => {
             return (
               <div
-                className="detectme bg-red-600 p-[10px] bg-transparent text-[#aaabaf] hover:text-white cursor-pointer"
+                className="detectme MediaPicker bg-red-600 p-[10px] bg-transparent text-[#aaabaf] hover:text-white cursor-pointer"
                 onClick={onclick}
               >
                 {icon}
@@ -225,9 +275,10 @@ const Input = () => {
           )}
           {showMediaPicker && (
             <div
-              className="absolute bottom-[65px] dark:bg-black w-[160px] px-1 py-2 rounded-lg
+              className="detectMe MediaPicker absolute bottom-[65px] dark:bg-black w-[160px] px-1 py-2 rounded-lg
                 hover:[&>div]:bg-gray-500 [&>div]:cursor-pointer [&>div]:rounded-md
-            text-[15px] [&>div>div]:flex [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 [&>div>div>svg]:mr-2 [&>div>label>svg]:mr-2"
+            text-[15px] [&>div>div]:flex [&>div>div]:items-center 
+            [&>div>div]:py-1 [&>div>div]:px-2 [&>div>div>svg]:mr-2 [&>div>label>svg]:mr-2"
             >
               <div className="file-input px-0 py-0">
                 <label className="flex items-center w-full h-full cursor-pointer py-1 px-2">

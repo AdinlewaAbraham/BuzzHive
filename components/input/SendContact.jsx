@@ -23,7 +23,7 @@ const UserCard = (p) => {
   );
 };
 
-const SendContact = ({setshowSendContact}) => {
+const SendContact = () => {
   const { User } = useContext(UserContext);
   const [selectedUsers, setselectedUsers] = useState([]);
 
@@ -56,17 +56,6 @@ const SendContact = ({setshowSendContact}) => {
       );
     }
   }
-  const handleClickOutside = (e) => {
-    if (!e.target.closest(".sendContact")) {
-      setshowSendContact(false);
-    }
-  };
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []); 
   return (
     <div className="sendContact absolute bottom-5 left-5 dark:bg-black z-20 p-2 w-[50%] max-h-[70%] rounded-lg">
       <h1 className="text-xl font-bold ">Share Contact</h1>
