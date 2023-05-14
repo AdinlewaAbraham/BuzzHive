@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { UserContext } from "../App";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -54,11 +54,22 @@ const MessageCard = ({ chat }) => {
     item.action();
     setshowMessageMenu(false);
   };
+
+  // const handleClickOutside = (e) => {
+  //   console.log(e)
+  //   if(!e) return
+  //   if (!e.target.closest(".menu")) {
+  //     setshowMessageMenu(false);
+  //   }
+  // };
+  // useEffect(() => {
+  //   window.addEventListener("click", handleClickOutside);
+  // }, []);
   return (
     <div
       className={`flex items-center my-2 justify-start ${
         chat.senderId === currentId ? " flex-row-reverse" : " "
-      } ${chat.reactions.length === 0 ? "" : "mb-[30px]"} `}
+      } ${chat.reactions.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
     >
@@ -67,7 +78,7 @@ const MessageCard = ({ chat }) => {
           chat.senderId === currentId
             ? " text-white text-right ml-2 dark:bg-[#296eff] mr-5"
             : "dark:bg-[#252d35] text-white text-left mr-2 ml-5"
-        }  `}
+        }  ${chat.type === "pic/video" && "w-[300px]"}`}
       >
         {chat.type == "reply" && (
           <div
@@ -97,10 +108,17 @@ const MessageCard = ({ chat }) => {
         )}
         {chat.type === "pic/video" && (
           <div>
-            {console.log(chat.dataObject)}
-            <ImageComponent src={chat.dataObject.blurredPixelatedBlobDownloadURL}/>
-            {/* <VideoComponent src={chat.dataObject.downloadURL}/> */}
-            
+            {console.log(chat.dataObject.type)}
+            {chat.dataObject.type.startsWith("image") ? (
+              <ImageComponent
+                blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                downloadSRC={chat.dataObject.downloadURL}
+                messageId={chat.id}
+              />
+            ) : (
+              <VideoComponent src={chat.dataObject.downloadURL} />
+            )}
+
             {chat.dataObject.name}
           </div>
         )}

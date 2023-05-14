@@ -6,7 +6,11 @@ import { handlePicVidUpload } from "@/utils/messagesUtils/handlePicVidUpload";
 import VideoPlayer from "./VideoPlayer";
 import { UserContext } from "../App";
 
-const MediaInput = ({ picVidmedia, setpicVidmediaToNull }) => {
+const MediaInput = ({
+  picVidmedia,
+  blurredPicVidmedia,
+  setpicVidmediaToNull,
+}) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
   const [mediaCaption, setmediaCaption] = useState("");
@@ -17,7 +21,10 @@ const MediaInput = ({ picVidmedia, setpicVidmediaToNull }) => {
       {picVidmedia.type.startsWith("image/") ? (
         <img src={URL.createObjectURL(picVidmedia)} alt="Downscaled media" />
       ) : (
-        <VideoPlayer src={URL.createObjectURL(picVidmedia)} />
+        <>
+            <img src={picVidmedia.blurredThumbnail} alt="" width={300} height={300}/>
+          {/* <VideoPlayer src={URL.createObjectURL(picVidmedia)} /> */}
+        </>
       )}
 
       <div className="flex bg-black justify-between items-center p-2">
@@ -36,6 +43,7 @@ const MediaInput = ({ picVidmedia, setpicVidmediaToNull }) => {
             const time = new Date();
             await handlePicVidUpload(
               picVidmedia,
+              blurredPicVidmedia,
               ChatObject,
               mediaCaption,
               User,

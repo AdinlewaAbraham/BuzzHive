@@ -3,9 +3,9 @@ import { storage } from "../firebaseUtils/firebase";
 import { v4 as uuid } from "uuid";
 import { sendMessage } from "./sendMessage";
 import { sendGroupMessage } from "../groupUtils/sendGroupMessage";
-import { downScalePicVid } from "./downScalePicVid";
 export const handlePicVidUpload = async (
   downscaledBlob,
+  blurredPixelatedBlob,
   ChatObject,
   mediaCaption,
   User,
@@ -21,7 +21,6 @@ export const handlePicVidUpload = async (
       isImage ? "images" : "videos"
     }/${id}`
   );
-  const blurredPixelatedBlob = await downScalePicVid(downscaledBlob, 0.35, 0.1, 2);
   let blurredPixelatedBlobDownloadURL;
   if (blurredPixelatedBlob) {
     console.log(blurredPixelatedBlob);

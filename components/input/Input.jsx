@@ -19,6 +19,7 @@ import EmojiPicker from "emoji-picker-react";
 import { AiOutlineSend, AiOutlineFile } from "react-icons/ai";
 import { ImCross } from "react-icons/im";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
+import { makeBlurredVideoThumbnail } from "@/utils/messagesUtils/makeBlurredVideoThumbnail";
 import MediaInput from "./MediaInput";
 import PollInput from "./PollInput";
 import SendContact from "./SendContact";
@@ -226,6 +227,7 @@ const Input = () => {
         <div className="detectMe">
           {picVidmedia && (
             <MediaInput
+              blurredPicVidmedia={blurredPicVidmedia}
               picVidmedia={picVidmedia}
               setpicVidmediaToNull={() => {
                 setpicVidmedia(null);
@@ -304,21 +306,28 @@ const Input = () => {
                     type="file"
                     className="hidden w-full h-full cursor-pointer"
                     onChange={async (e) => {
-                      const blob = await downScalePicVid(
-                        e.target.files[0],
-                        0.7,
-                        1,
-                        0
-                      );
-                      const downscaledBlod = await downScalePicVid(
-                        blob,
-                        0.35,
-                        0.1,
-                        2
-                      );
-                      console.log(blob);
-                      setpicVidmedia(blob);
-                      setblurredPicVidmedia(downscaledBlod);
+                      if (e.target.files[0].type.startsWith("image")) {
+                        const blob = await downScalePicVid(
+                          e.target.files[0],
+                          0.7,
+                          1,
+                          0
+                        );
+                        const downscaledBlod = await downScalePicVid(
+                          blob,
+                          0.35,
+                          0.1,
+                          2
+                        );
+                        setpicVidmedia(blob);
+                        setblurredPicVidmedia(downscaledBlod);
+                      } else {
+                        const image = await makeBlurredVideoThumbnail(e.target.files[0])
+                        const videoObj = e.target.files[0]
+                        videoObj.blurredThumbnail = image
+                        console.log(videoObj)
+                        setpicVidmedia(videoObj);
+                      }
                       setshowMediaPicker(false);
                     }}
                     accept="image/png, image/jpeg, video/mp4"
