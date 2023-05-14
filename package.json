@@ -27,7 +27,9 @@
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "18.2.0",
     "react-icons": "^4.8.0",
+    "react-lazy-load-image-component": "^1.5.6",
     "react-modal": "^3.16.1",
+    "react-thumbnail": "^1.0.0",
     "redux": "^4.2.1",
     "uuidv4": "^6.2.13"
   },

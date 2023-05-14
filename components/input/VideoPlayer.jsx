@@ -37,7 +37,7 @@ function VideoPlayer({ src }) {
   }
 
   return (
-    <div className="relative">
+    <div className="relative media-container">
       <video onClick={handlePlayPause} 
         ref={videoRef}
         onDurationChange={handleDurationChange}

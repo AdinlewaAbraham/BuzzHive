@@ -41,6 +41,7 @@ const Input = () => {
   const [showPopup, setShowPopup] = useState(false);
 
   const [picVidmedia, setpicVidmedia] = useState(null);
+  const [blurredPicVidmedia, setblurredPicVidmedia] = useState(null);
 
   const senderid = User.id;
   const elementRef = useRef(null);
@@ -162,9 +163,6 @@ const Input = () => {
     showSendContact,
     showPopup,
   ]);
-  function setpicVidmediafunc() {
-    setpicVidmedia(null);
-  }
   return (
     <>
       {showPopup && (
@@ -179,6 +177,7 @@ const Input = () => {
               onClick={() => {
                 setfile(null);
                 setpicVidmedia(null);
+                setblurredPicVidmedia(null);
                 setShowPopup(false);
                 setshowPollInput(false);
                 setshowSendContact(false);
@@ -230,6 +229,7 @@ const Input = () => {
               picVidmedia={picVidmedia}
               setpicVidmediaToNull={() => {
                 setpicVidmedia(null);
+                setblurredPicVidmedia(null);
               }}
             />
           )}
@@ -304,9 +304,21 @@ const Input = () => {
                     type="file"
                     className="hidden w-full h-full cursor-pointer"
                     onChange={async (e) => {
-                      const blob = await downScalePicVid(e.target.files[0]);
+                      const blob = await downScalePicVid(
+                        e.target.files[0],
+                        0.7,
+                        1,
+                        0
+                      );
+                      const downscaledBlod = await downScalePicVid(
+                        blob,
+                        0.35,
+                        0.1,
+                        2
+                      );
                       console.log(blob);
                       setpicVidmedia(blob);
+                      setblurredPicVidmedia(downscaledBlod);
                       setshowMediaPicker(false);
                     }}
                     accept="image/png, image/jpeg, video/mp4"

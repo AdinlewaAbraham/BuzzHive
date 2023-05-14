@@ -178,7 +178,6 @@ const ContentContainer = () => {
                       : "70px"
                   }`,
                 }}
-                //ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
               >
                 <AiOutlineArrowDown size={23} />
               </div>

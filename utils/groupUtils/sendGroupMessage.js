@@ -10,7 +10,7 @@ export const sendGroupMessage = async (
   type,
   time,
   replyObj,
-  fileObj,
+  dataObj,
 ) => {
   const groupRef = doc(db, "groups", groupID);
   const message = {
@@ -23,7 +23,7 @@ export const sendGroupMessage = async (
     groupID: groupID,
     reactions: [],
     replyObject: replyObj || {},
-    fileObject: fileObj || {},
+    dataObject: dataObj || {},
   };
   const user = await getUser(senderId);
   const newMessage = {

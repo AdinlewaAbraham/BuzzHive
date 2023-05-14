@@ -3,12 +3,10 @@ import { storage } from "../firebaseUtils/firebase";
 import { v4 as uuid } from "uuid";
 import { sendMessage } from "./sendMessage";
 import { sendGroupMessage } from "../groupUtils/sendGroupMessage";
-import { UserContext } from "@/components/App";
 import { useContext } from "react";
 
-export const handleFileUpload = async (file, ChatObject, fileCaption) => {
+export const handleFileUpload = async (file, ChatObject, fileCaption, User) => {
   const time = new Date();
-  const { User } = useContext(UserContext);
   try {
     if (!file) {
       return;
@@ -39,6 +37,12 @@ export const handleFileUpload = async (file, ChatObject, fileCaption) => {
 
     const snapshot = await uploadTask;
     const downloadURL = await getDownloadURL(snapshot.ref);
+    const fileObj = {
+      downloadURL: downloadURL,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    };
 
     ChatObject.activeChatType == "group"
       ? sendGroupMessage(
@@ -48,7 +52,8 @@ export const handleFileUpload = async (file, ChatObject, fileCaption) => {
           User.name,
           "file",
           time,
-          null
+          null,
+          fileObj
         )
       : sendMessage(
           User.id,
@@ -57,7 +62,8 @@ export const handleFileUpload = async (file, ChatObject, fileCaption) => {
           User.name,
           "file",
           time,
-          null
+          null,
+          fileObj
         );
     alert(downloadURL);
     console.log("File available at", downloadURL);

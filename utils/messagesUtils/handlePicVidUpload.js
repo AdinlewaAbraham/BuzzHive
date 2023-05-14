@@ -1,9 +1,18 @@
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../firebaseUtils/firebase";
 import { v4 as uuid } from "uuid";
-export const handlePicVidUpload = async (downscaledBlob, ChatObject) => {
+import { sendMessage } from "./sendMessage";
+import { sendGroupMessage } from "../groupUtils/sendGroupMessage";
+import { downScalePicVid } from "./downScalePicVid";
+export const handlePicVidUpload = async (
+  downscaledBlob,
+  ChatObject,
+  mediaCaption,
+  User,
+  time
+) => {
   if (!downscaledBlob) return;
-console.log(downscaledBlob)
+  console.log(downscaledBlob);
   const id = uuid();
   const isImage = downscaledBlob.type.includes("image");
   const storageRef = ref(
@@ -12,6 +21,38 @@ console.log(downscaledBlob)
       isImage ? "images" : "videos"
     }/${id}`
   );
+  const blurredPixelatedBlob = await downScalePicVid(downscaledBlob, 0.35, 0.1, 2);
+  let blurredPixelatedBlobDownloadURL;
+  if (blurredPixelatedBlob) {
+    console.log(blurredPixelatedBlob);
+    const blurredPixelatedRef = ref(
+      storage,
+      `${ChatObject.activeChatType}/${ChatObject.activeChatId}${
+        isImage ? "images" : "videos"
+      }/${id}_blurred`
+    );
+    try {
+      const blurredPixelatedUploadTask = uploadBytesResumable(
+        blurredPixelatedRef,
+        blurredPixelatedBlob
+      );
+      blurredPixelatedUploadTask.then(() => {
+        getDownloadURL(blurredPixelatedRef).then(
+          (blurredPixelatedDownloadURL) => {
+            blurredPixelatedBlobDownloadURL = blurredPixelatedDownloadURL;
+            console.log(
+              "Blurred/pixelated file available at",
+              blurredPixelatedBlobDownloadURL,
+              " ",
+              blurredPixelatedDownloadURL
+            );
+          }
+        );
+      });
+    } catch (error) {
+      console.error("Error uploading blurred/pixelated file:", error);
+    }
+  }
   try {
     const uploadTask = uploadBytesResumable(storageRef, downscaledBlob);
     uploadTask.on(
@@ -32,6 +73,37 @@ console.log(downscaledBlob)
       (error) => {},
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          console.log(blurredPixelatedBlobDownloadURL);
+          const picORvideoObj = {
+            downloadURL: downloadURL,
+            blurredPixelatedBlobDownloadURL: blurredPixelatedBlobDownloadURL
+              ? blurredPixelatedBlobDownloadURL
+              : null,
+            name: downscaledBlob.name,
+            size: downscaledBlob.size,
+            type: downscaledBlob.type,
+          };
+          ChatObject.activeChatType == "group"
+            ? sendGroupMessage(
+                User.id,
+                ChatObject.activeChatId,
+                mediaCaption,
+                User.name,
+                "pic/video",
+                time,
+                null,
+                picORvideoObj
+              )
+            : sendMessage(
+                User.id,
+                ChatObject.activeChatId,
+                mediaCaption,
+                User.name,
+                "pic/video",
+                time,
+                null,
+                picORvideoObj
+              );
           console.log("File available at", downloadURL);
         });
       }

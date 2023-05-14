@@ -4,6 +4,9 @@ import { UserContext } from "../App";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Emoji } from "emoji-picker-react";
 import reactTomessage from "@/utils/messagesUtils/reactToMessage";
+import { RenderFileType } from "../input/FileInput";
+import ImageComponent from "./ImageComponent";
+import VideoComponent from "./VideoComponent";
 const MessageCard = ({ chat }) => {
   const { ChatObject, setReplyObject, ReplyObject } = useContext(
     SelectedChannelContext
@@ -79,8 +82,29 @@ const MessageCard = ({ chat }) => {
             <p className="text-[12px]">{chat.replyObject.replyText}</p>
           </div>
         )}
+        {chat.type === "file" && (
+          <div>
+            <div className={`w-full flex ${chat.text && "mb-2"}`}>
+              <div className="p-3 bg-blue-900 rounded-full flex justify-center items-center mr-2">
+                <RenderFileType type={chat.dataObject.type} size={40} />
+              </div>
+              <div className="text-start">
+                <p>{chat.dataObject.name}</p>
+                <p>{chat.dataObject.size}</p>
+              </div>
+            </div>
+          </div>
+        )}
+        {chat.type === "pic/video" && (
+          <div>
+            {console.log(chat.dataObject)}
+            <ImageComponent src={chat.dataObject.blurredPixelatedBlobDownloadURL}/>
+            {/* <VideoComponent src={chat.dataObject.downloadURL}/> */}
+            
+            {chat.dataObject.name}
+          </div>
+        )}
         {chat.text}
-        <p>{}</p>
         {chat.reactions.length > 0 && (
           <div
             className={`rounded-lg max-w-[500px] flex absolute bottom-[-20px] right-0  bg-white p-[5px]`}
