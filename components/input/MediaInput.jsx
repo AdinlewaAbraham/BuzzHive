@@ -5,25 +5,80 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { handlePicVidUpload } from "@/utils/messagesUtils/handlePicVidUpload";
 import VideoPlayer from "./VideoPlayer";
 import { UserContext } from "../App";
+import VideoThumbnail from "react-video-thumbnail";
+import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 
 const MediaInput = ({
   picVidmedia,
   blurredPicVidmedia,
   setpicVidmediaToNull,
+  setblurredPicVidmedia,
 }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
   const [mediaCaption, setmediaCaption] = useState("");
-  console.log(picVidmedia);
+  const [ImageBase64, setImageBase64] = useState();
+  const isImage = picVidmedia.type.startsWith("image");
+  console.log(isImage);
 
+  async function base64toFile(base64String, fileName) {
+    const arr = base64String.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    const blob = new Blob([u8arr], { type: mime });
+    return new File([blob], fileName, { type: mime });
+  }
+
+  useEffect(() => {
+    if (isImage) return;
+    console.log("Loading");
+    async function processImage() {
+      if (!ImageBase64) return;
+      const ImgFile = await base64toFile(ImageBase64, picVidmedia.name);
+      const downloadScaledImgFile = await downScalePicVid(
+        ImgFile,
+        0.35,
+        0.1,
+        2
+      );
+      setblurredPicVidmedia(downloadScaledImgFile);
+      console.log(downloadScaledImgFile);
+      console.log(blurredPicVidmedia);
+    }
+    processImage();
+
+    return () => {};
+  }, [ImageBase64, picVidmedia.name]);
+
+  console.log(picVidmedia);
   return (
     <div className="absolute bottom-2 left-2 w-[80%] z-10 media-container">
       {picVidmedia.type.startsWith("image/") ? (
         <img src={URL.createObjectURL(picVidmedia)} alt="Downscaled media" />
       ) : (
         <>
-            <img src={picVidmedia.blurredThumbnail} alt="" width={300} height={300}/>
-          {/* <VideoPlayer src={URL.createObjectURL(picVidmedia)} /> */}
+          {blurredPicVidmedia && (
+            <img
+              src={URL.createObjectURL(blurredPicVidmedia)}
+              alt=""
+              width={300}
+              height={300}
+            />
+          )}
+          <VideoThumbnail
+            videoUrl={URL.createObjectURL(picVidmedia)}
+            thumbnailHandler={(thumbnail) => setImageBase64(thumbnail)}
+            width={null}
+            snapshotAtTime={5}
+            height={null}
+            className="hidden"
+          />
+          <VideoPlayer src={URL.createObjectURL(picVidmedia)} />
         </>
       )}
 

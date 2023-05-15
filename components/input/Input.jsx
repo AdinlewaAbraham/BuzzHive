@@ -19,7 +19,6 @@ import EmojiPicker from "emoji-picker-react";
 import { AiOutlineSend, AiOutlineFile } from "react-icons/ai";
 import { ImCross } from "react-icons/im";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
-import { makeBlurredVideoThumbnail } from "@/utils/messagesUtils/makeBlurredVideoThumbnail";
 import MediaInput from "./MediaInput";
 import PollInput from "./PollInput";
 import SendContact from "./SendContact";
@@ -229,9 +228,10 @@ const Input = () => {
             <MediaInput
               blurredPicVidmedia={blurredPicVidmedia}
               picVidmedia={picVidmedia}
+              setblurredPicVidmedia={setblurredPicVidmedia}
               setpicVidmediaToNull={() => {
                 setpicVidmedia(null);
-                setblurredPicVidmedia(null);
+                //setblurredPicVidmedia(null);
               }}
             />
           )}
@@ -322,11 +322,10 @@ const Input = () => {
                         setpicVidmedia(blob);
                         setblurredPicVidmedia(downscaledBlod);
                       } else {
-                        const image = await makeBlurredVideoThumbnail(e.target.files[0])
-                        const videoObj = e.target.files[0]
-                        videoObj.blurredThumbnail = image
-                        console.log(videoObj)
+                        const videoObj = e.target.files[0];
+                        console.log(videoObj);
                         setpicVidmedia(videoObj);
+                        setblurredPicVidmedia(null);
                       }
                       setshowMediaPicker(false);
                     }}
