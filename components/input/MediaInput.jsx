@@ -68,16 +68,18 @@ const MediaInput = ({
               alt=""
               width={300}
               height={300}
+              className="fixed z-[99]  top-[150px]"
             />
           )}
-          <VideoThumbnail
-            videoUrl={URL.createObjectURL(picVidmedia)}
-            thumbnailHandler={(thumbnail) => setImageBase64(thumbnail)}
-            width={null}
-            snapshotAtTime={5}
-            height={null}
-            className="hidden"
-          />
+          {/* dont want to render this comp below because i only need the thumbnail */}
+            <VideoThumbnail
+              videoUrl={URL.createObjectURL(picVidmedia)}
+              thumbnailHandler={(thumbnail) => setImageBase64(thumbnail)}
+              width={null}
+              snapshotAtTime={5}
+              height={null}
+              renderThumbnail={false}
+            />
           <VideoPlayer src={URL.createObjectURL(picVidmedia)} />
         </>
       )}
