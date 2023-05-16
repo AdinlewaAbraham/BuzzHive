@@ -117,11 +117,12 @@ const MessageCard = ({ chat }) => {
               />
             ) : (
               <>
-                {console.log(chat.dataObject)}
+                {console.log(chat)}
                 <VideoComponent
                   blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
                   downloadSRC={chat.dataObject.downloadURL}
                   messageId={chat.id}
+                  messageText={chat.text}
                 />
               </>
             )}

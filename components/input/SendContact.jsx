@@ -57,7 +57,7 @@ const SendContact = () => {
     }
   }
   return (
-    <div className="sendContact absolute bottom-5 left-5 dark:bg-black z-20 p-2 w-[50%] max-h-[70%] rounded-lg">
+    <div className="detectMe sendContact absolute bottom-5 left-5 dark:bg-black z-20 p-2 w-[50%] max-h-[70%] rounded-lg">
       <h1 className="text-xl font-bold ">Share Contact</h1>
       <input
         type="text"

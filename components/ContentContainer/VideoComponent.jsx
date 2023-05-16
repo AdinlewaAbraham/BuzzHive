@@ -3,8 +3,16 @@ import { UserContext } from "../App";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import VideoThumbnail from "react-video-thumbnail";
 import { BsFillPlayBtnFill } from "react-icons/bs";
+import { HiDownload } from "react-icons/hi";
+import MediaPlayer from "./MediaPlayer";
+import { openDB, deleteDB } from "idb";
 
-const VideoComponent = ({ blurredSRC, downloadSRC, messageId }) => {
+const VideoComponent = ({
+  blurredSRC,
+  downloadSRC,
+  messageId,
+  messageText,
+}) => {
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
 
@@ -13,15 +21,83 @@ const VideoComponent = ({ blurredSRC, downloadSRC, messageId }) => {
   const [isthumbnailrendered, setisthumbnailrendered] = useState(false);
   const [isDownloaded, setisDownloaded] = useState(false);
   const [videoPlayer, setvideoPlayer] = useState(false);
+  const [VideoSize, setVideoSize] = useState(0);
+
+  async function initializeDB() {
+    const db = await openDB("myDatabase", 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains("videos")) {
+          db.createObjectStore("videos");
+        }
+      },
+    });
+    return db;
+  }
+  const setVideoToIndexedDB = async (key, value) => {
+    const db = await initializeDB();
+    const tx = db.transaction("videos", "readwrite");
+    const store = tx.objectStore("videos");
+    await store.put(value, key);
+    await tx.done;
+  };
+
+  const getVideoFromIndexedDB = async (key) => {
+    const db = await initializeDB();
+    const tx = db.transaction("videos", "readonly");
+    const store = tx.objectStore("videos");
+    const value = await store.get(key);
+    await tx.done;
+    return value;
+  };
+
+  async function getFileSize(downloadLink) {
+    if (isDownloaded) return;
+    console.log("started");
+    return fetch(downloadLink).then((response) => {
+      const contentLength = response.headers.get("Content-Length");
+      if (contentLength) {
+        // Convert the size from bytes to kilobytes, megabytes, etc.
+        const fileSizeInBytes = parseInt(contentLength);
+        const fileSizeInKB = fileSizeInBytes / 1024;
+        const fileSizeInMB = fileSizeInKB / 1024;
+        // You can return the size in the desired format
+        console.log({
+          bytes: fileSizeInBytes,
+          kilobytes: fileSizeInKB,
+          megabytes: fileSizeInMB,
+        });
+        return {
+          bytes: fileSizeInBytes,
+          kilobytes: fileSizeInKB,
+          megabytes: fileSizeInMB,
+        };
+      } else {
+        throw new Error("Unable to retrieve file size.");
+      }
+    });
+  }
+  useEffect(() => {
+    async function getSize() {
+      if (isDownloaded) return;
+      const size = await getFileSize(downloadSRC);
+      console.log(size);
+      setVideoSize(size.megabytes);
+    }
+    getSize();
+    return () => {};
+  }, [downloadSRC]);
 
   useEffect(() => {
-    const storedVideo = localStorage.getItem(`video-${messageId}`);
-    if (storedVideo) {
-      setVideoSrc(storedVideo);
-      setisDownloaded(true);
-    } else if (User.autoDownloadSettings.video) {
-      downloadVideo();
-    }
+    const getStoredVideo = async () => {
+      const storedVideo = await getVideoFromIndexedDB(`video-${messageId}`);
+      if (storedVideo) {
+        setVideoSrc(storedVideo);
+        setisDownloaded(true);
+      } else if (User.autoDownloadSettings.video) {
+        downloadVideo();
+      }
+    };
+    getStoredVideo();
   }, [messageId]);
 
   const downloadVideo = () => {
@@ -33,18 +109,18 @@ const VideoComponent = ({ blurredSRC, downloadSRC, messageId }) => {
     request.addEventListener("progress", (event) => {
       if (event.lengthComputable) {
         const percentComplete = Math.round((event.loaded / event.total) * 100);
-        console.log(percentComplete)
+        console.log(percentComplete);
         setDownloadProgress(percentComplete);
       }
     });
 
-    request.addEventListener("load", (event) => {
+    request.addEventListener("load", async (event) => {
       if (request.status === 200) {
-        // Convert downloaded video to base64 and save to local storage
+        // Convert downloaded video to base64 and save to indexedDB
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.onload = async () => {
           const base64Video = reader.result;
-          localStorage.setItem(`video-${messageId}`, base64Video);
+          await setVideoToIndexedDB(`video-${messageId}`, base64Video);
           setVideoSrc(base64Video);
         };
         reader.readAsDataURL(request.response);
@@ -56,6 +132,7 @@ const VideoComponent = ({ blurredSRC, downloadSRC, messageId }) => {
     setisDownloaded(true);
     request.send();
   };
+
   function playvideo() {
     setvideoPlayer(true);
     const storedVideo = localStorage.getItem(`video-${messageId}`);
@@ -71,16 +148,11 @@ const VideoComponent = ({ blurredSRC, downloadSRC, messageId }) => {
     <div key={messageId}>
       {console.log(downloadSRC)}
       {videoPlayer && (
-        <div className="fixed inset-0 bg-black z-[99] flex justify-center items-center">
-          <button
-            onClick={() => {
-              setvideoPlayer(false);
-            }}
-          >
-            back
-          </button>
-          <video src={videoSrc} controls width={300} />
-        </div>
+        <MediaPlayer
+          VideoSRC={videoSrc}
+          setvideoPlayer={setvideoPlayer}
+          messageText={messageText}
+        />
       )}
 
       <div className="flex justify-center items-center relative">
@@ -104,6 +176,11 @@ const VideoComponent = ({ blurredSRC, downloadSRC, messageId }) => {
           <div className="absolute text-blue-500">
             <BsFillPlayBtnFill size={30} />
           </div>
+          {!isDownloaded && (
+            <div className="absolute  bottom-0 left-2 flex text-black">
+              <HiDownload size={30} /> {VideoSize.toFixed(2)} MB
+            </div>
+          )}
         </div>
         {!isthumbnailrendered && (
           <div className="relative flex justify-center items-center w-[300px] min-h-[100px]">

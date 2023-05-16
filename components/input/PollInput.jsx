@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { AiOutlineSend } from "react-icons/ai";
+import SelectedChannelContext from "@/context/SelectedChannelContext ";
+import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
+import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 
 const PollInput = () => {
+  const { ChatObject } = useContext(SelectedChannelContext);
   const [inputs, setInputs] = useState([
     { id: "1", value: "" },
     { id: "2", value: "" },
@@ -55,12 +59,32 @@ const PollInput = () => {
       setcurrentDraggedOptionId(id);
     }
   };
+  function handlePollSend() {
+    if (!ChatObject.activeChatId) return;
+    const dataOBJ = {
+      question: "pollQuestion",
+      options: "pollOptions",
+      votes: {
+        option1: [],
+        option2: [],
+        // Add more options as needed
+      },
+    };
+    const User = JSON.parse(localStorage.getItem("user"));
+    console.log(User);
+    return;
+    if (ChatObject.activeChatType === "group") {
+      sendGroupMessage();
+    } else {
+      sendMessage();
+    }
+  }
   return (
-    <div className="Poll-input absolute bottom-2 left-2 w-[50%] z-10 dark:bg-black min-w-[260px] flex flex-col p-4  rounded-lg">
+    <div className="detectMe absolute bottom-2 left-2 w-[50%] z-10 dark:bg-black min-w-[260px] flex flex-col p-4  rounded-lg">
       <input
         type="text"
         placeholder="Type poll question"
-        className="mb-4 px-2 py-1 rounded-md focus:outline-none"
+        className=" mb-4 px-2 py-1 rounded-md focus:outline-none"
       />
 
       <div className="rounded-lg px-1 pb-[6px] bg-gray-700">
@@ -91,7 +115,7 @@ const PollInput = () => {
             }}
           >
             <input
-              className="w-full bg-inherit outline-none z-50"
+              className=" w-full bg-inherit outline-none z-50"
               key={input.id}
               value={input.value}
               onChange={(e) => handleChange(input.id, e.target.value)}
@@ -110,7 +134,10 @@ const PollInput = () => {
         <div>
           <input type="checkbox" /> Allow multiple answers{" "}
         </div>
-        <div className="bg-blue-600 flex items-center px-2 py-2 rounded-md">
+        <div
+          className="bg-blue-600 flex items-center px-2 py-2 rounded-md"
+          onClick={handlePollSend()}
+        >
           <AiOutlineSend />
         </div>
       </div>
