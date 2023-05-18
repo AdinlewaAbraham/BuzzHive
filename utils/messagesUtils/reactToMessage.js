@@ -21,7 +21,6 @@ export default async function reactTomessage(
   const messageDoc = await getDoc(docRef);
   console.log(messageDoc);
   if (messageDoc.exists()) {
-    const messageData = messageDoc.data();
     const updatedReactions = arrayUnion({ emoji, name: user.name, displayImg: user.photoUrl });
     await updateDoc(docRef, { reactions: updatedReactions }, { merge: true });
   }

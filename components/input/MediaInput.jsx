@@ -40,12 +40,7 @@ const MediaInput = ({
     async function processImage() {
       if (!ImageBase64) return;
       const ImgFile = await base64toFile(ImageBase64, picVidmedia.name);
-      const downloadScaledImgFile = await downScalePicVid(
-        ImgFile,
-        0.35,
-        0.1,
-        2
-      );
+      const downloadScaledImgFile = await downScalePicVid(ImgFile, 0.7, 1, 0);
       setblurredPicVidmedia(downloadScaledImgFile);
       console.log(downloadScaledImgFile);
       console.log(blurredPicVidmedia);
@@ -72,14 +67,14 @@ const MediaInput = ({
             />
           )}
           {/* dont want to render this comp below because i only need the thumbnail */}
-            <VideoThumbnail
-              videoUrl={URL.createObjectURL(picVidmedia)}
-              thumbnailHandler={(thumbnail) => setImageBase64(thumbnail)}
-              width={null}
-              snapshotAtTime={5}
-              height={null}
-              renderThumbnail={false}
-            />
+          <VideoThumbnail
+            videoUrl={URL.createObjectURL(picVidmedia)}
+            thumbnailHandler={(thumbnail) => setImageBase64(thumbnail)}
+            width={null}
+            snapshotAtTime={5}
+            height={null}
+            renderThumbnail={false}
+          />
           <VideoPlayer src={URL.createObjectURL(picVidmedia)} />
         </>
       )}

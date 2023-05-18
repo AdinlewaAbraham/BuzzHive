@@ -7,6 +7,7 @@ import reactTomessage from "@/utils/messagesUtils/reactToMessage";
 import { RenderFileType } from "../input/FileInput";
 import ImageComponent from "./ImageComponent";
 import VideoComponent from "./VideoComponent";
+import PollComponent from "./PollComponent";
 const MessageCard = ({ chat }) => {
   const { ChatObject, setReplyObject, ReplyObject } = useContext(
     SelectedChannelContext
@@ -55,16 +56,6 @@ const MessageCard = ({ chat }) => {
     setshowMessageMenu(false);
   };
 
-  // const handleClickOutside = (e) => {
-  //   console.log(e)
-  //   if(!e) return
-  //   if (!e.target.closest(".menu")) {
-  //     setshowMessageMenu(false);
-  //   }
-  // };
-  // useEffect(() => {
-  //   window.addEventListener("click", handleClickOutside);
-  // }, []);
   return (
     <div
       className={`flex items-center my-2 justify-start ${
@@ -130,7 +121,9 @@ const MessageCard = ({ chat }) => {
             {chat.dataObject.name}
           </div>
         )}
+        {chat.type === "poll" && <PollComponent PollObject={chat}/>}
         {chat.text}
+
         {chat.reactions.length > 0 && (
           <div
             className={`rounded-lg max-w-[500px] flex absolute bottom-[-20px] right-0  bg-white p-[5px]`}

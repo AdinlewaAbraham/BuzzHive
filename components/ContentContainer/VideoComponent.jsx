@@ -6,6 +6,7 @@ import { BsFillPlayBtnFill } from "react-icons/bs";
 import { HiDownload } from "react-icons/hi";
 import MediaPlayer from "./MediaPlayer";
 import { openDB, deleteDB } from "idb";
+import {BsFillImageFill} from "react-icons/bs"
 
 const VideoComponent = ({
   blurredSRC,
@@ -16,12 +17,14 @@ const VideoComponent = ({
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
 
+  const [blurredImgSRC, setblurredImgSRC] = useState(blurredSRC);
   const [videoSrc, setVideoSrc] = useState(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
-  const [isthumbnailrendered, setisthumbnailrendered] = useState(false);
   const [isDownloaded, setisDownloaded] = useState(false);
   const [videoPlayer, setvideoPlayer] = useState(false);
   const [VideoSize, setVideoSize] = useState(0);
+  const [loadingThumbnail, setloadingThumbnail] = useState(true);
+  const [bufferedChunks, setBufferedChunks] = useState([]);
 
   async function initializeDB() {
     const db = await openDB("myDatabase", 1, {
@@ -76,6 +79,7 @@ const VideoComponent = ({
       }
     });
   }
+
   useEffect(() => {
     async function getSize() {
       if (isDownloaded) return;
@@ -84,11 +88,11 @@ const VideoComponent = ({
       setVideoSize(size.megabytes);
     }
     getSize();
-    return () => {};
   }, [downloadSRC]);
 
   useEffect(() => {
-    const getStoredVideo = async () => {
+    const getStoredVideoandVideoThumbnail = async () => {
+      setloadingThumbnail(true);
       const storedVideo = await getVideoFromIndexedDB(`video-${messageId}`);
       if (storedVideo) {
         setVideoSrc(storedVideo);
@@ -96,12 +100,36 @@ const VideoComponent = ({
       } else if (User.autoDownloadSettings.video) {
         downloadVideo();
       }
-    };
-    getStoredVideo();
-  }, [messageId]);
 
-  const downloadVideo = () => {
-    // Set up request to download video from downloadSRC
+      const storedVideoThumnail = await getVideoFromIndexedDB(
+        `Thumbnail-${messageId}`
+      );
+      if (storedVideoThumnail) {
+        console.log(URL.createObjectURL(storedVideoThumnail));
+        setblurredImgSRC(URL.createObjectURL(storedVideoThumnail));
+      } else {
+        // Save blurred image to IndexedDB
+        const response = await fetch(blurredSRC);
+        console.log(blurredSRC);
+        setblurredImgSRC(blurredSRC);
+        const blob = await response.blob();
+        console.log(blob);
+        const db = await initializeDB();
+        const tx = db.transaction("videos", "readwrite");
+        const store = tx.objectStore("videos");
+        await store.put(blob, `Thumbnail-${messageId}`);
+        await tx.done;
+
+        setblurredImgSRC(URL.createObjectURL(blob));
+        console.log(URL.createObjectURL(blob));
+      }
+      setloadingThumbnail(false);
+    };
+
+    getStoredVideoandVideoThumbnail();
+  }, [messageId]);
+  const downloadVideo = async () => {
+    console.log("downloading video...");
     const request = new XMLHttpRequest();
     request.open("GET", downloadSRC, true);
     request.responseType = "blob";
@@ -109,44 +137,66 @@ const VideoComponent = ({
     request.addEventListener("progress", (event) => {
       if (event.lengthComputable) {
         const percentComplete = Math.round((event.loaded / event.total) * 100);
-        console.log(percentComplete);
         setDownloadProgress(percentComplete);
+        console.log(percentComplete);
       }
     });
 
     request.addEventListener("load", async (event) => {
       if (request.status === 200) {
-        // Convert downloaded video to base64 and save to indexedDB
-        const reader = new FileReader();
-        reader.onload = async () => {
-          const base64Video = reader.result;
-          await setVideoToIndexedDB(`video-${messageId}`, base64Video);
-          setVideoSrc(base64Video);
-        };
-        reader.readAsDataURL(request.response);
+        const blob = request.response;
+        const chunk = new Blob([blob], { type: blob.type });
+
+        // Buffer the downloaded chunk
+        setBufferedChunks((prevChunks) => [...prevChunks, chunk]);
+
+        // Save the downloaded chunk to IndexedDB
+        const chunkIndex = prevChunks.length;
+        await setVideoToIndexedDB(`chunk-${messageId}-${chunkIndex}`, chunk);
+
+        if (event.loaded < event.total) {
+          // Continue downloading the next chunk
+          downloadVideo();
+        } else {
+          // All video chunks have been downloaded
+          setisDownloaded(true);
+          console.log("All video chunks downloaded");
+        }
       } else {
         console.error(`Failed to download video (${request.status})`);
       }
     });
 
-    setisDownloaded(true);
     request.send();
   };
 
-  function playvideo() {
+  async function playvideo() {
     setvideoPlayer(true);
-    const storedVideo = localStorage.getItem(`video-${messageId}`);
+    const storedVideo = await getVideoFromIndexedDB(`video-${messageId}`);
     if (storedVideo) {
-      setVideoSrc(storedVideo);
+      console.log(storedVideo);
+      setVideoSrc(URL.createObjectURL(storedVideo));
       setisDownloaded(true);
     } else {
       downloadVideo();
+      // Combine and play the buffered video chunks
+      const combinedChunks = new Blob(bufferedChunks, { type: "video/mp4" });
+      console.log(combinedChunks);
+      setVideoSrc(URL.createObjectURL(combinedChunks));
+      setisDownloaded(true);
+
+      // Save the combined video to IndexedDB
+      await setVideoToIndexedDB(`video-${messageId}`, combinedChunks);
+
+      console.log("Buffered video chunks played");
     }
-    console.log("hello world");
   }
+
+  const [imageError, setImageError] = useState(false);
+  console.log(blurredImgSRC);
   return (
     <div key={messageId}>
-      {console.log(downloadSRC)}
+      {console.log(videoSrc)}
       {videoPlayer && (
         <MediaPlayer
           VideoSRC={videoSrc}
@@ -157,42 +207,33 @@ const VideoComponent = ({
 
       <div className="flex justify-center items-center relative">
         <div
-          className={`z-[2] ${
-            !isthumbnailrendered && "hidden"
-          } relative flex items-center justify-center`}
+          className={`z-[2] relative flex items-center justify-center`}
           onClick={playvideo}
         >
-          <VideoThumbnail
-            videoUrl={downloadSRC}
-            thumbnailHandler={(thumbnail) => {
-              console.log(thumbnail);
-              setisthumbnailrendered(true);
-            }}
-            width={300}
-            snapshotAtTime={5}
-            height={null}
-            renderThumbnail={isthumbnailrendered}
-          />
-          <div className="absolute text-blue-500">
-            <BsFillPlayBtnFill size={30} />
-          </div>
-          {!isDownloaded && (
-            <div className="absolute  bottom-0 left-2 flex text-black">
-              <HiDownload size={30} /> {VideoSize.toFixed(2)} MB
-            </div>
+          {loadingThumbnail ? (
+            <div>loading...</div>
+          ) : (
+            <>
+              {imageError ? (
+                <BsFillImageFill size={250}/>
+              ) : (
+                <img
+                  src={blurredImgSRC}
+                  width={300}
+                  onError={() => setImageError(true)}
+                />
+              )}
+              <div className="absolute text-blue-500">
+                <BsFillPlayBtnFill size={30} />
+              </div>
+              {!isDownloaded && (
+                <div className="absolute  bottom-0 left-2 flex text-black">
+                  <HiDownload size={30} /> {VideoSize.toFixed(2)} MB
+                </div>
+              )}
+            </>
           )}
         </div>
-        {!isthumbnailrendered && (
-          <div className="relative flex justify-center items-center w-[300px] min-h-[100px]">
-            <img src={blurredSRC} width={300} />
-            <div
-              className="absolute m-12 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-              role="status"
-            >
-              <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"></span>
-            </div>
-          </div>
-        )}
       </div>
 
       {downloadProgress > 0 && downloadProgress < 100 && (

@@ -14,6 +14,8 @@ const PollInput = () => {
   const [currentDraggedOptionId, setcurrentDraggedOptionId] = useState(null);
   const [dragIndex, setDragIndex] = useState(null);
   const [overIndex, setOverIndex] = useState(null);
+  const [pollQuestion, setpollQuestion] = useState("");
+  const [allowMultipleAnswers, setallowMultipleAnswers] = useState(false);
 
   const handleChange = (id, value) => {
     const newInputs = [...inputs];
@@ -59,32 +61,74 @@ const PollInput = () => {
       setcurrentDraggedOptionId(id);
     }
   };
+
+  const mapInputs = (arr) => {
+    const mappedArray = arr.map((input) => ({
+      id: input.id,
+      text: input.value,
+      voteCount: 0,
+      votes: []
+    }));
+
+    return mappedArray;
+  };
   function handlePollSend() {
     if (!ChatObject.activeChatId) return;
+    const newarr = [...inputs].filter((option) => option.value !== "");
+    console.log(newarr);
+    const options = mapInputs(newarr);
+    if (options.length < 2) {
+      alert("Please add value ");
+      return;
+    }
+    console.log(options);
+    console.log(inputs);
+    if (!pollQuestion) {
+      alert("Please add poll question");
+      return;
+    }
     const dataOBJ = {
-      question: "pollQuestion",
-      options: "pollOptions",
-      votes: {
-        option1: [],
-        option2: [],
-        // Add more options as needed
-      },
+      question: pollQuestion,
+      options: options,
+      allowMultipleAnswers: allowMultipleAnswers,
     };
     const User = JSON.parse(localStorage.getItem("user"));
     console.log(User);
-    return;
+    const time = new Date();
     if (ChatObject.activeChatType === "group") {
-      sendGroupMessage();
+      sendGroupMessage(
+        User.id,
+        ChatObject.activeChatId,
+        null,
+        User.name,
+        "poll",
+        time,
+        {},
+        dataOBJ
+      );
     } else {
-      sendMessage();
+      sendMessage(
+        User.id,
+        ChatObject.otherUserId,
+        null,
+        User.id,
+        User.name,
+        "poll",
+        time,
+        {},
+        dataOBJ
+      );
     }
   }
+  console.log(ChatObject);
   return (
     <div className="detectMe absolute bottom-2 left-2 w-[50%] z-10 dark:bg-black min-w-[260px] flex flex-col p-4  rounded-lg">
       <input
         type="text"
         placeholder="Type poll question"
         className=" mb-4 px-2 py-1 rounded-md focus:outline-none"
+        onChange={(e) => setpollQuestion(e.target.value)}
+        value={pollQuestion}
       />
 
       <div className="rounded-lg px-1 pb-[6px] bg-gray-700">
@@ -131,12 +175,20 @@ const PollInput = () => {
       </div>
       <div className="flex justify-between items-center mt-5">
         {" "}
-        <div>
-          <input type="checkbox" /> Allow multiple answers{" "}
+        <div onClick={() => setallowMultipleAnswers(!allowMultipleAnswers)}>
+          <input
+            type="checkbox"
+            onChange={(e) => {
+              console.log(e.target.checked);
+              setallowMultipleAnswers(e.target.checked);
+            }}
+            checked={allowMultipleAnswers}
+          />{" "}
+          Allow multiple answers{" "}
         </div>
         <div
           className="bg-blue-600 flex items-center px-2 py-2 rounded-md"
-          onClick={handlePollSend()}
+          onClick={() => handlePollSend()}
         >
           <AiOutlineSend />
         </div>

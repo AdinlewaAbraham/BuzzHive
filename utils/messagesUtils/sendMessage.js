@@ -22,7 +22,7 @@ export async function sendMessage(
     timestamp: time,
     reactions: [],
     replyObject: replyObj || {},
-    fileObject: fileObj || {},
+    dataObject: fileObj || {},
   };
 
   try {

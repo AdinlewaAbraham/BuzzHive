@@ -6,8 +6,6 @@ import {
   BiVolumeMute,
   BiVolumeFull,
 } from "react-icons/bi";
-import { openDB } from 'idb';
-
 
 const MediaPlayer = ({ VideoSRC, setvideoPlayer, messageText }) => {
   const videoRef = useRef(null);
@@ -58,6 +56,7 @@ const MediaPlayer = ({ VideoSRC, setvideoPlayer, messageText }) => {
     video.currentTime = seekTime;
     setCurrentTime(seekTime);
   };
+  console.log(VideoSRC);
 
   return (
     <div className="fixed inset-0 bg-[#111a20] z-[99] flex justify-center items-center px-[100px]">
