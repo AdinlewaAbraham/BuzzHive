@@ -8,8 +8,10 @@ import { RenderFileType } from "../input/FileInput";
 import ImageComponent from "./ImageComponent";
 import VideoComponent from "./VideoComponent";
 import PollComponent from "./PollComponent";
+import { onSnapshot, doc } from "firebase/firestore";
+import { db } from "@/utils/firebaseUtils/firebase";
 const MessageCard = ({ chat }) => {
-  const { ChatObject, setReplyObject, ReplyObject } = useContext(
+  const { ChatObject, setReplyObject, ReplyObject, setChats } = useContext(
     SelectedChannelContext
   );
   const { User } = useContext(UserContext);
@@ -55,6 +57,32 @@ const MessageCard = ({ chat }) => {
     item.action();
     setshowMessageMenu(false);
   };
+
+  //this checks for updates like when user reacts to messagee then updates localstorage
+  useEffect(() => {
+    const { activeChatId, activeChatType } = ChatObject;
+    const queryLocation =
+      activeChatType === "group" ? "groups" : "conversations";
+    if (!chat.id) return;
+    const q = doc(db, queryLocation, activeChatId, "messages", chat.id);
+    const unsub = onSnapshot(q, (doc) => {
+      const chats = JSON.parse(localStorage.getItem(activeChatId));
+      if (!chats) return;
+      console.log(chats);
+      const messageIndex = chats.findIndex((chat) => chat.id === doc.id);
+      console.log(doc.data());
+      if (messageIndex !== -1) {
+        chats[messageIndex] = doc.data();
+        setChats(chats);
+        localStorage.setItem(activeChatId, JSON.stringify(chats));
+      } else {
+        return;
+      }
+    });
+    return () => {
+      unsub();
+    };
+  }, []);
 
   return (
     <div
@@ -121,7 +149,7 @@ const MessageCard = ({ chat }) => {
             {chat.dataObject.name}
           </div>
         )}
-        {chat.type === "poll" && <PollComponent PollObject={chat}/>}
+        {chat.type === "poll" && <PollComponent PollObject={chat} />}
         {chat.text}
 
         {chat.reactions.length > 0 && (
