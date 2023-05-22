@@ -15,6 +15,7 @@ import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
 import { UserContext } from "../App";
+import { markMessagesAsSeen } from "@/utils/messagesUtils/markMessagesasSeen";
 const ChatCard = ({
   img,
   name,
@@ -89,6 +90,7 @@ const ChatCard = ({
         ];
         localStorage.setItem(id, JSON.stringify(modifiedArr));
       }
+      markMessagesAsSeen(id, type);
     }
     console.log(unReadCount);
     console.log(JSON.parse(localStorage.getItem("user")));

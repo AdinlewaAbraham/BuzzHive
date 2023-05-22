@@ -10,6 +10,8 @@ import VideoComponent from "./VideoComponent";
 import PollComponent from "./PollComponent";
 import { onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
+import { BsCheckAll, BsCheckLg } from "react-icons/bs";
+import { BiTimeFive } from "react-icons/bi";
 const MessageCard = ({ chat }) => {
   const { ChatObject, setReplyObject, ReplyObject, setChats } = useContext(
     SelectedChannelContext
@@ -22,6 +24,31 @@ const MessageCard = ({ chat }) => {
   const currentId = User.id;
   const timestamp = chat.timestamp;
 
+  //this checks for updates like when user reacts to messagee then updates localstorage
+  useEffect(() => {
+    const { activeChatId, activeChatType } = ChatObject;
+    const queryLocation =
+      activeChatType === "group" ? "groups" : "conversations";
+    if (!chat.id) return;
+    const q = doc(db, queryLocation, activeChatId, "messages", chat.id);
+    const unsub = onSnapshot(q, (doc) => {
+      const chats = JSON.parse(localStorage.getItem(activeChatId));
+      if (!chats) return;
+      console.log(chats);
+      const messageIndex = chats.findIndex((chat) => chat.id === doc.id);
+      console.log(doc.data());
+      if (messageIndex !== -1) {
+        chats[messageIndex] = doc.data();
+        setChats(chats);
+        localStorage.setItem(activeChatId, JSON.stringify(chats));
+      } else {
+        return;
+      }
+    });
+    return () => {
+      unsub();
+    };
+  }, [ChatObject, chat.id]);
   const handleEmojiClick = (emoji) => {
     reactTomessage(
       emoji,
@@ -57,32 +84,6 @@ const MessageCard = ({ chat }) => {
     item.action();
     setshowMessageMenu(false);
   };
-
-  //this checks for updates like when user reacts to messagee then updates localstorage
-  useEffect(() => {
-    const { activeChatId, activeChatType } = ChatObject;
-    const queryLocation =
-      activeChatType === "group" ? "groups" : "conversations";
-    if (!chat.id) return;
-    const q = doc(db, queryLocation, activeChatId, "messages", chat.id);
-    const unsub = onSnapshot(q, (doc) => {
-      const chats = JSON.parse(localStorage.getItem(activeChatId));
-      if (!chats) return;
-      console.log(chats);
-      const messageIndex = chats.findIndex((chat) => chat.id === doc.id);
-      console.log(doc.data());
-      if (messageIndex !== -1) {
-        chats[messageIndex] = doc.data();
-        setChats(chats);
-        localStorage.setItem(activeChatId, JSON.stringify(chats));
-      } else {
-        return;
-      }
-    });
-    return () => {
-      unsub();
-    };
-  }, []);
 
   return (
     <div
@@ -151,6 +152,14 @@ const MessageCard = ({ chat }) => {
         )}
         {chat.type === "poll" && <PollComponent PollObject={chat} />}
         {chat.text}
+        {chat.senderId === User.id && (
+          <div className="flex justify-end">
+            {chat.status === "pending" && <BiTimeFive />}
+            {chat.status === "sent" && <BsCheckLg />}
+            {chat.status === "received" && <BsCheckAll />}
+            {chat.status === "seen" && <BsCheckAll color="red" />}
+          </div>
+        )}
 
         {chat.reactions.length > 0 && (
           <div

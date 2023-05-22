@@ -21,13 +21,11 @@ import { ImCross } from "react-icons/im";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import MediaInput from "./MediaInput";
 import PollInput from "./PollInput";
-import SendContact from "./SendContact";
 import FileInput from "./FileInput";
 const Input = () => {
   const { User } = useContext(UserContext);
   const {
     ChatObject,
-    setChatObject,
     setChats,
     ReplyObject,
     setReplyObject,
@@ -53,15 +51,16 @@ const Input = () => {
       replyTextId: ReplyObject.ReplyTextId,
       replyDisplayName: ReplyObject.displayName,
     };
+    const time = new Date();
+    const messageObj = {
+      text: message,
+      senderId: senderid,
+      timeStamp: time,
+      reactions: [],
+      status: "pending",
+    };
+    setChats((prevChats) => [...prevChats, messageObj]);
     if (ChatObject.activeChatType == "group") {
-      const time = new Date();
-      const messageObj = {
-        text: message,
-        senderId: senderid,
-        timeStamp: time,
-        reactions: [],
-      };
-      setChats((prevChats) => [...prevChats, messageObj]);
       sendGroupMessage(
         User.id,
         ChatObject.activeChatId,
@@ -73,13 +72,6 @@ const Input = () => {
       );
     } else if (ChatObject.activeChatType == "personal") {
       const time = new Date();
-      const messageObj = {
-        text: message,
-        senderId: senderid,
-        timeStamp: time,
-        reactions: [],
-      };
-      setChats((prevChats) => [...prevChats, messageObj]);
       console.log(User);
       console.log("ran");
       sendMessage(
@@ -238,7 +230,6 @@ const Input = () => {
           {file && <FileInput file={file} setfile={setfile} />}
         </div>
         {showPollInput && <PollInput />}
-        {showSendContact && <SendContact />}
         <div className="relative flex">
           {[
             {
@@ -342,18 +333,6 @@ const Input = () => {
               >
                 <div>
                   <TiChartBarOutline /> Poll
-                </div>
-              </div>
-              <div
-                className="sendContact"
-                onClick={() => {
-                  setshowSendContact(!showSendContact);
-                  setshowMediaPicker(false);
-                }}
-              >
-                <div>
-                  <CiUser />
-                  Contact
                 </div>
               </div>
             </div>

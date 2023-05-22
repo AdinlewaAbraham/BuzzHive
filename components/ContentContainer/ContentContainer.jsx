@@ -28,14 +28,6 @@ const ContentContainer = () => {
   const secondDivRef = useRef(null);
 
   useEffect(() => {
-    const retard = () => {
-      console.log(replyDivHeight);
-    };
-    return () => {
-      retard();
-    };
-  }, [replyDivHeight]);
-  useEffect(() => {
     function widthResizer() {
       const width = window.innerWidth < 768;
       setIsMobile(width);
@@ -47,7 +39,6 @@ const ContentContainer = () => {
 
     return () => window.removeEventListener("resize", widthResizer);
   }, []);
-
   useEffect(() => {
     if (ChatObject.photoUrl && ChatObject.photoUrl.props) {
       setPhotoUrl(ChatObject.photoUrl.props.src);
@@ -174,8 +165,8 @@ const ContentContainer = () => {
                 style={{
                   bottom: `${
                     ReplyObject.ReplyTextId
-                      ? `${replyDivHeight + 70}px`
-                      : "70px"
+                      ? `${replyDivHeight + 120}px`
+                      : "120px"
                   }`,
                 }}
               >
