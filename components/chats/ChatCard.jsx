@@ -65,12 +65,15 @@ const ChatCard = ({
     if (ChatObject.activeChatId === id) {
       return;
     }
+
     if (unReadCount == 0) {
       const data = JSON.parse(localStorage.getItem(id));
       if (data) {
-        const filteredData = data.filter(
-          (message) => message.type !== "unread"
-        );
+        console.log(data);
+        const filteredData = data.filter((message) => {
+          if (!message) return;
+          return message.type !== "unread";
+        });
         localStorage.setItem(id, JSON.stringify(filteredData));
       }
     } else {
@@ -79,9 +82,10 @@ const ChatCard = ({
         type: "unread",
       };
       if (data) {
-        const filteredData = data.filter(
-          (message) => message.type !== "unread"
-        );
+        const filteredData = data.filter((message) => {
+          if (!message) return;
+          return message.type !== "unread";
+        });
         const index = filteredData.length - unReadCount;
         const modifiedArr = [
           ...filteredData.slice(0, index),
@@ -186,7 +190,7 @@ const ChatCard = ({
       localStorage.getItem("user")
     ).unReadMessages;
     const LocallyStoredMessages = JSON.parse(localStorage.getItem(id));
-    const unsub = onSnapshot(q, async (snapshot) => {
+    const unsub = onSnapshot(q, (snapshot) => {
       console.log("ran");
       if (!lastUnReadMessagesObject[id]) return;
       snapshot.forEach((doc) => {
@@ -203,7 +207,10 @@ const ChatCard = ({
           console.log(data);
           if (
             !chats.some((chat) => chat.id === data.id) &&
-            !LocallyStoredMessages.some((chat) => chat.id === data.id)
+            !LocallyStoredMessages.some((chat) => {
+              if (!chat) return;
+              return chat.id === data.id;
+            })
           ) {
             chats.push(data);
             console.log(data);
@@ -213,18 +220,17 @@ const ChatCard = ({
       console.log(LocallyStoredMessages);
       if (chats.length == 0) return;
       const sortedChats = [...chats].sort((a, b) => a.timestamp - b.timestamp);
-      console.log(LocallyStoredMessages);
+
       console.log(sortedChats);
 
-      const newMessages = JSON.parse(localStorage.getItem(id));
-
-      const updatedMessages = [...newMessages, ...sortedChats];
+      const updatedMessages = [...LocallyStoredMessages, ...sortedChats];
       console.log(updatedMessages);
       localStorage.setItem(id, JSON.stringify(updatedMessages));
-      await changeMessagesStatus(id, type, "received");
-      if (id == currentChatId) {
+      if (id === currentChatId) {
         setChats(updatedMessages);
         changeMessagesStatus(id, type, "seen");
+      } else {
+        changeMessagesStatus(id, type, "received");
       }
     });
     return () => {
@@ -236,10 +242,10 @@ const ChatCard = ({
     return JSON.parse(str);
   };
   useEffect(() => {
-    console.log("ran");
     if (ChatObject.activeChatId === "") return;
 
     setChats(null);
+    changeMessagesStatus(id, type, "seen");
 
     if (
       localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&
@@ -271,7 +277,8 @@ const ChatCard = ({
           a.timestamp - b.timestamp;
         });
         console.log(sortedMessages);
-        setChats(sortedMessages);
+        const filteredMessages = sortedMessages.filter((message) => message);
+        setChats(filteredMessages);
         localStorage.setItem(
           `${ChatObject.activeChatId}`,
           JSON.stringify(sortedMessages)
