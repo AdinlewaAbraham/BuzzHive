@@ -19,14 +19,6 @@ const UserCard = ({ name, id, image }) => {
       photoUrl: image,
       displayName: `${name}`,
     });
-    const q = query(collection(db, "conversations", id, "messages"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      let chats = [];
-      snapshot.forEach((doc) => {
-        chats.push(doc.data());
-      });
-      setChats(chats); // Update the state with the latest data
-    });
     setIsChatsLoading(false);
   };
 

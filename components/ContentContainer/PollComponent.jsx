@@ -37,6 +37,8 @@ const PollComponent = ({ PollObject }) => {
         const votes = messageOptions[i]["votes"];
         console.log(messageOptions[i]["votes"]);
         console.log(messageOptions[i]);
+        console.log(votes)
+        if (!votes) return;
         const optionVotedFor = votes.findIndex((vote) => vote.id === User.id);
         if (optionVotedFor !== -1) {
           console.log("removing " + optionVotedFor);

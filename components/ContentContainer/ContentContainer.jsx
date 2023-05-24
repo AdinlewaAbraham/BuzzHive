@@ -161,7 +161,7 @@ const ContentContainer = () => {
                   console.log("click");
                   secondDivRef.current.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="absolute z-10 right-[20px] cursor-pointer p-3 dark:bg-[#1d232a] rounded-lg"
+                className="hidden absolute z-10 right-[20px] cursor-pointer p-3 dark:bg-[#1d232a] rounded-lg"
                 style={{
                   bottom: `${
                     ReplyObject.ReplyTextId

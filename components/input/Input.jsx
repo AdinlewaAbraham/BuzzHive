@@ -59,7 +59,10 @@ const Input = () => {
       reactions: [],
       status: "pending",
     };
-    setChats((prevChats) => [...prevChats, messageObj]);
+    setChats((prevChats) => {
+      console.log([...prevChats, messageObj]);
+      return [...prevChats, messageObj];
+    });
     if (ChatObject.activeChatType == "group") {
       sendGroupMessage(
         User.id,

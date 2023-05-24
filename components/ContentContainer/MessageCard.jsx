@@ -31,24 +31,28 @@ const MessageCard = ({ chat }) => {
       activeChatType === "group" ? "groups" : "conversations";
     if (!chat.id) return;
     const q = doc(db, queryLocation, activeChatId, "messages", chat.id);
-    const unsub = onSnapshot(q, (doc) => {
-      const chats = JSON.parse(localStorage.getItem(activeChatId));
-      if (!chats) return;
-      console.log(chats);
-      const messageIndex = chats.findIndex((chat) => chat.id === doc.id);
-      console.log(doc.data());
-      if (messageIndex !== -1) {
-        chats[messageIndex] = doc.data();
-        setChats(chats);
-        localStorage.setItem(activeChatId, JSON.stringify(chats));
-      } else {
-        return;
-      }
+
+    const unsubscribe = onSnapshot(q, (doc) => {
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((message) => {
+          if (message.id === doc.id) {
+            if (message.status === "received" && doc.data().status === "sent") {
+              return message; // Do not update status if current status is "received"
+            }
+            return doc.data();
+          }
+          return message;
+        });
+        localStorage.setItem(activeChatId, JSON.stringify(updatedChats));
+        return updatedChats;
+      });
     });
+
     return () => {
-      unsub();
+      unsubscribe();
     };
   }, [ChatObject, chat.id]);
+
   const handleEmojiClick = (emoji) => {
     reactTomessage(
       emoji,

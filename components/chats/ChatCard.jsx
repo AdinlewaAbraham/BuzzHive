@@ -15,7 +15,7 @@ import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
 import { UserContext } from "../App";
-import { markMessagesAsSeen } from "@/utils/messagesUtils/markMessagesasSeen";
+import { changeMessagesStatus } from "@/utils/messagesUtils/changeMessagesStatus";
 const ChatCard = ({
   img,
   name,
@@ -90,7 +90,6 @@ const ChatCard = ({
         ];
         localStorage.setItem(id, JSON.stringify(modifiedArr));
       }
-      markMessagesAsSeen(id, type);
     }
     console.log(unReadCount);
     console.log(JSON.parse(localStorage.getItem("user")));
@@ -186,11 +185,8 @@ const ChatCard = ({
     const lastUnReadMessagesObject = JSON.parse(
       localStorage.getItem("user")
     ).unReadMessages;
-    if (id == "w6AHSRlOZ1Tje6L8q3ZA05Le78B3eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2") {
-      console.log(qt);
-    }
     const LocallyStoredMessages = JSON.parse(localStorage.getItem(id));
-    const unsub = onSnapshot(q, (snapshot) => {
+    const unsub = onSnapshot(q, async (snapshot) => {
       console.log("ran");
       if (!lastUnReadMessagesObject[id]) return;
       snapshot.forEach((doc) => {
@@ -217,14 +213,18 @@ const ChatCard = ({
       console.log(LocallyStoredMessages);
       if (chats.length == 0) return;
       const sortedChats = [...chats].sort((a, b) => a.timestamp - b.timestamp);
-
+      console.log(LocallyStoredMessages);
       console.log(sortedChats);
 
-      const updatedMessages = [...LocallyStoredMessages, ...sortedChats];
+      const newMessages = JSON.parse(localStorage.getItem(id));
+
+      const updatedMessages = [...newMessages, ...sortedChats];
       console.log(updatedMessages);
       localStorage.setItem(id, JSON.stringify(updatedMessages));
+      await changeMessagesStatus(id, type, "received");
       if (id == currentChatId) {
         setChats(updatedMessages);
+        changeMessagesStatus(id, type, "seen");
       }
     });
     return () => {

@@ -23,6 +23,7 @@ export async function sendMessage(
     reactions: [],
     replyObject: replyObj || {},
     dataObject: fileObj || {},
+    status: "sent"
   };
 
   try {
@@ -45,7 +46,6 @@ export async function sendMessage(
     const newMessageRef = await addDoc(messagesRef, message);
     const newMessageId = newMessageRef.id;
     message.id = newMessageId;
-    message.status = "sent"
 
     await setDoc(newMessageRef, message);
   } catch (error) {

@@ -24,6 +24,7 @@ export const sendGroupMessage = async (
     reactions: [],
     replyObject: replyObj || {},
     dataObject: dataObj || {},
+    status: "sent"
   };
   const user = await getUser(senderId);
   const newMessage = {
@@ -38,10 +39,9 @@ export const sendGroupMessage = async (
     const messagesRef = collection(groupRef, "messages");
     console.log(message)
     const newMessageRef = await addDoc(messagesRef, message);
-    console.log("newMessageRef", newMessageRef);
     const newMessageId = newMessageRef.id;
-    console.log("newMessageId", newMessageId);
     message.id = newMessageId;
+
     await updateDoc(groupRef, { lastMessage: newMessage });
     await setDoc(newMessageRef, message);
   } catch (error) {
