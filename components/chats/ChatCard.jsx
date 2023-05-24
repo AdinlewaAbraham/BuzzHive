@@ -223,7 +223,21 @@ const ChatCard = ({
 
       console.log(sortedChats);
 
-      const updatedMessages = [...LocallyStoredMessages, ...sortedChats];
+      const localstorageMessages = JSON.parse(localStorage.getItem(id));
+      const newSortedChats = sortedChats.map((chat) => { //this pervent the snapshot from changing the status of the message to its previous status
+        const matchingMessage = localstorageMessages.find(
+          (localStorageChat) => localStorageChat.id === chat.id
+        );
+        if (matchingMessage) {
+          return {
+            ...chat,
+            status: matchingMessage.status,
+          };
+        }
+        return chat;
+      });
+      console.log(newSortedChats);
+      const updatedMessages = [...LocallyStoredMessages, ...newSortedChats];
       console.log(updatedMessages);
       localStorage.setItem(id, JSON.stringify(updatedMessages));
       if (id === currentChatId) {
