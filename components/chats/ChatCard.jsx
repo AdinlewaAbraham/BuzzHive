@@ -224,7 +224,8 @@ const ChatCard = ({
       console.log(sortedChats);
 
       const localstorageMessages = JSON.parse(localStorage.getItem(id));
-      const newSortedChats = sortedChats.map((chat) => { //this pervent the snapshot from changing the status of the message to its previous status
+      const newSortedChats = sortedChats.map((chat) => {
+        //this pervent the snapshot from changing the status of the message to its previous status
         const matchingMessage = localstorageMessages.find(
           (localStorageChat) => localStorageChat.id === chat.id
         );
@@ -239,13 +240,24 @@ const ChatCard = ({
       console.log(newSortedChats);
       const updatedMessages = [...LocallyStoredMessages, ...newSortedChats];
       console.log(updatedMessages);
-      localStorage.setItem(id, JSON.stringify(updatedMessages));
       if (id === currentChatId) {
-        setChats(updatedMessages);
-        changeMessagesStatus(id, type, "seen");
+        changeMessagesStatus(id, type, "seen")
+          .then(() => {
+            setChats((prevChats) => [...updatedMessages]);
+          })
+          .catch((error) => {
+            console.log("Error updating message status:", error);
+          });
       } else {
-        changeMessagesStatus(id, type, "received");
+        changeMessagesStatus(id, type, "received")
+          .then(() => {
+            setChats((prevChats) => [...updatedMessages]);
+          })
+          .catch((error) => {
+            console.log("Error updating message status:", error);
+          });
       }
+      localStorage.setItem(id, JSON.stringify(updatedMessages));
     });
     return () => {
       unsub();

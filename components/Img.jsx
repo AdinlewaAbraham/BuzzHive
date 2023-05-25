@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import {MdGroup} from "react-icons/md"
-import {FaUserAlt} from "react-icons/fa"
+import { MdGroup } from "react-icons/md";
+import { FaUserAlt } from "react-icons/fa";
 const Img = (p) => {
-    const [invalidURL, setinvalidURL] = useState(true);
+  const [invalidURL, setinvalidURL] = useState(true);
   return (
     <div className={`bg-inherit ${p.styles}`}>
       {p.src && invalidURL ? (
@@ -13,9 +13,9 @@ const Img = (p) => {
           onError={() => setinvalidURL(false)}
         />
       ) : p.type === "group" ? (
-        <MdGroup size={35} />
+        <MdGroup size={"100%"} />
       ) : (
-        <FaUserAlt size={22} />
+        <FaUserAlt size={"100%"} />
       )}
     </div>
   );

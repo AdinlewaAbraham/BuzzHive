@@ -3,10 +3,10 @@ import Input from "../input/Input";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";
 import { IoMdPerson } from "react-icons/io";
-import { GiCancel } from "react-icons/gi";
 import { AiOutlineSearch } from "react-icons/ai";
 import { BiArrowBack } from "react-icons/bi";
 import { AiOutlineArrowDown } from "react-icons/ai";
+import AboutProfile from "./AboutProfile";
 import MessageCard from "./MessageCard";
 
 const ContentContainer = () => {
@@ -77,26 +77,18 @@ const ContentContainer = () => {
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
         <div className=" flex-col relative bg-gray-300 dark:bg-[#12171d]  overflow-y-auto inset md:flex ">
           {showProfile && (
-            <div className="bg-pink-500 inset-0 absolute z-30 ">
-              <div
-                className="border-b p-[16px]"
-                onClick={() => {
-                  setshowProfile(false);
-                }}
-              >
-                <div className="cursor-pointer">
-                  <GiCancel size={30} />
-                </div>
-              </div>
-            </div>
+            <AboutProfile
+              setshowProfile={setshowProfile}
+              ChatObject={ChatObject}
+            />
           )}
           <div
-            className="flex justify-between md:ml-[1px] items-center dark:bg-[#1d232a] p-[13px] max-h-[66px] z-20 cursor-pointer"
+            className="flex justify-between md:ml-[1px] items-center dark:bg-[#1d232a] px-[13px] max-h-[66px] z-20 cursor-pointer"
             onClick={() => {
               //setshowProfile(true);
             }}
           >
-            <div className="flex items-center">
+            <div className="flex items-center h-full p-[13px]">
               {IsMobile && (
                 <div
                   className="mr-[15px]"
@@ -109,28 +101,32 @@ const ContentContainer = () => {
                 </div>
               )}
               <div
-                className={`h-[40px] w-[40px] rounded-full flex item-center justify-center bg-gray-500 ${
-                  ChatObject.photoUrl === null ? "pt-[3px]" : ""
-                }`}
+                className="flex items-center h-full"
                 onClick={() => {
                   setshowProfile(true);
                 }}
               >
-                {ChatObject.photoUrl === null ? (
-                  ChatObject.activeChatType === "group" ? (
-                    <MdGroup size={30} />
+                <div
+                  className={`h-[40px] w-[40px] rounded-full flex item-center justify-center bg-gray-500 ${
+                    ChatObject.photoUrl === null ? "pt-[3px]" : ""
+                  }`}
+                >
+                  {ChatObject.photoUrl === null ? (
+                    ChatObject.activeChatType === "group" ? (
+                      <MdGroup size={30} />
+                    ) : (
+                      <IoMdPerson size={30} />
+                    )
                   ) : (
-                    <IoMdPerson size={30} />
-                  )
-                ) : (
-                  <img
-                    src={ChatObject.photoUrl}
-                    alt="Profile"
-                    className="w-full h-full rounded-full"
-                  />
-                )}
+                    <img
+                      src={ChatObject.photoUrl}
+                      alt="Profile"
+                      className="w-full h-full rounded-full"
+                    />
+                  )}
+                </div>
+                <div className="ml-[10px]">{ChatObject.displayName}</div>
               </div>
-              <div className="ml-[10px]">{ChatObject.displayName}</div>
             </div>
 
             <div className="px-[10px]">
