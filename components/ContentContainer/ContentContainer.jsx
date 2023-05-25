@@ -8,6 +8,7 @@ import { BiArrowBack } from "react-icons/bi";
 import { AiOutlineArrowDown } from "react-icons/ai";
 import AboutProfile from "./AboutProfile";
 import MessageCard from "./MessageCard";
+import Img from "../Img";
 
 const ContentContainer = () => {
   const {
@@ -107,23 +108,20 @@ const ContentContainer = () => {
                 }}
               >
                 <div
-                  className={`h-[40px] w-[40px] rounded-full flex item-center justify-center bg-gray-500 ${
+                  className={`h-[40px] w-[40px] rounded-full flex items-center justify-center${
                     ChatObject.photoUrl === null ? "pt-[3px]" : ""
                   }`}
                 >
-                  {ChatObject.photoUrl === null ? (
-                    ChatObject.activeChatType === "group" ? (
-                      <MdGroup size={30} />
-                    ) : (
-                      <IoMdPerson size={30} />
-                    )
-                  ) : (
-                    <img
+                  <div className="w-[40px] h-[40px]">
+                    <Img
                       src={ChatObject.photoUrl}
-                      alt="Profile"
-                      className="w-full h-full rounded-full"
+                      type={ChatObject.activeChatType}
+                      styles="justify-center flex"
+                      imgStyles="rounded-full w-full h-full"
+                      groupSize={100}
+                      personalSize={75}
                     />
-                  )}
+                  </div>
                 </div>
                 <div className="ml-[10px]">{ChatObject.displayName}</div>
               </div>

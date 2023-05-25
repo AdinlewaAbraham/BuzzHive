@@ -1,6 +1,6 @@
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { useContext } from "react";
-import { UserContext } from "../App";
+import { UserContext } from "../../App";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 const UserCard = ({ name, id, image }) => {
@@ -11,7 +11,7 @@ const UserCard = ({ name, id, image }) => {
   const handleUserClick = async () => {
     setIsChatsLoading(true);
     const activeChatId = User.id > id ? User.id + id : id + User.id;
-     setChatObject({
+    setChatObject({
       ...ChatObject,
       activeChatId: `${activeChatId}`,
       activeChatType: `personal`,
@@ -30,7 +30,11 @@ const UserCard = ({ name, id, image }) => {
         handleUserClick();
       }}
     >
-      {image ? <img src={image} width={50} height={50} />: <>you have no img</>}
+      {image ? (
+        <img src={image} width={50} height={50} />
+      ) : (
+        <>you have no img</>
+      )}
       {name}
     </div>
   );

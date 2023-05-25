@@ -22,7 +22,7 @@ const Menu = ({ icon, header, context }) => {
 const Header = ({ title, isActive, onClick }) => {
   return (
     <div
-      className={`header ${isActive ? " border-blue-500 " : ""}`}
+      className={`mx-5 mb-5 cursor-pointer ${isActive ? " border-blue-500 " : ""}`}
       onClick={onClick}
     >
       {title}
@@ -31,19 +31,19 @@ const Header = ({ title, isActive, onClick }) => {
 };
 
 const Media = () => {
-  return <div>Component A</div>;
+  return <div className="w-full h-[350px]">Component A</div>;
 };
 
 const Files = () => {
-  return <div>Component B</div>;
+  return <div className="w-full h-[350px]">Component B</div>;
 };
 
 const Links = () => {
-  return <div>Component C</div>;
+  return <div className="w-full h-[350px]">Component C</div>;
 };
 
 const Participants = () => {
-  return <div>Component D</div>;
+  return <div className="w-full h-[350px]">Component D</div>;
 };
 
 const AboutProfile = ({ setshowProfile, ChatObject }) => {
@@ -101,13 +101,13 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
           <h3>contact info</h3>
         </div>
         <div className=" p-5">
-          <div className="flex flex-col items-center justify-center mb-5">
+          <div className="flex flex-col items-center justify-center mb-5 h-[200px] mt-5">
             <Img
               src={ChatObject.photoUrl}
               type={ChatObject.activeChatType}
               styles="w-[200px]"
             />
-            <h3>{ChatObject.displayName}</h3>
+            <h3 className="mt-2">{ChatObject.displayName}</h3>
           </div>
           <div>
             <Menu
@@ -124,7 +124,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
         </div>
       </div>
 
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center justify-around">
         <div className="flex">
           {["Media", "Files", "Links", "Participants"].map((header) => (
             <Header

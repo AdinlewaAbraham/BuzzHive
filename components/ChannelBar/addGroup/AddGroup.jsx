@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
 import useFetchUsers from "@/hooks/useFetchUsers";
-import { UserContext } from "../App";
+import { UserContext } from "../../App";
 import { createGroup } from "@/utils/groupUtils/createGroup";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";

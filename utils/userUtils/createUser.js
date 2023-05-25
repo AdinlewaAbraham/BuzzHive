@@ -23,7 +23,8 @@ export const createUser = async (uid, displayname, email, photoUrl, bio) => {
         picture: false,
         videos: false,
         files: false,
-      }
+      },
+      isReadReceiptsOn: true,
     });
     console.log("User added to Firebase successfully");
   } catch (error) {

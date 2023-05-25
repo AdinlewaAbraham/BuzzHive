@@ -1,13 +1,13 @@
 import { useGetChats } from "@/hooks/useGetChats";
 import UserCard from "./UserCard";
 import useFetchUsers from "@/hooks/useFetchUsers";
-import { UserContext } from "../App";
+import { UserContext } from "../../App";
 import { useContext } from "react";
 
 const AddContact = () => {
   const { User } = useContext(UserContext);
   const { users, lastDoc, loading, handleScroll } = useFetchUsers();
-  const neverUse = useGetChats(User.id)
+  const neverUse = useGetChats(User.id);
 
   const handleOnScroll = (event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.target;

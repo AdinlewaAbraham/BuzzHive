@@ -6,7 +6,7 @@ import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
 import { onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
-import { UserContext } from "../App";
+import { UserContext } from "../../App";
 
 const Chats = () => {
   const { User } = useContext(UserContext);

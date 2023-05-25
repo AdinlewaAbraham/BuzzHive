@@ -9,13 +9,13 @@ const Img = (p) => {
         <img
           src={p.src}
           alt="profile pic"
-          className="rounded-full object-cover h-full w-full"
+          className={`${p.imgStyles} object-cover h-full w-full`}
           onError={() => setinvalidURL(false)}
         />
       ) : p.type === "group" ? (
-        <MdGroup size={"100%"} />
+        <MdGroup size={`${p.groupSize}%`} />
       ) : (
-        <FaUserAlt size={"100%"} />
+        <FaUserAlt size={`${p.personalSize}%`} />
       )}
     </div>
   );

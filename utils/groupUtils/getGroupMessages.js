@@ -1,4 +1,4 @@
-import Chats from "@/components/chats/Chats";
+import Chats from "@/components/ChannelBar/chats/Chats";
 import { collection, getDocs, onSnapshot, query } from "firebase/firestore";
 import { db } from "../firebaseUtils/firebase";
 import { useContext } from "react";

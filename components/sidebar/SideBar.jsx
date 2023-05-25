@@ -12,7 +12,8 @@ import { BiLogOut } from "react-icons/bi";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import { deleteDB } from "idb";
-import {FcDeleteDatabase} from "react-icons/fc"
+import { FcDeleteDatabase } from "react-icons/fc";
+import Img from "../Img";
 const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
   const { setSelectedChannel, selectedChannel } = useContext(
     SelectedChannelContext
@@ -24,7 +25,7 @@ const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
         setSelectedChannel(clickevent ? clickevent : selectedChannel);
       }}
     >
-      {icon}{" "}
+      {icon}
       <span className="sidebar-tooltip group-hover:scale-100">{text}</span>
     </div>
   );
@@ -118,16 +119,26 @@ const SideBar = () => {
             clearIndexedDB();
           }}
         >
-         <SideBarIcon icon={<FcDeleteDatabase size="27"/>}/>
+          <SideBarIcon icon={<FcDeleteDatabase size="27" />} />
         </i>
-        {renderThemeChanger()}
-        <SideBarIcon icon={<AiOutlineSetting size={22} />} />
+        {/* {renderThemeChanger()} */}
       </i>
-      <div className=" flex justify-center items-center cursor-pointer">
-        <img
-          src={User.photoUrl}
-          alt=""
-          className="rounded-lg w-[30px] h-[30px] "
+      <div className="flex flex-col justify-center items-center ">
+        <SideBarIcon
+          icon={<AiOutlineSetting size={22} />}
+          clickevent="settings"
+        />
+        <SideBarIcon
+          icon={
+            <Img
+              src={User.photoUrl}
+              type="personal"
+              styles="rounded-lg flex justify-center items-center cursor-pointer w-[30px] h-[30px]"
+              imgStyles="rounded-lg"
+              personalSize="80"
+            />
+          }
+          clickevent="profileSettings"
         />
       </div>
     </div>

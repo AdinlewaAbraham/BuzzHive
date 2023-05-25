@@ -9,11 +9,11 @@
 @layer components {
   .sidebar-icon {
     @apply relative flex items-center justify-center 
-    h-10 w-10 md:mt-1 mb-0 md:mb-1 mx-1 md:mx-auto 
+    h-10 w-10 md:my-1 mb-0 mx-1 md:mx-auto 
   bg-gray-400 hover:bg-green-600 dark:bg-inherit 
   text-[#aaabaf] hover:text-white rounded-lg 
     transition-all duration-300 ease-linear
-    cursor-pointer ;
+    cursor-pointer;
   }
 
   .sidebar-tooltip {

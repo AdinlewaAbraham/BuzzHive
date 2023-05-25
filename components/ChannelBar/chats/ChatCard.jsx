@@ -14,7 +14,7 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
-import { UserContext } from "../App";
+import { UserContext } from "../../App";
 import { changeMessagesStatus } from "@/utils/messagesUtils/changeMessagesStatus";
 const ChatCard = ({
   img,
@@ -241,6 +241,7 @@ const ChatCard = ({
       const updatedMessages = [...LocallyStoredMessages, ...newSortedChats];
       console.log(updatedMessages);
       if (id === currentChatId) {
+        const readReceiptsSetting = JSON.parse(localStorage.getItem("user")).isReadReceiptsOn
         changeMessagesStatus(id, type, "seen")
           .then(() => {
             setChats((prevChats) => [...updatedMessages]);
