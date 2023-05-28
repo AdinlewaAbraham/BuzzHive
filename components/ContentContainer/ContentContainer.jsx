@@ -76,7 +76,7 @@ const ContentContainer = () => {
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
-        <div className=" flex-col relative bg-gray-300 dark:bg-[#12171d]  overflow-y-auto inset md:flex ">
+        <div className=" flex-col relative bg-[#f3f3f3] dark:bg-[#12171d]  overflow-y-auto inset md:flex ">
           {showProfile && (
             <AboutProfile
               setshowProfile={setshowProfile}
@@ -84,7 +84,7 @@ const ContentContainer = () => {
             />
           )}
           <div
-            className="flex justify-between md:ml-[1px] items-center dark:bg-[#1d232a] px-[13px] max-h-[66px] z-20 cursor-pointer"
+            className="flex justify-between md:ml-[1px] items-center  bg-[#fcfcfc] dark:bg-[#1d232a] px-[13px] max-h-[66px] z-20 cursor-pointer"
             onClick={() => {
               //setshowProfile(true);
             }}

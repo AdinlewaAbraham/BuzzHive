@@ -14,7 +14,7 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import { deleteDB } from "idb";
 import { FcDeleteDatabase } from "react-icons/fc";
 import Img from "../Img";
-const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
+ const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
   const { setSelectedChannel, selectedChannel } = useContext(
     SelectedChannelContext
   );
@@ -31,7 +31,7 @@ const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
   );
 };
 
-const SideBar = () => {
+ const SideBar = () => {
   const [Mounted, setMounted] = useState(false);
 
   const { systemTheme, theme, setTheme } = useTheme();
@@ -81,7 +81,7 @@ const SideBar = () => {
     <div
       className=" justify-center items-center w-full h-[70px] md:max-h-screen
      md:max-w-[70px] md:w-[5%] md:h-screen
-      md:min-w-[70px] flex md:flex-col md:justify-between bg-gray-900 dark:bg-[#12171d]
+      md:min-w-[70px] flex md:flex-col md:justify-between bg-[#f3f3f3] dark:bg-[#12171d]
        text-white md:pt-10 md:pb-5 "
     >
       <i className="flex md:flex-col">
@@ -123,7 +123,8 @@ const SideBar = () => {
         </i>
         {/* {renderThemeChanger()} */}
       </i>
-      <div className="flex flex-col justify-center items-center ">
+      {renderThemeChanger()}
+      <div className="flex md:flex-col justify-center items-center ">
         <SideBarIcon
           icon={<AiOutlineSetting size={22} />}
           clickevent="settings"

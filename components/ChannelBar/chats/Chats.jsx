@@ -117,7 +117,7 @@ const Chats = () => {
           <input
             type="text"
             placeholder="Search"
-            className="w-[90%] my-5 rounded-lg px-3 py-2 dark:bg-[#12171d] "
+            className="w-[90%] my-5 rounded-lg px-3 py-2 dark:bg-[#12171d] bg-[#f3f3f3] outline-none"
           />
         </div>
       </div>

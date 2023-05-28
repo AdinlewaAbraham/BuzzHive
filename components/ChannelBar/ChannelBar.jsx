@@ -11,7 +11,7 @@ const ChannelBar = () => {
   return (
     <div
       className="max-h-screen h-[calc(100vh-70px)] md:h-screen w-full md:w-[35%] md:min-w-[400px] p-3 
-    bg-gray-800 dark:bg-[#1d232a] md:mr-[0px]  overflow-y-hidden"
+    bg-[#fcfcfc] dark:bg-[#1d232a] md:mr-[0px]  overflow-y-hidden"
     >
       {selectedChannel === "chats" && <Chats />}
       {selectedChannel === "addcontact" && <AddContact />}

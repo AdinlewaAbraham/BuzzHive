@@ -217,7 +217,7 @@ const Input = () => {
           </div>
         </div>
       )}
-      <div className="flex md:ml-[1px] dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px]">
+      <div className="flex md:ml-[1px] bg-[#fcfcfc] dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px]">
         <div className="detectMe">
           {picVidmedia && (
             <MediaInput
@@ -250,7 +250,7 @@ const Input = () => {
           ].map(({ icon, onclick }) => {
             return (
               <div
-                className="detectme MediaPicker bg-red-600 p-[10px] bg-transparent text-[#aaabaf] hover:text-white cursor-pointer"
+                className="detectme MediaPicker bg-red-600 p-[10px] bg-transparent dark:text-[#aaabaf] dark:hover:text-white cursor-pointer"
                 onClick={onclick}
               >
                 {icon}
@@ -271,7 +271,7 @@ const Input = () => {
           )}
           {showMediaPicker && (
             <div
-              className="detectMe MediaPicker absolute bottom-[65px] dark:bg-black w-[160px] px-1 py-2 rounded-lg
+              className="detectMe MediaPicker absolute bottom-[65px]  dark:bg-black w-[160px] px-1 py-2 rounded-lg
                 hover:[&>div]:bg-gray-500 [&>div]:cursor-pointer [&>div]:rounded-md
             text-[15px] [&>div>div]:flex [&>div>div]:items-center 
             [&>div>div]:py-1 [&>div>div]:px-2 [&>div>div>svg]:mr-2 [&>div>label>svg]:mr-2"

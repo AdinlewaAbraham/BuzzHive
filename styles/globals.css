@@ -10,9 +10,9 @@
   .sidebar-icon {
     @apply relative flex items-center justify-center 
     h-10 w-10 md:my-1 mb-0 mx-1 md:mx-auto 
-  bg-gray-400 hover:bg-green-600 dark:bg-inherit 
-  text-[#aaabaf] hover:text-white rounded-lg 
-    transition-all duration-300 ease-linear
+     dark:hover:bg-[#1d232a] hover:bg-[#e8e8e8]  bg-inherit 
+  text-[#aaabaf] dark:hover:text-white rounded-lg 
+    transition-all duration-150 ease-linear
     cursor-pointer;
   }
 
@@ -59,4 +59,10 @@
   100% {
     opacity: 0.5;
   }
+}
+
+
+.ImgParentComp:hover .ImgChildComp {
+  background-color:  rgba(155, 145, 145, 0.2);
+  opacity: 1;
 }

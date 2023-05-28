@@ -80,6 +80,7 @@ const ChatCard = ({
       const data = JSON.parse(localStorage.getItem(id));
       const unreadObj = {
         type: "unread",
+        id: "propid",
       };
       if (data) {
         const filteredData = data.filter((message) => {
@@ -308,7 +309,7 @@ const ChatCard = ({
         setChats(filteredMessages);
         localStorage.setItem(
           `${ChatObject.activeChatId}`,
-          JSON.stringify(sortedMessages)
+          JSON.stringify(filteredMessages)
         );
       };
       getMessage();
@@ -319,8 +320,8 @@ const ChatCard = ({
     <div
       className={`${
         ChatObject.activeChatId == id
-          ? "bg-gray-600 hover:bg-gray-600"
-          : "hover:bg-gray-700 "
+          ? "dark:bg-gray-600 dark:hover:bg-gray-600 bg-[#e8e8e8] hover:bg-[#e8e8e8]"
+          : "dark:hover:bg-gray-700 hover:bg-[#f2f2f2]"
       } flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
         rounded-xl w-[100%] relative`}
       onClick={() => {

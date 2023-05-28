@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import Img from "@/components/Img";
 import { UserContext } from "@/components/App";
-import { FaPen } from "react-icons/fa";
+import { MdOutlineModeEditOutline } from "react-icons/md";
 import { BsCheck2 } from "react-icons/bs";
 import { useRef } from "react";
 import { useEffect } from "react";
@@ -14,7 +14,7 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
   };
   useEffect(() => {
     if (showInput && inputRef.current) {
-      inputRef.current.value = toBeEdited;
+      inputRef.current.value = toBeEdited
       inputRef.current.focus();
     }
   }, [showInput]);
@@ -25,7 +25,7 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
       <p className="text-blue-500">{title}</p>
       {showInput ? (
         <div className="flex justify-between items-center">
-          <input type="text" name="" id="" ref={inputRef} className="outline-none"/>
+          <input type="text" name="" id="" ref={inputRef} className="outline-none w-full bg-transparent"/>
           <div onClick={() => setshowInput(false)}>
             <BsCheck2 />
           </div>
@@ -34,7 +34,7 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
         <div className="flex justify-between items-center">
           <p className="w-full">{toBeEdited}</p>
           <div onClick={ handleEditClick} className="cursor-pointer">
-            <FaPen />
+            <MdOutlineModeEditOutline size={20} />
           </div>
         </div>
       )}

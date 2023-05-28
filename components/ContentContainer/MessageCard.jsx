@@ -34,15 +34,21 @@ const MessageCard = ({ chat }) => {
 
     const unsubscribe = onSnapshot(q, (doc) => {
       setChats((prevChats) => {
-        const updatedChats = prevChats.map((message) => {
-          if (message.id === doc.id) {
-            if (message.status === "received" && doc.data().status === "sent") {
-              return message; // Do not update status if current status is "received"
+        console.log(prevChats);
+        const updatedChats = [...prevChats]
+          .filter((chat) => chat)
+          .map((message) => {
+            if (message.id === doc.id) {
+              if (
+                message.status === "received" &&
+                doc.data().status === "sent"
+              ) {
+                return message; // Do not update status if current status is "received"
+              }
+              return doc.data();
             }
-            return doc.data();
-          }
-          return message;
-        });
+            return message;
+          });
         localStorage.setItem(activeChatId, JSON.stringify(updatedChats));
         return updatedChats;
       });
@@ -100,8 +106,8 @@ const MessageCard = ({ chat }) => {
       <div
         className={`text-left rounded-lg p-2 max-w-[80%] relative ${
           chat.senderId === currentId
-            ? " text-white text-right ml-2 dark:bg-[#296eff] mr-5"
-            : "dark:bg-[#252d35] text-white text-left mr-2 ml-5"
+            ? " text-white text-right ml-2  bg-[#296eff] mr-5"
+            : "dark:bg-[#252d35] bg-[#fcfcfc] text-black dark:text-white text-left mr-2 ml-5"
         }  ${chat.type === "pic/video" && "w-[300px]"}`}
       >
         {chat.type == "reply" && (
