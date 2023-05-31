@@ -13,6 +13,7 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import { BsCheckAll, BsCheckLg } from "react-icons/bs";
 import { BiTimeFive } from "react-icons/bi";
 const MessageCard = ({ chat }) => {
+  if (!chat) return;
   const { ChatObject, setReplyObject, ReplyObject, setChats } = useContext(
     SelectedChannelContext
   );
@@ -34,7 +35,7 @@ const MessageCard = ({ chat }) => {
 
     const unsubscribe = onSnapshot(q, (doc) => {
       setChats((prevChats) => {
-        console.log(prevChats);
+        (prevChats);
         const updatedChats = [...prevChats]
           .filter((chat) => chat)
           .map((message) => {
@@ -84,11 +85,11 @@ const MessageCard = ({ chat }) => {
           displayName: `${chat.senderDisplayName}`,
         }),
     },
-    { label: "Forward", action: () => console.log("Forward clicked") },
-    { label: "React to message", action: () => console.log("React clicked") },
-    { label: "Copy", action: () => console.log("Copy clicked") },
+    { label: "Forward", action: () => ("Forward clicked") },
+    { label: "React to message", action: () => ("React clicked") },
+    { label: "Copy", action: () => ("Copy clicked") },
   ];
-  console.log(chat);
+  (chat);
 
   const handleMenuItemClick = (item) => {
     item.action();
@@ -97,22 +98,22 @@ const MessageCard = ({ chat }) => {
 
   return (
     <div
-      className={`flex items-center my-2 justify-start ${
+      className={`my-2 flex items-center justify-start ${
         chat.senderId === currentId ? " flex-row-reverse" : " "
       } ${chat.reactions.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
     >
       <div
-        className={`text-left rounded-lg p-2 max-w-[80%] relative ${
+        className={`relative max-w-[80%] rounded-lg p-2 text-left ${
           chat.senderId === currentId
-            ? " text-white text-right ml-2  bg-[#296eff] mr-5"
-            : "dark:bg-[#252d35] bg-[#fcfcfc] text-black dark:text-white text-left mr-2 ml-5"
+            ? " ml-2 mr-5 bg-[#296eff]  text-right text-white"
+            : "mr-2 ml-5 bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
         }  ${chat.type === "pic/video" && "w-[300px]"}`}
       >
         {chat.type == "reply" && (
           <div
-            className="dark:bg-gray-500 p-2 rounded-lg border-l-blue-600 max-h-[80px] truncate"
+            className="max-h-[80px] truncate rounded-lg border-l-blue-600 p-2 dark:bg-gray-500"
             onClick={() => {
               document
                 .getElementById(chat.replyObject.replyTextId)
@@ -125,8 +126,8 @@ const MessageCard = ({ chat }) => {
         )}
         {chat.type === "file" && (
           <div>
-            <div className={`w-full flex ${chat.text && "mb-2"}`}>
-              <div className="p-3 bg-blue-900 rounded-full flex justify-center items-center mr-2">
+            <div className={`flex w-full ${chat.text && "mb-2"}`}>
+              <div className="mr-2 flex items-center justify-center rounded-full bg-blue-900 p-3">
                 <RenderFileType type={chat.dataObject.type} size={40} />
               </div>
               <div className="text-start">
@@ -138,7 +139,7 @@ const MessageCard = ({ chat }) => {
         )}
         {chat.type === "pic/video" && (
           <div>
-            {console.log(chat.dataObject.type)}
+            {(chat.dataObject.type)}
             {chat.dataObject.type.startsWith("image") ? (
               <ImageComponent
                 blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
@@ -147,7 +148,7 @@ const MessageCard = ({ chat }) => {
               />
             ) : (
               <>
-                {console.log(chat)}
+                {(chat)}
                 <VideoComponent
                   blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
                   downloadSRC={chat.dataObject.downloadURL}
@@ -173,7 +174,7 @@ const MessageCard = ({ chat }) => {
 
         {chat.reactions.length > 0 && (
           <div
-            className={`rounded-lg max-w-[500px] flex absolute bottom-[-20px] right-0  bg-white p-[5px]`}
+            className={`absolute bottom-[-20px] right-0 flex max-w-[500px] rounded-lg  bg-white p-[5px]`}
           >
             {chat.reactions.map(({ emoji }) => (
               <Emoji unified={emoji} size="15" />
@@ -189,7 +190,7 @@ const MessageCard = ({ chat }) => {
       >
         <div className="relative">
           {showReactEmojiTray && (
-            <div className=" flex bg-blue-700 absolute bottom-[25px] left-[-100px] w-[200px] p-[20px] rounded-lg z-20">
+            <div className=" absolute bottom-[25px] left-[-100px] z-20 flex w-[200px] rounded-lg bg-blue-700 p-[20px]">
               {["1f423", "1f423", "1f433", "1f423", "1f423"].map((emoji) => (
                 <div
                   className="mx-[5px]"
@@ -202,12 +203,12 @@ const MessageCard = ({ chat }) => {
           )}
           {showMessageMenu && (
             <div className="absolute top-4 z-20">
-              <ul className="bg-white border border-gray-300 shadow-md rounded-md">
+              <ul className="rounded-md border border-gray-300 bg-white shadow-md">
                 {menuItems.map((item) => (
                   <li
                     key={item.label}
                     onClick={() => handleMenuItemClick(item)}
-                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:bg-black"
+                    className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:bg-black"
                   >
                     {item.label}
                   </li>

@@ -47,7 +47,7 @@ const ProfileSettings = () => {
   const [showEditDisplayNameInput, setshowEditDisplayNameInput] =
     useState(false);
   const [showEditAboutInput, setshowEditAboutInput] = useState(false);
-  console.log(User);
+  (User);
   return (
     <div className="p-6">
       <h1>My Profile</h1>

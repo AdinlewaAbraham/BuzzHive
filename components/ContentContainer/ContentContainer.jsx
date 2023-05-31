@@ -20,7 +20,7 @@ const ContentContainer = () => {
     ReplyObject,
     replyDivHeight,
   } = useContext(SelectedChannelContext);
-  console.log(Chats);
+  (Chats);
 
   const [sortedChats, setSortedChats] = useState([]);
   const [photoUrl, setPhotoUrl] = useState(null);
@@ -62,7 +62,7 @@ const ContentContainer = () => {
       </div>
     );
   }
-  console.log(ReplyObject.divHeight);
+  (ReplyObject.divHeight);
 
   const mainContentStyle = {
     overflowY: "auto",
@@ -71,12 +71,12 @@ const ContentContainer = () => {
     })`,
   };
 
-  console.log(replyDivHeight);
+  (replyDivHeight);
 
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
-        <div className=" flex-col relative bg-[#f3f3f3] dark:bg-[#12171d]  overflow-y-auto inset md:flex ">
+        <div className=" flex-col relative bg-[#f0f2f5] dark:bg-[#12171d]  overflow-y-auto inset md:flex ">
           {showProfile && (
             <AboutProfile
               setshowProfile={setshowProfile}
@@ -112,14 +112,14 @@ const ContentContainer = () => {
                     ChatObject.photoUrl === null ? "pt-[3px]" : ""
                   }`}
                 >
-                  <div className="w-[40px] h-[40px]">
+                  <div className="w-[40px] h-[40px] text-[#ffffff] dark:bg-gray-500 bg-[#dfe5e7] rounded-full flex justify-center items-center">
                     <Img
                       src={ChatObject.photoUrl}
                       type={ChatObject.activeChatType}
-                      styles="justify-center flex"
+                      styles="justify-center flex rounded-full items-center"
                       imgStyles="rounded-full w-full h-full"
-                      groupSize={100}
-                      personalSize={75}
+                      groupSize={80}
+                      personalSize={60}
                     />
                   </div>
                 </div>
@@ -141,8 +141,8 @@ const ContentContainer = () => {
               <>you have nothing </>
             ) : (
               <div
-                className="w-full  my-element overflow-y-auto scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
-              scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar- "
+                className="w-full  my-element overflow-y-auto  my-element scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-[#ced0d1]
+                dark:scrollbar-thumb-gray-500 scrollbar-track-[transparent]  "
               >
                 {sortedChats &&
                   sortedChats.map((chat) => <MessageCard chat={chat} />)}
@@ -152,7 +152,7 @@ const ContentContainer = () => {
             {
               <div
                 onClick={() => {
-                  console.log("click");
+                  ("click");
                   secondDivRef.current.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="hidden absolute z-10 right-[20px] cursor-pointer p-3 dark:bg-[#1d232a] rounded-lg"

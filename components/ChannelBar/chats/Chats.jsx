@@ -7,6 +7,7 @@ import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import { UserContext } from "../../App";
+import { HiUserAdd } from "react-icons/hi";
 
 const Chats = () => {
   const { User } = useContext(UserContext);
@@ -41,17 +42,17 @@ const Chats = () => {
       window.removeEventListener("offline", handleOffline);
     };
   }, []);
-  console.log(JSON.parse(localStorage.getItem(`${User.id}_userChats`)));
+  (JSON.parse(localStorage.getItem(`${User.id}_userChats`)));
   useEffect(() => {
     const storedChats = getStoredChats();
-    console.log(storedChats);
+    (storedChats);
     if (storedChats && storedChats.length) {
-      console.log(storedChats);
+      (storedChats);
       set_Chats(storedChats);
       setLoading(false);
     } else {
-      console.log("ranning");
-      console.log(chats);
+      ("ranning");
+      (chats);
       set_Chats(chats);
       chats == null
         ? 0
@@ -94,22 +95,25 @@ const Chats = () => {
     );
     setSortedChats(sortedChats);
   }, [Chats]);
-  console.log(Chats);
-  console.log(sortedChats);
+  (Chats);
+  (sortedChats);
 
   return (
     <div className="">
       <div className="h-[95px]">
         <div className="flex justify-between items-center px-2 ">
           <h1 className="text-2xl ">Chats</h1>{" "}
-          <div className="relative">
+          <div className="relative text-[#54656f] dark:text-[#aaabaf] flex items-center ">
+            <i className="mr-6 cursor-pointer">
+              <HiUserAdd size={27} />
+            </i>
             <i
               onClick={() => {
                 setSelectedChannel("addGroup");
               }}
               className="cursor-pointer"
             >
-              <MdGroupAdd size={24} />
+              <MdGroupAdd size={25} />
             </i>
           </div>
         </div>
@@ -117,7 +121,7 @@ const Chats = () => {
           <input
             type="text"
             placeholder="Search"
-            className="w-[90%] my-5 rounded-lg px-3 py-2 dark:bg-[#12171d] bg-[#f3f3f3] outline-none"
+            className="w-[90%] my-5 rounded-lg px-3 py-2 dark:bg-[#12171d] bg-[#f0f2f5] outline-none"
           />
         </div>
       </div>
@@ -127,8 +131,9 @@ const Chats = () => {
         <>
           {sortedChats.length !== 0 ? (
             <div
-              className="flex flex-col items-center overflow-y-auto pt-[2px] pr-[2px] overflow-x-hidden md:h-[calc(100vh-125px)] h-[calc(100vh-195px)] mt-2 my-element scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-blue-700
-            scrollbar-track-blue-300 dark:scrollbar-thumb-gray-500 dark:scrollbar-track-[transparent] hover:scrollbar-"
+              className="flex flex-col items-center overflow-y-auto pt-[2px] pr-[2px] overflow-x-hidden md:h-[calc(100vh-125px)]
+               h-[calc(100vh-195px)] mt-2 my-element scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-[#ced0d1]
+            dark:scrollbar-thumb-gray-500 scrollbar-track-[transparent] "
             >
               {sortedChats.map((chat) => (
                 <ChatCard
@@ -140,7 +145,7 @@ const Chats = () => {
                   name={chat.senderDisplayName}
                   sender={
                     chat.senderId == User.id
-                      ? "you"
+                      ? null
                       : chat.lastMessageSenderName
                   }
                   message={chat.lastMessage}

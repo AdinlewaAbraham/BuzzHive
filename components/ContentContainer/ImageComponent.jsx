@@ -8,14 +8,14 @@ import { UserContext } from "../App";
 const ImageComponent = ({ blurredSRC, downloadSRC, messageId }) => {
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
-  console.log(messageId);
+  (messageId);
   const [imageSrc, setImageSrc] = useState(blurredSRC);
   const [downloadProgress, setDownloadProgress] = useState(null);
   const [isDownloaded, setisDownloaded] = useState(false);
   const [loadingImg, setloadingImg] = useState(true);
 
   function dataURItoBlob(dataURI) {
-    console.log(dataURI);
+    (dataURI);
     const byteString = atob(dataURI.split(",")[1]);
     const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
     const ab = new ArrayBuffer(byteString.length);
@@ -71,7 +71,7 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId }) => {
 
   useEffect(() => {
     if (User.autoDownloadSettings.picture) {
-      console.log("i ran");
+      ("i ran");
       handleDownload();
     }
   }, []);
@@ -91,8 +91,8 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId }) => {
         )}
       </div>{" "}
       <div className="absolute flex justify-center top-[50%] left-[50%] items-center ">
-        {console.log(downloadProgress)}
-        {console.log(isDownloaded)}
+        {(downloadProgress)}
+        {(isDownloaded)}
         {downloadProgress !== 100 &&
           !isDownloaded &&
           downloadProgress !== 0 && (

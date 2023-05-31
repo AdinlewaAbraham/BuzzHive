@@ -55,7 +55,7 @@ const VideoComponent = ({
 
   async function getFileSize(downloadLink) {
     if (isDownloaded) return;
-    console.log("started");
+    ("started");
     return fetch(downloadLink).then((response) => {
       const contentLength = response.headers.get("Content-Length");
       if (contentLength) {
@@ -64,7 +64,7 @@ const VideoComponent = ({
         const fileSizeInKB = fileSizeInBytes / 1024;
         const fileSizeInMB = fileSizeInKB / 1024;
         // You can return the size in the desired format
-        console.log({
+        ({
           bytes: fileSizeInBytes,
           kilobytes: fileSizeInKB,
           megabytes: fileSizeInMB,
@@ -84,7 +84,7 @@ const VideoComponent = ({
     async function getSize() {
       if (isDownloaded) return;
       const size = await getFileSize(downloadSRC);
-      console.log(size);
+      (size);
       setVideoSize(size.megabytes);
     }
     getSize();
@@ -105,15 +105,15 @@ const VideoComponent = ({
         `Thumbnail-${messageId}`
       );
       if (storedVideoThumnail) {
-        console.log(URL.createObjectURL(storedVideoThumnail));
+        (URL.createObjectURL(storedVideoThumnail));
         setblurredImgSRC(URL.createObjectURL(storedVideoThumnail));
       } else {
         // Save blurred image to IndexedDB
         const response = await fetch(blurredSRC);
-        console.log(blurredSRC);
+        (blurredSRC);
         setblurredImgSRC(blurredSRC);
         const blob = await response.blob();
-        console.log(blob);
+        (blob);
         const db = await initializeDB();
         const tx = db.transaction("videos", "readwrite");
         const store = tx.objectStore("videos");
@@ -121,7 +121,7 @@ const VideoComponent = ({
         await tx.done;
 
         setblurredImgSRC(URL.createObjectURL(blob));
-        console.log(URL.createObjectURL(blob));
+        (URL.createObjectURL(blob));
       }
       setloadingThumbnail(false);
     };
@@ -129,7 +129,7 @@ const VideoComponent = ({
     getStoredVideoandVideoThumbnail();
   }, [messageId]);
   const downloadVideo = async () => {
-    console.log("downloading video...");
+    ("downloading video...");
     const request = new XMLHttpRequest();
     request.open("GET", downloadSRC, true);
     request.responseType = "blob";
@@ -138,7 +138,7 @@ const VideoComponent = ({
       if (event.lengthComputable) {
         const percentComplete = Math.round((event.loaded / event.total) * 100);
         setDownloadProgress(percentComplete);
-        console.log(percentComplete);
+        (percentComplete);
       }
     });
 
@@ -160,7 +160,7 @@ const VideoComponent = ({
         } else {
           // All video chunks have been downloaded
           setisDownloaded(true);
-          console.log("All video chunks downloaded");
+          ("All video chunks downloaded");
         }
       } else {
         console.error(`Failed to download video (${request.status})`);
@@ -174,29 +174,29 @@ const VideoComponent = ({
     setvideoPlayer(true);
     const storedVideo = await getVideoFromIndexedDB(`video-${messageId}`);
     if (storedVideo) {
-      console.log(storedVideo);
+      (storedVideo);
       setVideoSrc(URL.createObjectURL(storedVideo));
       setisDownloaded(true);
     } else {
       downloadVideo();
       // Combine and play the buffered video chunks
       const combinedChunks = new Blob(bufferedChunks, { type: "video/mp4" });
-      console.log(combinedChunks);
+      (combinedChunks);
       setVideoSrc(URL.createObjectURL(combinedChunks));
       setisDownloaded(true);
 
       // Save the combined video to IndexedDB
       await setVideoToIndexedDB(`video-${messageId}`, combinedChunks);
 
-      console.log("Buffered video chunks played");
+      ("Buffered video chunks played");
     }
   }
 
   const [imageError, setImageError] = useState(false);
-  console.log(blurredImgSRC);
+  (blurredImgSRC);
   return (
     <div key={messageId}>
-      {console.log(videoSrc)}
+      {(videoSrc)}
       {videoPlayer && (
         <MediaPlayer
           VideoSRC={videoSrc}

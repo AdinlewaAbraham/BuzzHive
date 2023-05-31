@@ -45,16 +45,16 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    console.log(User);
+    (User);
     if (!User) {
       return;
     }
     const q = doc(db, "users", User.id);
     const unsub = onSnapshot(q, async (doc) => {
-      console.log(doc.data());
+      (doc.data());
       setUser(doc.data());
       localStorage.setItem("user", JSON.stringify(doc.data()));
-      console.log(localStorage.getItem("user"));
+      (localStorage.getItem("user"));
     });
     return () => {
       unsub();
@@ -63,7 +63,6 @@ const App = () => {
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
-    console.log(userData)
     if (userData !== "undefined" && JSON.parse(userData)) {
       setUser(JSON.parse(userData));
       setIsAuthed(true);

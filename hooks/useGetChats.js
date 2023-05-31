@@ -26,7 +26,7 @@ export const useGetChats = (currentUserId) => {
   ////////////////////
 
   useEffect(() => {
-    console.log("ran");
+    ("ran");
     const conversationRef = collection(db, "conversations");
     const groupRef = collection(db, "groups");
     const groupQuery = query(
@@ -41,15 +41,15 @@ export const useGetChats = (currentUserId) => {
     if (JSON.parse(localStorage.getItem("user")) == undefined) {
       return;
     }
-    console.log(JSON.parse(localStorage.getItem("user")));
+    (JSON.parse(localStorage.getItem("user")));
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      console.log(activeId)
+      (activeId)
       const activeChatId = JSON.parse(sessionStorage.getItem("activeChatId")); // this is a retarded hack but it works
-      console.log(activeChatId);
+      (activeChatId);
       const lastMessagesObject = JSON.parse(
         localStorage.getItem("user")
       ).unReadMessages;
-      console.log("ran");
+      ("ran");
       const chats = [];
       for (const doc of querySnapshot.docs) {
         const conversation = doc.data();
@@ -68,12 +68,12 @@ export const useGetChats = (currentUserId) => {
 
         const lastMessageTimestamp = lastMessagesObject[doc.id];
         if (lastMessageTimestamp /* && doc.id == ChatObject.activeChatId*/) {
-          console.log(lastMessageTimestamp);
+          (lastMessageTimestamp);
           const qT = new Timestamp(
             lastMessageTimestamp.seconds,
             lastMessageTimestamp.nanoseconds
           );
-          console.log(qT);
+          (qT);
           const unReadMessagesQuery = query(
             collection(db, "conversations", doc.id, "messages"),
             where("timestamp", ">", qT),
@@ -83,13 +83,13 @@ export const useGetChats = (currentUserId) => {
 
           unReadmessagesCount =
             activeChatId == doc.id ? 0 : unReadMessagequerySnapshot.size;
-          console.log(ChatObject.activeChatId);
-          console.log(doc.id);
-          console.log(activeChatId);
-          console.log("this is for " + doc.id + " " + unReadmessagesCount);
+          (ChatObject.activeChatId);
+          (doc.id);
+          (activeChatId);
+          ("this is for " + doc.id + " " + unReadmessagesCount);
         } else {
           unReadmessagesCount = 0;
-          console.log("this is for " + doc.id + " " + unReadmessagesCount);
+          ("this is for " + doc.id + " " + unReadmessagesCount);
         }
         const chat = {
           id: doc.id,

@@ -56,7 +56,7 @@ const MediaPlayer = ({ VideoSRC, setvideoPlayer, messageText }) => {
     video.currentTime = seekTime;
     setCurrentTime(seekTime);
   };
-  console.log(VideoSRC);
+  (VideoSRC);
 
   return (
     <div className="fixed inset-0 bg-[#111a20] z-[99] flex justify-center items-center px-[100px]">

@@ -116,12 +116,12 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
     .then((querySnapshot) => {
       const isUserInArray = !querySnapshot.empty;
       setisAdmin(isUserInArray);
-      console.log(isUserInArray);
+      (isUserInArray);
     })
     .catch((error) => {
       console.error("Error getting document: ", error);
     });
-  console.log(ChatObject);
+  (ChatObject);
   return (
     <div className="dark:bg-[#12171d] inset-0 absolute z-30 ">
       <div

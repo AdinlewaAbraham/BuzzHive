@@ -14,7 +14,7 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import { deleteDB } from "idb";
 import { FcDeleteDatabase } from "react-icons/fc";
 import Img from "../Img";
- const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
+const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
   const { setSelectedChannel, selectedChannel } = useContext(
     SelectedChannelContext
   );
@@ -31,7 +31,7 @@ import Img from "../Img";
   );
 };
 
- const SideBar = () => {
+const SideBar = () => {
   const [Mounted, setMounted] = useState(false);
 
   const { systemTheme, theme, setTheme } = useTheme();
@@ -79,10 +79,10 @@ import Img from "../Img";
 
   return (
     <div
-      className=" justify-center items-center w-full h-[70px] md:max-h-screen
-     md:max-w-[70px] md:w-[5%] md:h-screen
-      md:min-w-[70px] flex md:flex-col md:justify-between bg-[#f3f3f3] dark:bg-[#12171d]
-       text-white md:pt-10 md:pb-5 "
+      className=" flex h-[70px] w-full items-center justify-center
+     bg-[#f0f2f5] text-white dark:bg-[#12171d]
+      md:h-screen md:max-h-screen md:w-[5%] md:min-w-[70px] md:max-w-[70px] md:flex-col 
+       md:justify-between md:pt-10 md:pb-5 "
     >
       <i className="flex md:flex-col">
         <SideBarIcon icon={<BsChatRightText size="20" />} clickevent="chats" />
@@ -92,7 +92,7 @@ import Img from "../Img";
         />
       </i>
 
-      <i className="md:mx-auto flex md:flex-col cursor-pointer">
+      <i className="flex cursor-pointer md:mx-auto md:flex-col">
         <i
           onClick={() => {
             const auth = getAuth();
@@ -124,7 +124,7 @@ import Img from "../Img";
         {/* {renderThemeChanger()} */}
       </i>
       {renderThemeChanger()}
-      <div className="flex md:flex-col justify-center items-center ">
+      <div className="flex items-center justify-center md:flex-col ">
         <SideBarIcon
           icon={<AiOutlineSetting size={22} />}
           clickevent="settings"

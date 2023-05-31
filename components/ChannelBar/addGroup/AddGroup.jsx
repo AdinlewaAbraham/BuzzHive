@@ -84,7 +84,7 @@ const AddGroup = () => {
     }
   }
   useEffect(() => {
-    console.log(selectedUsers);
+    (selectedUsers);
   }, [selectedUsers]);
 
   return (

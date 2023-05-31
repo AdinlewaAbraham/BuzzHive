@@ -44,7 +44,7 @@ const Input = () => {
   const senderid = User.id;
   const elementRef = useRef(null);
   function handleSend() {
-    console.log(ReplyObject);
+    (ReplyObject);
     if (!message || message.trim().length === 0) return;
     const replyObject = {
       replyText: ReplyObject.ReplyText,
@@ -60,7 +60,7 @@ const Input = () => {
       status: "pending",
     };
     setChats((prevChats) => {
-      console.log([...prevChats, messageObj]);
+      ([...prevChats, messageObj]);
       return [...prevChats, messageObj];
     });
     if (ChatObject.activeChatType == "group") {
@@ -75,8 +75,8 @@ const Input = () => {
       );
     } else if (ChatObject.activeChatType == "personal") {
       const time = new Date();
-      console.log(User);
-      console.log("ran");
+      (User);
+      ("ran");
       sendMessage(
         senderid,
         ChatObject.otherUserId,
@@ -116,7 +116,7 @@ const Input = () => {
   useEffect(() => {
     if (elementRef.current) {
       const height = elementRef.current.offsetHeight;
-      console.log("Element height:", height);
+      ("Element height:", height);
       setreplyDivHeight(height);
     }
   }, [ReplyObject]);
@@ -165,10 +165,10 @@ const Input = () => {
           className="Poll-input fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50"
           ref={popupRef}
         >
-          <div className="bg-black absolute p-4 rounded-lg">
+          <div className="absolute rounded-lg bg-black p-4">
             <p>Do you want to forfeit your input?</p>
             <button
-              className="p-4 bg-blue-500"
+              className="bg-blue-500 p-4"
               onClick={() => {
                 setfile(null);
                 setpicVidmedia(null);
@@ -181,9 +181,9 @@ const Input = () => {
               Discard
             </button>
             <button
-              className="p-4 detectMe"
+              className="detectMe p-4"
               onClick={() => {
-                console.log("clicked");
+                ("clicked");
                 setShowPopup(false);
               }}
             >
@@ -194,10 +194,10 @@ const Input = () => {
       )}
       {ReplyObject.ReplyTextId && (
         <div
-          className="px-10 py-2 dark:bg-[#1d232a] max-h-[90px] truncate ml-[1px]"
+          className="ml-[1px] max-h-[90px] truncate px-10 py-2 dark:bg-[#1d232a]"
           ref={elementRef}
         >
-          <div className="bg-gray-500 p-1 flex justify-between items-center rounded-lg ">
+          <div className="flex items-center justify-between rounded-lg bg-gray-500 p-1 ">
             <div>
               <p>{ReplyObject.displayName}</p>
               <p>{ReplyObject.ReplyText}</p>
@@ -217,7 +217,7 @@ const Input = () => {
           </div>
         </div>
       )}
-      <div className="flex md:ml-[1px] bg-[#fcfcfc] dark:bg-[#1d232a] items-center justify-between px-[4px] py-[8px]">
+      <div className="flex items-center justify-between bg-[#fcfcfc] px-[4px] py-[8px] dark:bg-[#1d232a] md:ml-[1px]">
         <div className="detectMe">
           {picVidmedia && (
             <MediaInput
@@ -250,7 +250,7 @@ const Input = () => {
           ].map(({ icon, onclick }) => {
             return (
               <div
-                className="detectme MediaPicker bg-red-600 p-[10px] bg-transparent dark:text-[#aaabaf] dark:hover:text-white cursor-pointer"
+                className="detectme MediaPicker cursor-pointer bg-red-600 bg-transparent p-[10px] dark:text-[#aaabaf] dark:hover:text-white"
                 onClick={onclick}
               >
                 {icon}
@@ -258,7 +258,7 @@ const Input = () => {
             );
           })}
           {showEmojiPicker && (
-            <div className="fixed bottom-[60px] left-[20%] detectme ">
+            <div className="detectme fixed bottom-[60px] left-[20%] ">
               <EmojiPicker
                 width={"150%"}
                 height={400}
@@ -271,34 +271,34 @@ const Input = () => {
           )}
           {showMediaPicker && (
             <div
-              className="detectMe MediaPicker absolute bottom-[65px]  dark:bg-black w-[160px] px-1 py-2 rounded-lg
-                hover:[&>div]:bg-gray-500 [&>div]:cursor-pointer [&>div]:rounded-md
-            text-[15px] [&>div>div]:flex [&>div>div]:items-center 
-            [&>div>div]:py-1 [&>div>div]:px-2 [&>div>div>svg]:mr-2 [&>div>label>svg]:mr-2"
+              className="detectMe MediaPicker absolute bottom-[65px]  w-[160px] rounded-lg px-1 py-2 text-[15px]
+                dark:bg-black [&>div>div>svg]:mr-2 [&>div>div]:flex
+            [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 
+            [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-gray-500"
             >
               <div className="file-input px-0 py-0">
-                <label className="flex items-center w-full h-full cursor-pointer py-1 px-2">
+                <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
                   <AiOutlineFile />
                   File
                   <input
                     type="file"
-                    className="hidden w-full h-full cursor-pointer"
+                    className="hidden h-full w-full cursor-pointer"
                     onChange={(e) => {
-                      console.log(e.target.files[0]);
+                      (e.target.files[0]);
                       setfile(e.target.files[0]);
-                      console.log(e.target.files[0]);
+                      (e.target.files[0]);
                       setshowMediaPicker(false);
                     }}
                   />
                 </label>
               </div>
               <div>
-                <label className="flex items-center w-full h-full cursor-pointer py-1 px-2">
+                <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
                   <RiGalleryLine />
                   Photo or video
                   <input
                     type="file"
-                    className="hidden w-full h-full cursor-pointer"
+                    className="hidden h-full w-full cursor-pointer"
                     onChange={async (e) => {
                       if (e.target.files[0].type.startsWith("image")) {
                         const blob = await downScalePicVid(
@@ -317,7 +317,7 @@ const Input = () => {
                         setblurredPicVidmedia(downscaledBlod);
                       } else {
                         const videoObj = e.target.files[0];
-                        console.log(videoObj);
+                        (videoObj);
                         setpicVidmedia(videoObj);
                         setblurredPicVidmedia(null);
                       }
@@ -343,7 +343,7 @@ const Input = () => {
         </div>
         <input
           type="text"
-          className="text-white  px-4 py-2 bg-transparent w-full outline-none placeholder-[#aaabaf]"
+          className="w-full  bg-transparent px-4 py-2 text-white placeholder-[#aaabaf] outline-none"
           placeholder="Type a message"
           value={message}
           onKeyDown={handleInputKeyDown}

@@ -6,8 +6,6 @@ export default async function getMessageReactions(
   chatid,
   messageId
 ) {
-  console.log("started");
-  console.log(messageId);
   if (!messageId) {
     return [];
   }

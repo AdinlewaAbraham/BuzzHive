@@ -69,7 +69,7 @@ const ChatCard = ({
     if (unReadCount == 0) {
       const data = JSON.parse(localStorage.getItem(id));
       if (data) {
-        console.log(data);
+        (data);
         const filteredData = data.filter((message) => {
           if (!message) return;
           return message.type !== "unread";
@@ -96,8 +96,8 @@ const ChatCard = ({
         localStorage.setItem(id, JSON.stringify(modifiedArr));
       }
     }
-    console.log(unReadCount);
-    console.log(JSON.parse(localStorage.getItem("user")));
+    (unReadCount);
+    (JSON.parse(localStorage.getItem("user")));
     setactiveId(id);
     setChatObject({
       activeChatId: id,
@@ -110,15 +110,15 @@ const ChatCard = ({
     const userRef = doc(db, "users", User.id);
 
     const messages = JSON.parse(localStorage.getItem(id));
-    console.log(messages);
+    (messages);
     if (!messages || JSON.stringify(message) == "[]") {
       return;
     }
     const lastMessage = messages[messages.length - 1];
-    console.log(lastMessage);
+    (lastMessage);
     const Chats = getStoredChats();
-    console.log(Chats);
-    console.log(Chats);
+    (Chats);
+    (Chats);
     const updatedArr = Chats.map((obj) => {
       if (obj.id == id) {
         return { ...obj, unReadmessagesCount: 0 };
@@ -126,7 +126,7 @@ const ChatCard = ({
         return obj;
       }
     });
-    console.log(updatedArr);
+    (updatedArr);
     set_Chats(
       updatedArr.sort((a, b) => {
         a.timestamp - b.timestamp;
@@ -142,10 +142,10 @@ const ChatCard = ({
     );
 
     if (lastMessage) {
-      console.log("trre");
-      console.log(User.id);
-      console.log(userRef);
-      console.log(lastMessage);
+      ("trre");
+      (User.id);
+      (userRef);
+      (lastMessage);
       await updateDoc(userRef, {
         [`unReadMessages.${id}`]: lastMessage.timestamp,
       });
@@ -157,9 +157,9 @@ const ChatCard = ({
           [id]: lastMessage.timestamp,
         },
       };
-      console.log(newObj);
+      (newObj);
       localStorage.setItem("user", JSON.stringify(newObj));
-      console.log(JSON.parse(localStorage.getItem("user")));
+      (JSON.parse(localStorage.getItem("user")));
     }
   };
   ////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ const ChatCard = ({
     ).unReadMessages;
     const LocallyStoredMessages = JSON.parse(localStorage.getItem(id));
     const unsub = onSnapshot(q, (snapshot) => {
-      console.log("ran");
+      ("ran");
       if (!lastUnReadMessagesObject[id]) return;
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -202,10 +202,10 @@ const ChatCard = ({
           lastMessageTimestamp.seconds +
           lastMessageTimestamp.nanoseconds / 1000000000;
         const isNewMessage = severTS > localTS;
-        console.log(isNewMessage);
-        console.log(data);
+        (isNewMessage);
+        (data);
         if (isNewMessage && data.id !== null) {
-          console.log(data);
+          (data);
           if (
             !chats.some((chat) => chat.id === data.id) &&
             !LocallyStoredMessages.some((chat) => {
@@ -214,21 +214,24 @@ const ChatCard = ({
             })
           ) {
             chats.push(data);
-            console.log(data);
+            (data);
           }
         }
       });
-      console.log(LocallyStoredMessages);
+      (LocallyStoredMessages);
       if (chats.length == 0) return;
       const sortedChats = [...chats].sort((a, b) => a.timestamp - b.timestamp);
 
-      console.log(sortedChats);
+      (sortedChats);
 
       const localstorageMessages = JSON.parse(localStorage.getItem(id));
       const newSortedChats = sortedChats.map((chat) => {
         //this pervent the snapshot from changing the status of the message to its previous status
         const matchingMessage = localstorageMessages.find(
-          (localStorageChat) => localStorageChat.id === chat.id
+          (localStorageChat) => {
+            if (!localStorageChat) return;
+            return localStorageChat.id === chat.id;
+          }
         );
         if (matchingMessage) {
           return {
@@ -238,17 +241,20 @@ const ChatCard = ({
         }
         return chat;
       });
-      console.log(newSortedChats);
-      const updatedMessages = [...LocallyStoredMessages, ...newSortedChats];
-      console.log(updatedMessages);
+      (newSortedChats);
+      (sortedChats);
+      const updatedMessages = [...LocallyStoredMessages, ...sortedChats];
+      (updatedMessages);
       if (id === currentChatId) {
-        const readReceiptsSetting = JSON.parse(localStorage.getItem("user")).isReadReceiptsOn
+        const readReceiptsSetting = JSON.parse(
+          localStorage.getItem("user")
+        ).isReadReceiptsOn;
         changeMessagesStatus(id, type, "seen")
           .then(() => {
             setChats((prevChats) => [...updatedMessages]);
           })
           .catch((error) => {
-            console.log("Error updating message status:", error);
+            ("Error updating message status:", error);
           });
       } else {
         changeMessagesStatus(id, type, "received")
@@ -256,7 +262,7 @@ const ChatCard = ({
             setChats((prevChats) => [...updatedMessages]);
           })
           .catch((error) => {
-            console.log("Error updating message status:", error);
+            ("Error updating message status:", error);
           });
       }
       localStorage.setItem(id, JSON.stringify(updatedMessages));
@@ -283,14 +289,14 @@ const ChatCard = ({
       localStorage.getItem(`${ChatObject.activeChatId}`)
     ) {
       const Chat = getStoredMessages();
-      console.log(Chat);
-      console.log("this is for " + name + " " + unReadCount);
+      (Chat);
+      ("this is for " + name + " " + unReadCount);
       setChats(Chat);
     } else {
       const getMessage = async () => {
         const CollectionName =
           ChatObject.activeChatType === "group" ? "groups" : "conversations";
-        console.log(CollectionName);
+        (CollectionName);
         const query = collection(
           db,
           CollectionName,
@@ -300,11 +306,11 @@ const ChatCard = ({
 
         const snapshot = await getDocs(query);
         const messages = await snapshot.docs.map((doc) => doc.data());
-        console.log(messages);
+        (messages);
         const sortedMessages = messages.sort((a, b) => {
           a.timestamp - b.timestamp;
         });
-        console.log(sortedMessages);
+        (sortedMessages);
         const filteredMessages = sortedMessages.filter((message) => message);
         setChats(filteredMessages);
         localStorage.setItem(
@@ -320,21 +326,21 @@ const ChatCard = ({
     <div
       className={`${
         ChatObject.activeChatId == id
-          ? "dark:bg-gray-600 dark:hover:bg-gray-600 bg-[#e8e8e8] hover:bg-[#e8e8e8]"
-          : "dark:hover:bg-gray-700 hover:bg-[#f2f2f2]"
-      } flex flex-row justify-between align-middle items-center px-4 py-3 cursor-pointer
-        rounded-xl w-[100%] relative`}
+          ? "bg-[#f0f2f5] hover:bg-[#f0f2f5] dark:bg-gray-600 dark:hover:bg-gray-600"
+          : "hover:bg-[#f5f6f6] dark:hover:bg-gray-700"
+      } relative flex w-[100%] cursor-pointer flex-row items-center justify-between rounded-xl
+        px-4 py-3 align-middle`}
       onClick={() => {
         handleChatClick();
       }}
     >
-      <div className="flex flex-row  align-middle items-center w-full">
-        <div className="w-[50px] h-[50px] mr-3 flex items-center justify-center bg-gray-500 rounded-full">
+      <div className="flex w-full  flex-row items-center ">
+        <div className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500 ">
           {img && invalidURL ? (
             <img
               src={img}
               alt="profile pic"
-              className="rounded-full object-cover h-full w-full"
+              className="h-full w-full rounded-full object-cover"
               onError={() => setinvalidURL(false)}
             />
           ) : type === "group" ? (
@@ -343,16 +349,17 @@ const ChatCard = ({
             <FaUserAlt size={22} />
           )}
         </div>
-        <div className=" truncate w-[90%]">
+        <div className=" ml-3 w-[90%]  truncate">
           <h3>{name}</h3>
-          <div className="flex flex-row">
-            <p>{sender}</p>: <p> {message}</p>
+          <div className="flex flex-row text-sm text-[#6c757d] dark:text-[#aaaaaa]">
+            <p>{sender}</p>
+            {sender && <>:</>} <p> {message}</p>
           </div>
         </div>
       </div>
       <p className="">{timestamp}</p>
       {unReadCount !== 0 && (
-        <p className="flex justify-center items-center h-6 w-6 rounded-full bg-blue-500">
+        <p className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500">
           {unReadCount}
         </p>
       )}
