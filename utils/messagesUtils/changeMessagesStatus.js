@@ -7,17 +7,20 @@ import {
   writeBatch,
   limit,
   getDocs,
+  getDoc,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseUtils/firebase";
 
 export async function changeMessagesStatus(activeChatId, type, status) {
-  console.log(activeChatId);
+  activeChatId;
   const User = JSON.parse(localStorage.getItem("user"));
   const { unReadMessages } = User;
   const lastMessageTimestamp = unReadMessages[activeChatId];
 
-  console.log(lastMessageTimestamp);
-  console.log(activeChatId);
+  lastMessageTimestamp;
+  activeChatId;
   const queryRef = collection(
     db,
     type === "group" ? "groups" : "conversations",
@@ -32,6 +35,46 @@ export async function changeMessagesStatus(activeChatId, type, status) {
     orderBy("timestamp", "desc")
     //  limit(20)
   );
+
+  const q = doc(
+    db,
+    type === "group" ? "groups" : "conversations",
+    activeChatId
+  );
+  const lastMessage = (await getDoc(q)).data();
+  const lastMessageStatus = lastMessage.lastMessage.status;
+  if (lastMessageStatus === "seen") {
+    // Do nothing if status is already "seen"
+    return;
+  } else if (lastMessageStatus === "received" && status === "seen") {
+    // Change status to "sent" only if current status is "received"
+    if (lastMessage.senderId !== User.id) {
+      console.log(status);
+      await updateDoc(q, {
+        ...lastMessage,
+        lastMessage: {
+          ...lastMessage.lastMessage,
+          status: status,
+        },
+      });
+    }
+  } else if (
+    lastMessageStatus === "sent" &&
+    (status === "received" || status === "seen")
+  ) {
+    // Change status to "received" or "seen" if current status is "sent"
+    if (lastMessage.senderId !== User.id) {
+      console.log(status);
+      await updateDoc(q, {
+        ...lastMessage,
+        lastMessage: {
+          ...lastMessage.lastMessage,
+          status: status,
+        },
+      });
+    }
+  }
+
   const senderIdQuerySnapshot = await getDocs(senderIdQuery);
 
   if (!senderIdQuerySnapshot.empty) {
@@ -44,9 +87,9 @@ export async function changeMessagesStatus(activeChatId, type, status) {
       }
     });
 
-    console.log("Newest message timestamp:", newestMessageTimestamp);
+    "Newest message timestamp:", newestMessageTimestamp;
   } else {
-    console.log("No messages found.");
+    ("No messages found.");
   }
 
   const batch = writeBatch(db);

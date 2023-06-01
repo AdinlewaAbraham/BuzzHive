@@ -26,39 +26,39 @@ const MessageCard = ({ chat }) => {
   const timestamp = chat.timestamp;
 
   //this checks for updates like when user reacts to messagee then updates localstorage
-  useEffect(() => {
-    const { activeChatId, activeChatType } = ChatObject;
-    const queryLocation =
-      activeChatType === "group" ? "groups" : "conversations";
-    if (!chat.id) return;
-    const q = doc(db, queryLocation, activeChatId, "messages", chat.id);
+  // useEffect(() => {
+  //   const { activeChatId, activeChatType } = ChatObject;
+  //   const queryLocation =
+  //     activeChatType === "group" ? "groups" : "conversations";
+  //   if (!chat.id) return;
+  //   const q = doc(db, queryLocation, activeChatId, "messages", chat.id);
 
-    const unsubscribe = onSnapshot(q, (doc) => {
-      setChats((prevChats) => {
-        (prevChats);
-        const updatedChats = [...prevChats]
-          .filter((chat) => chat)
-          .map((message) => {
-            if (message.id === doc.id) {
-              if (
-                message.status === "received" &&
-                doc.data().status === "sent"
-              ) {
-                return message; // Do not update status if current status is "received"
-              }
-              return doc.data();
-            }
-            return message;
-          });
-        localStorage.setItem(activeChatId, JSON.stringify(updatedChats));
-        return updatedChats;
-      });
-    });
+  //   const unsubscribe = onSnapshot(q, (doc) => {
+  //     setChats((prevChats) => {
+  //       (prevChats);
+  //       const updatedChats = [...prevChats]
+  //         .filter((chat) => chat)
+  //         .map((message) => {
+  //           if (message.id === doc.id) {
+  //             if (
+  //               message.status === "received" &&
+  //               doc.data().status === "sent"
+  //             ) {
+  //               return message; // Do not update status if current status is "received"
+  //             }
+  //             return doc.data();
+  //           }
+  //           return message;
+  //         });
+  //       localStorage.setItem(activeChatId, JSON.stringify(updatedChats));
+  //       return updatedChats;
+  //     });
+  //   });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [ChatObject, chat.id]);
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, [ChatObject, chat.id]);
 
   const handleEmojiClick = (emoji) => {
     reactTomessage(
@@ -85,11 +85,11 @@ const MessageCard = ({ chat }) => {
           displayName: `${chat.senderDisplayName}`,
         }),
     },
-    { label: "Forward", action: () => ("Forward clicked") },
-    { label: "React to message", action: () => ("React clicked") },
-    { label: "Copy", action: () => ("Copy clicked") },
+    { label: "Forward", action: () => "Forward clicked" },
+    { label: "React to message", action: () => "React clicked" },
+    { label: "Copy", action: () => "Copy clicked" },
   ];
-  (chat);
+  chat;
 
   const handleMenuItemClick = (item) => {
     item.action();
@@ -109,7 +109,12 @@ const MessageCard = ({ chat }) => {
           chat.senderId === currentId
             ? " ml-2 mr-5 bg-[#296eff]  text-right text-white"
             : "mr-2 ml-5 bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
-        }  ${chat.type === "pic/video" && "w-[300px]"}`}
+        }  ${
+          (chat.type === "pic/video" ||
+            chat.type === "image" ||
+            chat.type === "video") &&
+          "w-[300px]"
+        }`}
       >
         {chat.type == "reply" && (
           <div
@@ -137,9 +142,11 @@ const MessageCard = ({ chat }) => {
             </div>
           </div>
         )}
-        {chat.type === "pic/video" && (
+        {(chat.type === "pic/video" ||
+          chat.type === "image" ||
+          chat.type === "video") && (
           <div>
-            {(chat.dataObject.type)}
+            {chat.dataObject.type}
             {chat.dataObject.type.startsWith("image") ? (
               <ImageComponent
                 blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
@@ -148,7 +155,7 @@ const MessageCard = ({ chat }) => {
               />
             ) : (
               <>
-                {(chat)}
+                {chat}
                 <VideoComponent
                   blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
                   downloadSRC={chat.dataObject.downloadURL}
@@ -162,7 +169,7 @@ const MessageCard = ({ chat }) => {
           </div>
         )}
         {chat.type === "poll" && <PollComponent PollObject={chat} />}
-        {chat.text}
+        {chat.type !== "poll" && chat.text}
         {chat.senderId === User.id && (
           <div className="flex justify-end">
             {chat.status === "pending" && <BiTimeFive />}

@@ -9,7 +9,7 @@ export const handlePicVidUpload = async (
   ChatObject,
   mediaCaption,
   User,
-  time,
+  time
 ) => {
   if (!downscaledBlob) return;
   console.log(downscaledBlob);
@@ -88,7 +88,7 @@ export const handlePicVidUpload = async (
                 ChatObject.activeChatId,
                 mediaCaption,
                 User.name,
-                "pic/video",
+                isImage ? "image" : "video",
                 time,
                 null,
                 picORvideoObj
@@ -98,7 +98,7 @@ export const handlePicVidUpload = async (
                 ChatObject.activeChatId,
                 mediaCaption,
                 User.name,
-                "pic/video",
+                isImage ? "image" : "video",
                 time,
                 null,
                 picORvideoObj

@@ -20,7 +20,7 @@ const ContentContainer = () => {
     ReplyObject,
     replyDivHeight,
   } = useContext(SelectedChannelContext);
-  (Chats);
+  Chats;
 
   const [sortedChats, setSortedChats] = useState([]);
   const [photoUrl, setPhotoUrl] = useState(null);
@@ -57,12 +57,12 @@ const ContentContainer = () => {
   }, [Chats]);
   if (ChatObject.activeChatId == "") {
     return (
-      <div className="bg-gray-300 dark:bg-[#12171d]  flex-1 overflow-hidden hidden items-center justify-center md:flex">
+      <div className="hidden flex-1  items-center justify-center overflow-hidden bg-gray-300 dark:bg-[#12171d] md:flex">
         no active chat right now
       </div>
     );
   }
-  (ReplyObject.divHeight);
+  ReplyObject.divHeight;
 
   const mainContentStyle = {
     overflowY: "auto",
@@ -70,13 +70,10 @@ const ContentContainer = () => {
       ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
     })`,
   };
-
-  (replyDivHeight);
-
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
-        <div className=" flex-col relative bg-[#f0f2f5] dark:bg-[#12171d]  overflow-y-auto inset md:flex ">
+        <div className=" inset relative flex-col overflow-y-auto  bg-[#f0f2f5] dark:bg-[#12171d] md:flex ">
           {showProfile && (
             <AboutProfile
               setshowProfile={setshowProfile}
@@ -84,12 +81,12 @@ const ContentContainer = () => {
             />
           )}
           <div
-            className="flex justify-between md:ml-[1px] items-center  bg-[#fcfcfc] dark:bg-[#1d232a] px-[13px] max-h-[66px] z-20 cursor-pointer"
+            className="z-20 flex max-h-[66px] cursor-pointer  items-center justify-between bg-[#fcfcfc] px-[13px] dark:bg-[#1d232a] md:ml-[1px]"
             onClick={() => {
               //setshowProfile(true);
             }}
           >
-            <div className="flex items-center h-full p-[13px]">
+            <div className="flex h-full items-center p-[13px]">
               {IsMobile && (
                 <div
                   className="mr-[15px]"
@@ -102,17 +99,17 @@ const ContentContainer = () => {
                 </div>
               )}
               <div
-                className="flex items-center h-full"
+                className="flex h-full items-center"
                 onClick={() => {
                   setshowProfile(true);
                 }}
               >
                 <div
-                  className={`h-[40px] w-[40px] rounded-full flex items-center justify-center${
+                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${
                     ChatObject.photoUrl === null ? "pt-[3px]" : ""
                   }`}
                 >
-                  <div className="w-[40px] h-[40px] text-[#ffffff] dark:bg-gray-500 bg-[#dfe5e7] rounded-full flex justify-center items-center">
+                  <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500">
                     <Img
                       src={ChatObject.photoUrl}
                       type={ChatObject.activeChatType}
@@ -133,7 +130,7 @@ const ContentContainer = () => {
           </div>
           <main
             style={mainContentStyle}
-            className="h-[calc(100vh-123px)] flex flex-col justify-end"
+            className="flex h-[calc(100vh-123px)] flex-col justify-end"
           >
             {Chats == null ? (
               <div className="text-center text-2xl">Loading</div>
@@ -141,8 +138,8 @@ const ContentContainer = () => {
               <>you have nothing </>
             ) : (
               <div
-                className="w-full  my-element overflow-y-auto  my-element scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-[#ced0d1]
-                dark:scrollbar-thumb-gray-500 scrollbar-track-[transparent]  "
+                className="my-element  my-element scrollbar-thumb-rounded-[2px]  w-full overflow-y-auto  scrollbar-thin scrollbar-track-[transparent]
+                scrollbar-thumb-[#ced0d1] dark:scrollbar-thumb-gray-500  "
               >
                 {sortedChats &&
                   sortedChats.map((chat) => <MessageCard chat={chat} />)}
@@ -155,7 +152,7 @@ const ContentContainer = () => {
                   ("click");
                   secondDivRef.current.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="hidden absolute z-10 right-[20px] cursor-pointer p-3 dark:bg-[#1d232a] rounded-lg"
+                className="absolute right-[20px] z-10 hidden cursor-pointer rounded-lg p-3 dark:bg-[#1d232a]"
                 style={{
                   bottom: `${
                     ReplyObject.ReplyTextId

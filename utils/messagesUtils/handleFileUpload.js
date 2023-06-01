@@ -11,7 +11,7 @@ export const handleFileUpload = async (file, ChatObject, fileCaption, User) => {
     if (!file) {
       return;
     }
-    console.log(file);
+    console.log(ChatObject);
 
     const id = uuid();
     const storageRef = ref(
@@ -44,27 +44,30 @@ export const handleFileUpload = async (file, ChatObject, fileCaption, User) => {
       type: file.type,
     };
 
-    ChatObject.activeChatType == "group"
-      ? sendGroupMessage(
-          User.id,
-          ChatObject.activeChatId,
-          fileCaption,
-          User.name,
-          "file",
-          time,
-          null,
-          fileObj
-        )
-      : sendMessage(
-          User.id,
-          ChatObject.activeChatId,
-          fileCaption,
-          User.name,
-          "file",
-          time,
-          null,
-          fileObj
-        );
+    if (ChatObject.activeChatType == "group") {
+      await sendGroupMessage(
+        User.id,
+        ChatObject.activeChatId,
+        fileCaption || fileCaption !== "" ? fileCaption : file.name,
+        User.name,
+        "file",
+        time,
+        null,
+        fileObj
+      );
+    } else {
+      await sendMessage(
+        User.id,
+        ChatObject.otherUserId,
+        fileCaption || fileCaption !== "" ? fileCaption : file.name,
+        User.id,
+        User.name,
+        "file",
+        time,
+        null,
+        fileObj
+      );
+    }
     alert(downloadURL);
     console.log("File available at", downloadURL);
   } catch (error) {

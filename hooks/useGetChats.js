@@ -41,11 +41,11 @@ export const useGetChats = (currentUserId) => {
     if (JSON.parse(localStorage.getItem("user")) == undefined) {
       return;
     }
-    (JSON.parse(localStorage.getItem("user")));
+    JSON.parse(localStorage.getItem("user"));
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      (activeId)
+      activeId;
       const activeChatId = JSON.parse(sessionStorage.getItem("activeChatId")); // this is a retarded hack but it works
-      (activeChatId);
+      activeChatId;
       const lastMessagesObject = JSON.parse(
         localStorage.getItem("user")
       ).unReadMessages;
@@ -68,12 +68,12 @@ export const useGetChats = (currentUserId) => {
 
         const lastMessageTimestamp = lastMessagesObject[doc.id];
         if (lastMessageTimestamp /* && doc.id == ChatObject.activeChatId*/) {
-          (lastMessageTimestamp);
+          lastMessageTimestamp;
           const qT = new Timestamp(
             lastMessageTimestamp.seconds,
             lastMessageTimestamp.nanoseconds
           );
-          (qT);
+          qT;
           const unReadMessagesQuery = query(
             collection(db, "conversations", doc.id, "messages"),
             where("timestamp", ">", qT),
@@ -83,14 +83,15 @@ export const useGetChats = (currentUserId) => {
 
           unReadmessagesCount =
             activeChatId == doc.id ? 0 : unReadMessagequerySnapshot.size;
-          (ChatObject.activeChatId);
-          (doc.id);
-          (activeChatId);
-          ("this is for " + doc.id + " " + unReadmessagesCount);
+          ChatObject.activeChatId;
+          doc.id;
+          activeChatId;
+          "this is for " + doc.id + " " + unReadmessagesCount;
         } else {
           unReadmessagesCount = 0;
-          ("this is for " + doc.id + " " + unReadmessagesCount);
+          "this is for " + doc.id + " " + unReadmessagesCount;
         }
+        console.log(lastMessage);
         const chat = {
           id: doc.id,
           senderId: conversation.senderId,
@@ -98,7 +99,9 @@ export const useGetChats = (currentUserId) => {
           senderDisplayName: user.name,
           lastMessageSenderName: conversation.senderDisplayName,
           senderDisplayImg: user.photoUrl,
-          lastMessage: lastMessage,
+          lastMessage: lastMessage.text,
+          lastMessageType: lastMessage.type,
+          lastMessageStatus: lastMessage.status,
           timestamp: timestamp,
           type: "personal",
           unReadmessagesCount: unReadmessagesCount,
@@ -111,7 +114,7 @@ export const useGetChats = (currentUserId) => {
     });
 
     const unsub = onSnapshot(groupQuery, async (querySnapshot) => {
-      const activeChatId = JSON.parse(sessionStorage.getItem("activeChatId")); 
+      const activeChatId = JSON.parse(sessionStorage.getItem("activeChatId"));
       const lastMessagesObject = JSON.parse(
         localStorage.getItem("user")
       ).unReadMessages;
@@ -132,7 +135,7 @@ export const useGetChats = (currentUserId) => {
           );
           const unReadMessagequerySnapshot = await getDocs(unReadMessagesQuery);
           unReadmessagesCount =
-          activeChatId == doc.id ? 0 : unReadMessagequerySnapshot.size;
+            activeChatId == doc.id ? 0 : unReadMessagequerySnapshot.size;
         } else {
           unReadmessagesCount = 0;
         }
@@ -144,6 +147,8 @@ export const useGetChats = (currentUserId) => {
           lastMessageSenderName: group.lastMessage.senderDisplayName,
           senderDisplayImg: group.photoUrl,
           lastMessage: group.lastMessage.lastMessage,
+          lastMessageType: group.lastMessage.type,
+          lastMessageStatus: group.lastMessage.status,
           timestamp: group.lastMessage.timestamp,
           type: "group",
           unReadmessagesCount: unReadmessagesCount,

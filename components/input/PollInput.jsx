@@ -67,7 +67,7 @@ const PollInput = () => {
       id: input.id,
       text: input.value,
       voteCount: 0,
-      votes: []
+      votes: [],
     }));
 
     return mappedArray;
@@ -99,7 +99,7 @@ const PollInput = () => {
       sendGroupMessage(
         User.id,
         ChatObject.activeChatId,
-        null,
+        pollQuestion,
         User.name,
         "poll",
         time,
@@ -110,7 +110,7 @@ const PollInput = () => {
       sendMessage(
         User.id,
         ChatObject.otherUserId,
-        null,
+        pollQuestion,
         User.id,
         User.name,
         "poll",
@@ -122,19 +122,20 @@ const PollInput = () => {
   }
   console.log(ChatObject);
   return (
-    <div className="detectMe absolute bottom-2 left-2 w-[50%] z-10 dark:bg-black min-w-[260px] flex flex-col p-4  rounded-lg">
+    <div className="detectMe absolute bottom-2 left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg p-4  dark:bg-black">
       <input
         type="text"
         placeholder="Type poll question"
-        className=" mb-4 px-2 py-1 rounded-md focus:outline-none"
+        className=" mb-4 rounded-md px-2 py-1 focus:outline-none"
         onChange={(e) => setpollQuestion(e.target.value)}
         value={pollQuestion}
       />
 
-      <div className="rounded-lg px-1 pb-[6px] bg-gray-700">
+      <div className="rounded-lg bg-gray-700 px-1 pb-[6px]">
         {inputs.map((input, index) => (
           <div
-            className={`flex w-full border-b items-center p-2 ${
+            key={input.id}
+            className={`flex w-full items-center border-b p-2 ${
               currentDraggedOptionId === input.id
                 ? dragIndex < index
                   ? "pb-10"
@@ -159,7 +160,7 @@ const PollInput = () => {
             }}
           >
             <input
-              className=" w-full bg-inherit outline-none z-50"
+              className=" z-50 w-full bg-inherit outline-none"
               key={input.id}
               value={input.value}
               onChange={(e) => handleChange(input.id, e.target.value)}
@@ -173,7 +174,7 @@ const PollInput = () => {
           </div>
         ))}
       </div>
-      <div className="flex justify-between items-center mt-5">
+      <div className="mt-5 flex items-center justify-between">
         {" "}
         <div onClick={() => setallowMultipleAnswers(!allowMultipleAnswers)}>
           <input
@@ -187,7 +188,7 @@ const PollInput = () => {
           Allow multiple answers{" "}
         </div>
         <div
-          className="bg-blue-600 flex items-center px-2 py-2 rounded-md"
+          className="flex items-center rounded-md bg-blue-600 px-2 py-2"
           onClick={() => handlePollSend()}
         >
           <AiOutlineSend />

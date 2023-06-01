@@ -48,24 +48,24 @@ const FileInput = ({ file, setfile }) => {
   const [fileCaption, setfileCaption] = useState("");
 
   return (
-    <div className="file-input absolute bottom-2 left-2 w-[50%] z-10 dark:bg-black min-w-[260px] flex flex-col p-4  rounded-lg">
-      <div className="flex flex-col justify-center items-center">
+    <div className="file-input absolute bottom-2 left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg p-4  dark:bg-black">
+      <div className="flex flex-col items-center justify-center">
         <RenderFileType type={file.type} size={100} />
         {file.name}
       </div>
 
-      <div className="flex bg-black justify-between items-center p-2">
+      <div className="flex items-center justify-between bg-black p-2">
         <BsEmojiSmile />
         <input
           type="text"
-          className="px-4 py-2 bg-transparent w-full outline-none placeholder-[#aaabaf]"
+          className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
           placeholder="Caption (optional)"
           onChange={(e) => {
             setfileCaption(e.target.value);
           }}
         />
         <div
-          className="bg-blue-600 flex items-center px-2 py-2 rounded-md"
+          className="flex items-center rounded-md bg-blue-600 px-2 py-2"
           onClick={async () => {
             await handleFileUpload(file, ChatObject, fileCaption, User).then(
               () => {

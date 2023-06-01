@@ -44,7 +44,6 @@ const Input = () => {
   const senderid = User.id;
   const elementRef = useRef(null);
   function handleSend() {
-    (ReplyObject);
     if (!message || message.trim().length === 0) return;
     const replyObject = {
       replyText: ReplyObject.ReplyText,
@@ -58,9 +57,10 @@ const Input = () => {
       timeStamp: time,
       reactions: [],
       status: "pending",
+      id: "propId",
     };
     setChats((prevChats) => {
-      ([...prevChats, messageObj]);
+      [...prevChats, messageObj];
       return [...prevChats, messageObj];
     });
     if (ChatObject.activeChatType == "group") {
@@ -75,7 +75,7 @@ const Input = () => {
       );
     } else if (ChatObject.activeChatType == "personal") {
       const time = new Date();
-      (User);
+      User;
       ("ran");
       sendMessage(
         senderid,
@@ -116,7 +116,7 @@ const Input = () => {
   useEffect(() => {
     if (elementRef.current) {
       const height = elementRef.current.offsetHeight;
-      ("Element height:", height);
+      "Element height:", height;
       setreplyDivHeight(height);
     }
   }, [ReplyObject]);
@@ -284,9 +284,9 @@ const Input = () => {
                     type="file"
                     className="hidden h-full w-full cursor-pointer"
                     onChange={(e) => {
-                      (e.target.files[0]);
+                      e.target.files[0];
                       setfile(e.target.files[0]);
-                      (e.target.files[0]);
+                      e.target.files[0];
                       setshowMediaPicker(false);
                     }}
                   />
@@ -317,7 +317,7 @@ const Input = () => {
                         setblurredPicVidmedia(downscaledBlod);
                       } else {
                         const videoObj = e.target.files[0];
-                        (videoObj);
+                        videoObj;
                         setpicVidmedia(videoObj);
                         setblurredPicVidmedia(null);
                       }
@@ -335,7 +335,10 @@ const Input = () => {
                 }}
               >
                 <div>
-                  <TiChartBarOutline /> Poll
+                  <i className="mr-2 rotate-90">
+                    <TiChartBarOutline />
+                  </i>{" "}
+                  Poll
                 </div>
               </div>
             </div>

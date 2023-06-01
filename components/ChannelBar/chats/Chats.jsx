@@ -42,17 +42,17 @@ const Chats = () => {
       window.removeEventListener("offline", handleOffline);
     };
   }, []);
-  (JSON.parse(localStorage.getItem(`${User.id}_userChats`)));
+  JSON.parse(localStorage.getItem(`${User.id}_userChats`));
   useEffect(() => {
     const storedChats = getStoredChats();
-    (storedChats);
+    storedChats;
     if (storedChats && storedChats.length) {
-      (storedChats);
+      storedChats;
       set_Chats(storedChats);
       setLoading(false);
     } else {
       ("ranning");
-      (chats);
+      chats;
       set_Chats(chats);
       chats == null
         ? 0
@@ -86,8 +86,6 @@ const Chats = () => {
     };
   }, [User, chats, loading]);
 
-  useEffect(() => {}, []);
-
   useMemo(async () => {
     if (!Chats) return;
     const sortedChats = Chats.slice().sort(
@@ -95,15 +93,13 @@ const Chats = () => {
     );
     setSortedChats(sortedChats);
   }, [Chats]);
-  (Chats);
-  (sortedChats);
-
+  console.log(sortedChats);
   return (
     <div className="">
       <div className="h-[95px]">
-        <div className="flex justify-between items-center px-2 ">
+        <div className="flex items-center justify-between px-2 ">
           <h1 className="text-2xl ">Chats</h1>{" "}
-          <div className="relative text-[#54656f] dark:text-[#aaabaf] flex items-center ">
+          <div className="relative flex items-center text-[#54656f] dark:text-[#aaabaf] ">
             <i className="mr-6 cursor-pointer">
               <HiUserAdd size={27} />
             </i>
@@ -117,11 +113,11 @@ const Chats = () => {
             </i>
           </div>
         </div>
-        <div className=" flex justify-center items-center">
+        <div className=" flex items-center justify-center">
           <input
             type="text"
             placeholder="Search"
-            className="w-[90%] my-5 rounded-lg px-3 py-2 dark:bg-[#12171d] bg-[#f0f2f5] outline-none"
+            className="my-5 w-[90%] rounded-lg bg-[#f0f2f5] px-3 py-2 outline-none dark:bg-[#12171d]"
           />
         </div>
       </div>
@@ -131,26 +127,28 @@ const Chats = () => {
         <>
           {sortedChats.length !== 0 ? (
             <div
-              className="flex flex-col items-center overflow-y-auto pt-[2px] pr-[2px] overflow-x-hidden md:h-[calc(100vh-125px)]
-               h-[calc(100vh-195px)] mt-2 my-element scrollbar-thin  scrollbar-thumb-rounded-[2px] scrollbar-thumb-[#ced0d1]
-            dark:scrollbar-thumb-gray-500 scrollbar-track-[transparent] "
+              className="my-element scrollbar-thumb-rounded-[2px] mt-2 flex h-[calc(100vh-195px)] flex-col items-center overflow-y-auto
+               overflow-x-hidden pt-[2px] pr-[2px] scrollbar-thin  scrollbar-track-[transparent] scrollbar-thumb-[#ced0d1]
+            dark:scrollbar-thumb-gray-500 md:h-[calc(100vh-125px)] "
             >
               {sortedChats.map((chat) => (
-                <ChatCard
+                <ChatCard //this is soo stupid of me too late to change this
                   key={chat.id}
                   otherUserId={chat.otherParticipant}
                   type={chat.type}
                   id={chat.id}
                   img={chat.senderDisplayImg}
                   name={chat.senderDisplayName}
-                  sender={
-                    chat.senderId == User.id
-                      ? null
-                      : chat.lastMessageSenderName
-                  }
-                  message={chat.lastMessage}
+                  sender={chat.lastMessageSenderName}
+                  isMessageSentByMe={chat.senderId === User.id}
+                  message={{
+                    text: chat.lastMessage,
+                    type: chat.lastMessageType,
+                    status: chat.lastMessageStatus
+                  }}
                   unReadCount={chat.unReadmessagesCount}
                   set_Chats={set_Chats}
+                  chat={chat}
                   //  timestamp={chat.timestamp}
                 />
               ))}

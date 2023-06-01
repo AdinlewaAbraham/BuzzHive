@@ -11,7 +11,7 @@ export async function sendMessage(
   type,
   time,
   replyObj,
-  fileObj,
+  fileObj
 ) {
   const message = {
     type: type,
@@ -23,7 +23,7 @@ export async function sendMessage(
     reactions: [],
     replyObject: replyObj || {},
     dataObject: fileObj || {},
-    status: "sent"
+    status: "sent",
   };
 
   try {
@@ -34,11 +34,10 @@ export async function sendMessage(
     const user = await getUser(senderId);
     const newConversationData = {
       participants: [user1Id, user2Id],
-      lastMessage: messageText,
+      lastMessage: { text: messageText, type: type, status: "sent" },
       senderId: senderId,
       senderDisplayName: user.name,
       timestamp: time,
-      readBy: [],
     };
     await setDoc(newConversationRef, newConversationData);
 

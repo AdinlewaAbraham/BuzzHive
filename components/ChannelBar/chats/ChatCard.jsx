@@ -16,6 +16,15 @@ import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
 import { UserContext } from "../../App";
 import { changeMessagesStatus } from "@/utils/messagesUtils/changeMessagesStatus";
+import { TiChartBarOutline } from "react-icons/ti";
+import { HiOutlinePhotograph } from "react-icons/hi";
+import {
+  BsFileEarmark,
+  BsCheckAll,
+  BsCheckLg,
+  BiTimeFive,
+} from "react-icons/bs";
+
 const ChatCard = ({
   img,
   name,
@@ -27,6 +36,8 @@ const ChatCard = ({
   otherUserId,
   unReadCount,
   set_Chats,
+  isMessageSentByMe,
+  chat,
 }) => {
   const {
     setChats,
@@ -55,7 +66,6 @@ const ChatCard = ({
   useEffect(() => {
     setcurrentChatId(activeChatIdRef.current);
   }, [activeChatIdRef.current]);
-  // onsnapshot
   const getStoredChats = () => {
     const storedData = localStorage.getItem(`${User.id}_userChats`);
     return storedData ? JSON.parse(storedData) : null;
@@ -69,7 +79,7 @@ const ChatCard = ({
     if (unReadCount == 0) {
       const data = JSON.parse(localStorage.getItem(id));
       if (data) {
-        (data);
+        data;
         const filteredData = data.filter((message) => {
           if (!message) return;
           return message.type !== "unread";
@@ -96,8 +106,8 @@ const ChatCard = ({
         localStorage.setItem(id, JSON.stringify(modifiedArr));
       }
     }
-    (unReadCount);
-    (JSON.parse(localStorage.getItem("user")));
+    unReadCount;
+    JSON.parse(localStorage.getItem("user"));
     setactiveId(id);
     setChatObject({
       activeChatId: id,
@@ -110,15 +120,15 @@ const ChatCard = ({
     const userRef = doc(db, "users", User.id);
 
     const messages = JSON.parse(localStorage.getItem(id));
-    (messages);
+    messages;
     if (!messages || JSON.stringify(message) == "[]") {
       return;
     }
     const lastMessage = messages[messages.length - 1];
-    (lastMessage);
+    lastMessage;
     const Chats = getStoredChats();
-    (Chats);
-    (Chats);
+    Chats;
+    Chats;
     const updatedArr = Chats.map((obj) => {
       if (obj.id == id) {
         return { ...obj, unReadmessagesCount: 0 };
@@ -126,7 +136,7 @@ const ChatCard = ({
         return obj;
       }
     });
-    (updatedArr);
+    updatedArr;
     set_Chats(
       updatedArr.sort((a, b) => {
         a.timestamp - b.timestamp;
@@ -143,9 +153,9 @@ const ChatCard = ({
 
     if (lastMessage) {
       ("trre");
-      (User.id);
-      (userRef);
-      (lastMessage);
+      User.id;
+      userRef;
+      lastMessage;
       await updateDoc(userRef, {
         [`unReadMessages.${id}`]: lastMessage.timestamp,
       });
@@ -157,9 +167,9 @@ const ChatCard = ({
           [id]: lastMessage.timestamp,
         },
       };
-      (newObj);
+      newObj;
       localStorage.setItem("user", JSON.stringify(newObj));
-      (JSON.parse(localStorage.getItem("user")));
+      JSON.parse(localStorage.getItem("user"));
     }
   };
   ////////////////////////////////////////////////////////////////
@@ -192,7 +202,6 @@ const ChatCard = ({
     ).unReadMessages;
     const LocallyStoredMessages = JSON.parse(localStorage.getItem(id));
     const unsub = onSnapshot(q, (snapshot) => {
-      ("ran");
       if (!lastUnReadMessagesObject[id]) return;
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -202,10 +211,10 @@ const ChatCard = ({
           lastMessageTimestamp.seconds +
           lastMessageTimestamp.nanoseconds / 1000000000;
         const isNewMessage = severTS > localTS;
-        (isNewMessage);
-        (data);
+        isNewMessage;
+        data;
         if (isNewMessage && data.id !== null) {
-          (data);
+          data;
           if (
             !chats.some((chat) => chat.id === data.id) &&
             !LocallyStoredMessages.some((chat) => {
@@ -214,15 +223,15 @@ const ChatCard = ({
             })
           ) {
             chats.push(data);
-            (data);
+            data;
           }
         }
       });
-      (LocallyStoredMessages);
+      LocallyStoredMessages;
       if (chats.length == 0) return;
       const sortedChats = [...chats].sort((a, b) => a.timestamp - b.timestamp);
 
-      (sortedChats);
+      sortedChats;
 
       const localstorageMessages = JSON.parse(localStorage.getItem(id));
       const newSortedChats = sortedChats.map((chat) => {
@@ -241,10 +250,8 @@ const ChatCard = ({
         }
         return chat;
       });
-      (newSortedChats);
-      (sortedChats);
       const updatedMessages = [...LocallyStoredMessages, ...sortedChats];
-      (updatedMessages);
+      updatedMessages;
       if (id === currentChatId) {
         const readReceiptsSetting = JSON.parse(
           localStorage.getItem("user")
@@ -254,7 +261,7 @@ const ChatCard = ({
             setChats((prevChats) => [...updatedMessages]);
           })
           .catch((error) => {
-            ("Error updating message status:", error);
+            "Error updating message status:", error;
           });
       } else {
         changeMessagesStatus(id, type, "received")
@@ -262,7 +269,7 @@ const ChatCard = ({
             setChats((prevChats) => [...updatedMessages]);
           })
           .catch((error) => {
-            ("Error updating message status:", error);
+            "Error updating message status:", error;
           });
       }
       localStorage.setItem(id, JSON.stringify(updatedMessages));
@@ -289,14 +296,14 @@ const ChatCard = ({
       localStorage.getItem(`${ChatObject.activeChatId}`)
     ) {
       const Chat = getStoredMessages();
-      (Chat);
-      ("this is for " + name + " " + unReadCount);
+      Chat;
+      "this is for " + name + " " + unReadCount;
       setChats(Chat);
     } else {
       const getMessage = async () => {
         const CollectionName =
           ChatObject.activeChatType === "group" ? "groups" : "conversations";
-        (CollectionName);
+        CollectionName;
         const query = collection(
           db,
           CollectionName,
@@ -306,11 +313,11 @@ const ChatCard = ({
 
         const snapshot = await getDocs(query);
         const messages = await snapshot.docs.map((doc) => doc.data());
-        (messages);
+        messages;
         const sortedMessages = messages.sort((a, b) => {
           a.timestamp - b.timestamp;
         });
-        (sortedMessages);
+        sortedMessages;
         const filteredMessages = sortedMessages.filter((message) => message);
         setChats(filteredMessages);
         localStorage.setItem(
@@ -349,11 +356,39 @@ const ChatCard = ({
             <FaUserAlt size={22} />
           )}
         </div>
-        <div className=" ml-3 w-[90%]  truncate">
+        <div className=" ml-3  w-[90%] truncate">
           <h3>{name}</h3>
           <div className="flex flex-row text-sm text-[#6c757d] dark:text-[#aaaaaa]">
-            <p>{sender}</p>
-            {sender && <>:</>} <p> {message}</p>
+            {isMessageSentByMe && (
+              <i className="mr-1 flex items-center">
+                {message.status === "pending" && <BiTimeFive />}
+                {message.status === "sent" && <BsCheckLg />}
+                {message.status === "received" && <BsCheckAll />}
+                {message.status === "seen" && <BsCheckAll color="blue" />}
+              </i>
+            )}
+            {!isMessageSentByMe && <p className="mr-1">{sender}:</p>}
+            <i className="flex">
+              {(message.type === "pic/video" ||
+                message.type === "image" ||
+                message.type === "video") && (
+                <i className="mr-1 flex items-center">
+                  <HiOutlinePhotograph /> {message.text === "" && message.type}
+                </i>
+              )}
+              {message.type === "file" && (
+                <i className="mr-1 flex items-center">
+                  <BsFileEarmark />
+                </i>
+              )}
+              {message.type === "poll" && (
+                <i className="mr-1 flex rotate-90 items-center">
+                  <TiChartBarOutline />
+                </i>
+              )}
+            </i>
+
+            <p> {message.text}</p>
           </div>
         </div>
       </div>
