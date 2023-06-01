@@ -172,112 +172,84 @@ const ChatCard = ({
       JSON.parse(localStorage.getItem("user"));
     }
   };
-  ////////////////////////////////////////////////////////////////
   useEffect(() => {
-    if (!LocalMessages) {
-      return;
-    }
-    const lastMessageTimestamp = LocalMessages[LocalMessages.length - 1]
-      ? LocalMessages[LocalMessages.length - 1].timestamp
-      : { seconds: 0, nanoseconds: 0 };
-    if (!lastMessageTimestamp) {
-      return;
-    }
-    if (!lastMessageTimestamp) {
-      return;
-    }
-
-    const qt = new Timestamp(
-      lastMessageTimestamp.seconds,
-      lastMessageTimestamp.nanoseconds
-    );
     const CollectionName = type === "group" ? "groups" : "conversations";
-    const q = query(
-      collection(db, CollectionName, id, "messages"),
-      where("timestamp", ">", qt)
-    );
-    const chats = [];
-    const lastUnReadMessagesObject = JSON.parse(
-      localStorage.getItem("user")
-    ).unReadMessages;
-    const LocallyStoredMessages = JSON.parse(localStorage.getItem(id));
-    const unsub = onSnapshot(q, (snapshot) => {
-      if (!lastUnReadMessagesObject[id]) return;
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const severTS =
-          data.timestamp.seconds + data.timestamp.nanoseconds / 1000000000;
-        const localTS =
-          lastMessageTimestamp.seconds +
-          lastMessageTimestamp.nanoseconds / 1000000000;
-        const isNewMessage = severTS > localTS;
-        isNewMessage;
-        data;
-        if (isNewMessage && data.id !== null) {
-          data;
-          if (
-            !chats.some((chat) => chat.id === data.id) &&
-            !LocallyStoredMessages.some((chat) => {
-              if (!chat) return;
-              return chat.id === data.id;
-            })
-          ) {
-            chats.push(data);
-            data;
-          }
-        }
-      });
-      LocallyStoredMessages;
-      if (chats.length == 0) return;
-      const sortedChats = [...chats].sort((a, b) => a.timestamp - b.timestamp);
-
-      sortedChats;
-
+    const q = query(collection(db, CollectionName, id, "messages"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const localstorageMessages = JSON.parse(localStorage.getItem(id));
-      const newSortedChats = sortedChats.map((chat) => {
-        //this pervent the snapshot from changing the status of the message to its previous status
-        const matchingMessage = localstorageMessages.find(
-          (localStorageChat) => {
-            if (!localStorageChat) return;
-            return localStorageChat.id === chat.id;
+      const updatedMessages = [];
+      snapshot.docChanges().forEach((change) => {
+        const messageData = change.doc.data();
+        if (change.type === "added") {
+          "New message: ", change.doc.data();
+          if (localstorageMessages === null) return;
+          if (!isMessageInLocalStorage(localstorageMessages, messageData)) {
+            [...localstorageMessages];
+            localstorageMessages.push(messageData);
+            localStorage.setItem(id, JSON.stringify(localstorageMessages));
+            if (id === currentChatId) {
+              changeMessagesStatus(id, type, "seen")
+                .then(() => {
+                  setChats([...localstorageMessages]);
+                })
+                .catch((error) => {
+                  "Error updating message status:", error;
+                });
+            } else {
+              changeMessagesStatus(id, type, "received").catch((error) => {
+                "Error updating message status:", error;
+              });
+            }
           }
-        );
-        if (matchingMessage) {
-          return {
-            ...chat,
-            status: matchingMessage.status,
-          };
         }
-        return chat;
+        if (change.type === "modified") {
+          "Modified message: ", change.doc.data();
+          const modifiedMessage = change.doc.data();
+          const localstorageMessages = JSON.parse(localStorage.getItem(id));
+
+          if (localstorageMessages !== null) {
+            const index = localstorageMessages.findIndex(
+              (message) => message.id === modifiedMessage.id
+            );
+
+            if (index !== -1) {
+              localstorageMessages[index] = modifiedMessage;
+              localStorage.setItem(id, JSON.stringify(localstorageMessages));
+              if (id === currentChatId) {
+                setChats([...localstorageMessages]);
+              }
+              "Modified message updated in local storage:", modifiedMessage;
+            }
+          }
+        }
+        if (change.type === "removed") {
+          "Removed message: ", change.doc.data();
+          const removedMessage = change.doc.data();
+          const localstorageMessages = JSON.parse(localStorage.getItem(id));
+
+          if (localstorageMessages !== null) {
+            const index = localstorageMessages.findIndex(
+              (message) => message.id === removedMessage.id
+            );
+
+            if (index !== -1) {
+              localstorageMessages.splice(index, 1);
+              localStorage.setItem(id, JSON.stringify(localstorageMessages));
+              if (id === currentChatId) {
+                setChats([...localstorageMessages]);
+              }
+            }
+          }
+        }
       });
-      const updatedMessages = [...LocallyStoredMessages, ...sortedChats];
-      updatedMessages;
-      if (id === currentChatId) {
-        const readReceiptsSetting = JSON.parse(
-          localStorage.getItem("user")
-        ).isReadReceiptsOn;
-        changeMessagesStatus(id, type, "seen")
-          .then(() => {
-            setChats((prevChats) => [...updatedMessages]);
-          })
-          .catch((error) => {
-            "Error updating message status:", error;
-          });
-      } else {
-        changeMessagesStatus(id, type, "received")
-          .then(() => {
-            setChats((prevChats) => [...updatedMessages]);
-          })
-          .catch((error) => {
-            "Error updating message status:", error;
-          });
-      }
-      localStorage.setItem(id, JSON.stringify(updatedMessages));
     });
-    return () => {
-      unsub();
-    };
-  }, [currentChatId, unReadCount]);
+
+    function isMessageInLocalStorage(messages, newMessage) {
+      return messages.some((message) => message.id === newMessage.id);
+    }
+    return () => unsubscribe();
+  }, [currentChatId]);
+
   const getStoredMessages = () => {
     const str = localStorage.getItem(`${ChatObject.activeChatId}`);
     return JSON.parse(str);
@@ -286,7 +258,7 @@ const ChatCard = ({
     if (ChatObject.activeChatId === "") return;
 
     setChats(null);
-    changeMessagesStatus(id, type, "seen");
+    changeMessagesStatus(ChatObject.activeChatId , type, "seen");
 
     if (
       localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&

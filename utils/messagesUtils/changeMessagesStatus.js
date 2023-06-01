@@ -42,6 +42,9 @@ export async function changeMessagesStatus(activeChatId, type, status) {
     activeChatId
   );
   const lastMessage = (await getDoc(q)).data();
+  if (!lastMessage) return 
+  console.log(lastMessage) 
+  console.log(status)
   const lastMessageStatus = lastMessage.lastMessage.status;
   if (lastMessageStatus === "seen") {
     // Do nothing if status is already "seen"

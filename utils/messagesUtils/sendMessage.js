@@ -1,6 +1,7 @@
 import { db } from "../firebaseUtils/firebase";
 import { collection, doc, setDoc, addDoc } from "firebase/firestore";
 import { getUser } from "../userUtils/getUser";
+import { v4 as uuidv4 } from "uuid";
 
 export async function sendMessage(
   user1Id,
@@ -13,9 +14,12 @@ export async function sendMessage(
   replyObj,
   fileObj
 ) {
+  const customId = uuidv4();
+
+  console.log(customId);
   const message = {
     type: type,
-    id: null,
+    id: customId,
     text: messageText,
     senderId: senderId,
     senderDisplayName: senderDisplayName,
@@ -31,22 +35,20 @@ export async function sendMessage(
     const conversationId =
       user1Id > user2Id ? user1Id + user2Id : user2Id + user1Id;
     const newConversationRef = doc(conversationsRef, conversationId);
-    const user = await getUser(senderId);
+    const User = JSON.parse(localStorage.getItem("user"));
     const newConversationData = {
       participants: [user1Id, user2Id],
       lastMessage: { text: messageText, type: type, status: "sent" },
       senderId: senderId,
-      senderDisplayName: user.name,
+      senderDisplayName: User.name,
       timestamp: time,
     };
     await setDoc(newConversationRef, newConversationData);
 
-    const messagesRef = collection(newConversationRef, "messages");
-    const newMessageRef = await addDoc(messagesRef, message);
-    const newMessageId = newMessageRef.id;
-    message.id = newMessageId;
-
-    await setDoc(newMessageRef, message);
+    const messagesColRef = collection(newConversationRef, "messages");
+    console.log(customId);
+    const messageDocRef = doc(messagesColRef, customId);
+    await setDoc(messageDocRef, message);
   } catch (error) {
     console.error("Failed to send message:", error);
     return null;
