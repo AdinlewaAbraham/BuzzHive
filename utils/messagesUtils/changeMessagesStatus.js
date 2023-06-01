@@ -33,7 +33,6 @@ export async function changeMessagesStatus(activeChatId, type, status) {
     where("senderId", "!=", User.id),
     orderBy("senderId"),
     orderBy("timestamp", "desc")
-    //  limit(20)
   );
 
   const q = doc(
@@ -42,9 +41,9 @@ export async function changeMessagesStatus(activeChatId, type, status) {
     activeChatId
   );
   const lastMessage = (await getDoc(q)).data();
-  if (!lastMessage) return 
-  console.log(lastMessage) 
-  console.log(status)
+  if (!lastMessage) return;
+  console.log(lastMessage.lastMessage.senderId)
+  if (lastMessage.lastMessage.senderId === User.id) return
   const lastMessageStatus = lastMessage.lastMessage.status;
   if (lastMessageStatus === "seen") {
     // Do nothing if status is already "seen"
@@ -89,8 +88,6 @@ export async function changeMessagesStatus(activeChatId, type, status) {
         newestMessageTimestamp = timestamp;
       }
     });
-
-    "Newest message timestamp:", newestMessageTimestamp;
   } else {
     ("No messages found.");
   }

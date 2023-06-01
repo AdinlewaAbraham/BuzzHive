@@ -93,7 +93,6 @@ const Chats = () => {
     );
     setSortedChats(sortedChats);
   }, [Chats]);
-  console.log(sortedChats);
   return (
     <div className="">
       <div className="h-[95px]">

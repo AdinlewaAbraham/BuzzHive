@@ -181,24 +181,31 @@ const ChatCard = ({
       snapshot.docChanges().forEach((change) => {
         const messageData = change.doc.data();
         if (change.type === "added") {
-          "New message: ", change.doc.data();
           if (localstorageMessages === null) return;
           if (!isMessageInLocalStorage(localstorageMessages, messageData)) {
             [...localstorageMessages];
             localstorageMessages.push(messageData);
             localStorage.setItem(id, JSON.stringify(localstorageMessages));
             if (id === currentChatId) {
+              console.log(id)
+              console.log(currentChatId)
+              
               changeMessagesStatus(id, type, "seen")
                 .then(() => {
+                  console.log("changed to seen in line 193");
                   setChats([...localstorageMessages]);
                 })
                 .catch((error) => {
                   "Error updating message status:", error;
                 });
             } else {
-              changeMessagesStatus(id, type, "received").catch((error) => {
-                "Error updating message status:", error;
-              });
+              changeMessagesStatus(id, type, "received")
+                .then(() => {
+                  console.log("changed to received in line 202");
+                })
+                .catch((error) => {
+                  "Error updating message status:", error;
+                });
             }
           }
         }
@@ -248,7 +255,7 @@ const ChatCard = ({
       return messages.some((message) => message.id === newMessage.id);
     }
     return () => unsubscribe();
-  }, [currentChatId]);
+  }, [ChatObject.activeChatId]);
 
   const getStoredMessages = () => {
     const str = localStorage.getItem(`${ChatObject.activeChatId}`);
@@ -258,7 +265,9 @@ const ChatCard = ({
     if (ChatObject.activeChatId === "") return;
 
     setChats(null);
-    changeMessagesStatus(ChatObject.activeChatId , type, "seen");
+    changeMessagesStatus(ChatObject.activeChatId, type, "seen").then(() => {
+      console.log("changed to seen in line 267");
+    });
 
     if (
       localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&
