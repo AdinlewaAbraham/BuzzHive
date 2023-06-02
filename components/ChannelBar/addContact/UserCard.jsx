@@ -3,7 +3,8 @@ import { useContext } from "react";
 import { UserContext } from "../../App";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
-const UserCard = ({ name, id, image }) => {
+import Img from "@/components/Img";
+const UserCard = ({ name, id, image, user }) => {
   const { setChats, setIsChatsLoading, ChatObject, setChatObject } = useContext(
     SelectedChannelContext
   );
@@ -24,18 +25,25 @@ const UserCard = ({ name, id, image }) => {
 
   return (
     <div
-      key={id}
-      className="rounded-lg flex cursor-pointer items-center hover:bg-gray-600  px-4 py-3 "
+      key={user.id}
+      className="flex cursor-pointer items-center truncate rounded-lg px-4  py-3 hover:bg-hover-light dark:hover:bg-hover-dark "
       onClick={() => {
         handleUserClick();
       }}
     >
-      {image ? (
-        <img src={image} width={50} height={50} />
-      ) : (
-        <>you have no img</>
-      )}
-      {name}
+      <div className="mr-4 h-[45px] w-[45px] rounded-full">
+        <Img
+          src={user.photoUrl}
+          styles="rounded-full"
+          imgStyles="rounded-full"
+        />
+      </div>
+      <div>
+        <p className="">{user.name}</p>
+        <p className="text-sm text-muted-light dark:text-muted-dark">
+          {user.bio}
+        </p>
+      </div>
     </div>
   );
 };

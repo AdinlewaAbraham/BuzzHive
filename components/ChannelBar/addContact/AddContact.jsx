@@ -3,6 +3,7 @@ import UserCard from "./UserCard";
 import useFetchUsers from "@/hooks/useFetchUsers";
 import { UserContext } from "../../App";
 import { useContext } from "react";
+import Goback from "../Goback";
 
 const AddContact = () => {
   const { User } = useContext(UserContext);
@@ -17,23 +18,38 @@ const AddContact = () => {
   };
 
   return (
-    <div onScroll={handleOnScroll}>
+    <div onScroll={handleOnScroll} className="">
+      <Goback text="Add contact" />
+      <div className="my-3 flex w-full items-center justify-center ">
+        <input
+          className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+          type="text"
+          name=""
+          placeholder="search"
+          id=""
+        />
+      </div>
       {users.map((user) => (
-        <UserCard name={user.name} id={user.id} image={user.photoUrl} />
+        <UserCard
+          name={user.name}
+          id={user.id}
+          image={user.photoUrl}
+          user={user}
+        />
       ))}
-      {loading &&
+      {/* {loading &&
         [1, 2, 3, 4].map((key) => (
           <div
-            className="rounded-lg flex cursor-pointer items-center px-4 py-3 "
+            className="flex cursor-pointer items-center rounded-lg px-4 py-3 "
             key={key}
           >
-            <div className="w-[50px] h-[50px] rounded-full skeleton mr-[10px]"></div>
+            <div className="skeleton mr-[10px] h-[50px] w-[50px] rounded-full"></div>
             <div>
-              <div className="w-[100px] h-[20px] skeleton mb-[10px]"></div>
-              <div className="w-[40px] h-[20px] skeleton"></div>
+              <div className="skeleton mb-[10px] h-[20px] w-[100px]"></div>
+              <div className="skeleton h-[20px] w-[40px]"></div>
             </div>
           </div>
-        ))}
+        ))} */}
     </div>
   );
 };

@@ -17,10 +17,10 @@
   }
 
   .sidebar-tooltip {
-    @apply absolute left-14 z-50 m-2 w-auto min-w-max origin-left scale-0
-    rounded-md bg-gray-900 
-    p-2 text-xs 
-    font-bold text-white shadow-md transition-all delay-300 duration-100 dark:bg-black;
+    @apply absolute bottom-[55px] z-50 m-2 w-auto min-w-max origin-left scale-0
+    rounded-md bg-gray-900  p-2 text-xs
+    font-bold text-white 
+    shadow-md transition-all delay-300 duration-100 dark:bg-black md:bottom-auto md:left-14;
   }
 }
 
@@ -66,21 +66,3 @@
   opacity: 1;
 }
 
-
-.lineComingFromTop {
-  animation: comingFromTop 1s ease-in-out;
-}
-
-@keyframes comingFromTop {
-  0% {
-    height: 50%;
-    bottom: 30%;
-    opacity: 1;
-  } 
-  100% {
-    height: 80%;
-    bottom: 30%;
-    opacity: 0;
-    color: red;
-  }
-}

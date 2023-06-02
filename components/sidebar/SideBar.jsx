@@ -16,11 +16,13 @@ import { BiLogOut } from "react-icons/bi";
 import { deleteDB } from "idb";
 import { FcDeleteDatabase } from "react-icons/fc";
 import Img from "../Img";
-const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
-  const { setSelectedChannel, selectedChannel } = useContext(
-    SelectedChannelContext
-  );
-  const [comingFromTop, setcomingFromTop] = useState(true);
+const SideBarIcon = ({ icon, text, clickevent }) => {
+  const {
+    setSelectedChannel,
+    selectedChannel,
+    prevSelectedChannel,
+    setprevSelectedChannel,
+  } = useContext(SelectedChannelContext);
 
   const [IsMobile, setIsMobile] = useState(false);
 
@@ -37,41 +39,45 @@ const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
     return () => window.removeEventListener("resize", widthResizer);
   }, []);
 
+  const channels = {
+    chats: 1,
+    addcontact: 2,
+    addGroup: 3,
+    settings: 4,
+    profileSettings: 5,
+  };
   function handleClick() {
-    const channels = {
-      chats: 1,
-      addcontact: 2,
-      addGroup: 3,
-      settings: 4,
-      profileSettings: 5,
-    };
-    setSelectedChannel((prevstate) => {
-      if (channels[prevstate] < channels[clickevent]) {
-        setcomingFromTop(true);
-      } else {
-        setcomingFromTop(false);
-      }
+    setprevSelectedChannel(selectedChannel);
 
-      return clickevent ? clickevent : selectedChannel;
-    });
+    setSelectedChannel(clickevent ? clickevent : selectedChannel);
   }
   return (
     <div className="relative flex items-center justify-center md:w-[5%] md:min-w-[70px] md:max-w-[70px] ">
       <span
-        className={`${
+        className={` delay-600 duration-300 ease-out ${
           selectedChannel === clickevent
-            ? ` opacity-1  bottom-[25%] ${
-                !comingFromTop && "top-[25%]"
-              } h-[50%] `
-            : " bottom-[25%] h-[80%] opacity-0"
-        } absolute left-0 w-1 bg-accent-blue transition-[height] duration-700 ease-in-out `}
+            ? ` opacity-1  right-[25%] md:bottom-[25%] ${
+                channels[prevSelectedChannel] > channels[clickevent] &&
+                "left-[25%] md:top-[25%]"
+              } w-[50%] md:h-[50%] `
+            : " left-[25%] w-[65%] opacity-0 md:bottom-[25%] md:h-[80%]"
+        } ${
+          prevSelectedChannel === clickevent &&
+          `${
+            channels[selectedChannel] < channels[prevSelectedChannel]
+              ? `${IsMobile ?  "" : "lineComingFromTop"} `
+              : `${IsMobile ?" " : "lineComingFromBottom"} `
+          } `
+        } absolute  bottom-0 z-50 h-1 bg-accent-blue transition-[width] md:left-0 md:w-1 md:transition-[height]`}
       ></span>
 
       <div
         className={`sidebar-icon group flex items-center ${
           selectedChannel === clickevent && "bg-hover-light dark:bg-hover-dark"
         }`}
-        onClick={handleClick}
+        onClick={() => {
+          if (selectedChannel !== clickevent) handleClick();
+        }}
       >
         <i className="text-muted-light dark:text-muted-dark">{icon}</i>
         <span className="sidebar-tooltip group-hover:scale-100">{text}</span>
@@ -134,14 +140,20 @@ const SideBar = () => {
        md:justify-between md:pt-10 md:pb-5 "
     >
       <i className="flex md:flex-col">
-        <SideBarIcon icon={<MdOutlineChat size="23" />} clickevent="chats" />
+        <SideBarIcon
+          icon={<MdOutlineChat size="23" />}
+          clickevent="chats"
+          text="Chats"
+        />
         <SideBarIcon
           icon={<MdPersonAddAlt size="27" />}
           clickevent="addcontact"
+          text="Add contact"
         />
         <SideBarIcon
           icon={<MdOutlineGroupAdd size="27" />}
           clickevent="addGroup"
+          text="Add group"
         />
       </i>
 
@@ -181,6 +193,7 @@ const SideBar = () => {
         <SideBarIcon
           icon={<AiOutlineSetting size={22} />}
           clickevent="settings"
+          text="settings"
         />
         <SideBarIcon
           icon={
@@ -193,6 +206,7 @@ const SideBar = () => {
             />
           }
           clickevent="profileSettings"
+          text="Profile"
         />
       </div>
     </div>

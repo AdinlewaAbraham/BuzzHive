@@ -32,12 +32,15 @@ const SelectedChannelContext = createContext({
   setactiveId: () => {},
   replyDivHeight: "",
   setreplyDivHeight: () => {},
+  prevSelectedChannel: "chats",
+  setprevSelectedChannel: () => {},
 });
 
 export const SelectedChannelProvider = ({ children }) => {
   const [isPopupOpen, setisPopupOpen] = useState(false);
   const [ShowAddGroup, setShowAddGroup] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState("chats");
+  const [prevSelectedChannel, setprevSelectedChannel] = useState("chats");
   const [Chats, setChats] = useState([]);
   const [IsChatsLoading, setIsChatsLoading] = useState(false);
   const [showChats, setshowChats] = useState(true);
@@ -78,6 +81,8 @@ export const SelectedChannelProvider = ({ children }) => {
         setReplyObject,
         replyDivHeight,
         setreplyDivHeight,
+        prevSelectedChannel,
+        setprevSelectedChannel,
       }}
     >
       {children}
