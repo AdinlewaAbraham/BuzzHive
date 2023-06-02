@@ -1,16 +1,18 @@
 import { useState, useEffect, useContext } from "react";
 import { useTheme } from "next-themes";
-import { BsSun, BsMoon } from "react-icons/bs";
-import { BsChatRightText } from "react-icons/bs";
-import { MdOutlineDelete, MdPersonAddAlt } from "react-icons/md";
+import { BsSun, BsMoon, BsChatSquareText } from "react-icons/bs";
+import { MdOutlineChat } from "react-icons/md";
+import {
+  MdOutlineDelete,
+  MdPersonAddAlt,
+  MdOutlineGroupAdd,
+} from "react-icons/md";
 import { AiOutlineSetting } from "react-icons/ai";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { getAuth, signOut } from "firebase/auth";
 import { UserContext } from "../App";
 
 import { BiLogOut } from "react-icons/bi";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/utils/firebaseUtils/firebase";
 import { deleteDB } from "idb";
 import { FcDeleteDatabase } from "react-icons/fc";
 import Img from "../Img";
@@ -18,15 +20,46 @@ const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
   const { setSelectedChannel, selectedChannel } = useContext(
     SelectedChannelContext
   );
+  const [comingFromTop, setcomingFromTop] = useState(true);
+
+  function handleClick() {
+    const channels = {
+      chats: 1,
+      addcontact: 2,
+      addGroup: 3,
+      settings: 4,
+      profileSettings: 5,
+    };
+    setSelectedChannel((prevstate) => {
+      if (channels[prevstate] < channels[clickevent]) {
+        setcomingFromTop(true);
+      } else {
+        setcomingFromTop(false);
+      }
+
+      return clickevent ? clickevent : selectedChannel;
+    });
+  }
   return (
-    <div
-      className="sidebar-icon group"
-      onClick={() => {
-        setSelectedChannel(clickevent ? clickevent : selectedChannel);
-      }}
-    >
-      {icon}
-      <span className="sidebar-tooltip group-hover:scale-100">{text}</span>
+    <div className="relative flex items-center justify-center md:w-[5%] md:min-w-[70px] md:max-w-[70px] ">
+      <span
+        className={`${
+          selectedChannel === clickevent
+            ? ` opacity-1 bottom-[25%] ${
+                !comingFromTop && "top-[25%]"
+              } h-[50%] `
+            : " bottom-[25%] h-[80%] opacity-0"
+        } absolute left-0 w-1 bg-accent-blue transition-[all] ease-in-out duration-700 `}
+      ></span>
+      <div
+        className={`sidebar-icon group flex items-center ${
+          selectedChannel === clickevent && "bg-hover-light dark:bg-hover-dark"
+        }`}
+        onClick={handleClick}
+      >
+        <i className="text-muted-light dark:text-muted-dark">{icon}</i>
+        <span className="sidebar-tooltip group-hover:scale-100">{text}</span>
+      </div>
     </div>
   );
 };
@@ -80,15 +113,19 @@ const SideBar = () => {
   return (
     <div
       className=" flex h-[70px] w-full items-center justify-center
-     bg-[#f0f2f5] text-white dark:bg-[#12171d]
+     bg-light-secondary text-white dark:bg-dark-secondary
       md:h-screen md:max-h-screen md:w-[5%] md:min-w-[70px] md:max-w-[70px] md:flex-col 
        md:justify-between md:pt-10 md:pb-5 "
     >
       <i className="flex md:flex-col">
-        <SideBarIcon icon={<BsChatRightText size="20" />} clickevent="chats" />
+        <SideBarIcon icon={<MdOutlineChat size="23" />} clickevent="chats" />
         <SideBarIcon
           icon={<MdPersonAddAlt size="27" />}
           clickevent="addcontact"
+        />
+        <SideBarIcon
+          icon={<MdOutlineGroupAdd size="27" />}
+          clickevent="addGroup"
         />
       </i>
 

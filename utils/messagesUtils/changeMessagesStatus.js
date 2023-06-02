@@ -42,7 +42,6 @@ export async function changeMessagesStatus(activeChatId, type, status) {
   );
   const lastMessage = (await getDoc(q)).data();
   if (!lastMessage) return;
-  console.log(lastMessage.lastMessage.senderId)
   if (lastMessage.lastMessage.senderId === User.id) return
   const lastMessageStatus = lastMessage.lastMessage.status;
   if (lastMessageStatus === "seen") {
@@ -51,7 +50,7 @@ export async function changeMessagesStatus(activeChatId, type, status) {
   } else if (lastMessageStatus === "received" && status === "seen") {
     // Change status to "sent" only if current status is "received"
     if (lastMessage.senderId !== User.id) {
-      console.log(status);
+      (status);
       await updateDoc(q, {
         ...lastMessage,
         lastMessage: {
@@ -66,7 +65,7 @@ export async function changeMessagesStatus(activeChatId, type, status) {
   ) {
     // Change status to "received" or "seen" if current status is "sent"
     if (lastMessage.senderId !== User.id) {
-      console.log(status);
+      (status);
       await updateDoc(q, {
         ...lastMessage,
         lastMessage: {

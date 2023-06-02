@@ -236,21 +236,29 @@ const Input = () => {
         <div className="relative flex">
           {[
             {
+              id: "showEmojiPicker",
               icon: <BsEmojiSmile />,
               onclick: () => {
                 setshowEmojiPicker(!showEmojiPicker);
               },
             },
             {
+              id: "showMediaPicker",
               icon: <ImAttachment />,
               onclick: () => {
                 setshowMediaPicker(!showMediaPicker);
               },
             },
-          ].map(({ icon, onclick }) => {
+          ].map(({ icon, onclick, id }) => {
             return (
               <div
-                className="detectme MediaPicker cursor-pointer bg-red-600 bg-transparent p-[10px] dark:text-[#aaabaf] dark:hover:text-white"
+                key={id}
+                className={` detectme MediaPicker
+                ${id === "showMediaPicker" && showMediaPicker && "bg-hover-light dark:bg-hover-dark"} 
+                ${id === "showEmojiPicker" && showEmojiPicker && "bg-hover-light dark:bg-hover-dark"} 
+                ${id === "showEmojiPicker" && "mr-1"} 
+                cursor-pointer rounded-lg bg-transparent p-[10px] px-[15px]
+                 text-muted-light hover:bg-hover-light dark:text-muted-dark dark:hover:bg-hover-dark`}
                 onClick={onclick}
               >
                 {icon}
@@ -278,7 +286,9 @@ const Input = () => {
             >
               <div className="file-input px-0 py-0">
                 <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
-                  <AiOutlineFile />
+                  <i className="mr-2 text-muted-light dark:text-muted-dark">
+                    <AiOutlineFile />
+                  </i>
                   File
                   <input
                     type="file"
@@ -294,7 +304,10 @@ const Input = () => {
               </div>
               <div>
                 <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
-                  <RiGalleryLine />
+                  <i className="mr-2 text-muted-light dark:text-muted-dark">
+                    {" "}
+                    <RiGalleryLine />
+                  </i>
                   Photo or video
                   <input
                     type="file"
@@ -335,9 +348,9 @@ const Input = () => {
                 }}
               >
                 <div>
-                  <i className="mr-2 rotate-90">
+                  <i className="mr-2 rotate-90 text-muted-light dark:text-muted-dark">
                     <TiChartBarOutline />
-                  </i>{" "}
+                  </i>
                   Poll
                 </div>
               </div>
@@ -346,7 +359,7 @@ const Input = () => {
         </div>
         <input
           type="text"
-          className="w-full  bg-transparent px-4 py-2 text-white placeholder-[#aaabaf] outline-none"
+          className="w-full  bg-transparent px-4 py-2 text-white placeholder-muted-light outline-none dark:placeholder-muted-dark"
           placeholder="Type a message"
           value={message}
           onKeyDown={handleInputKeyDown}
@@ -358,9 +371,8 @@ const Input = () => {
           onClick={() => {
             handleSend();
           }}
-          className="bg-transparent p-[10px] text-[#aaabaf] hover:text-white "
+          className="cursor-pointer rounded-lg bg-transparent p-[10px] px-[15px] text-muted-light hover:bg-hover-light dark:text-muted-dark dark:hover:bg-hover-dark"
         >
-          {" "}
           <AiOutlineSend />
         </div>
       </div>

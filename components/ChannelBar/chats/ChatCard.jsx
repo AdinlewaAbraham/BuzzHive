@@ -186,19 +186,19 @@ const ChatCard = ({
             [...localstorageMessages];
             localstorageMessages.push(messageData);
             localStorage.setItem(id, JSON.stringify(localstorageMessages));
-            if (id === currentChatId) {
-              console.log(id)
-              console.log(currentChatId)
-              
+            if (id === ChatObject.activeChatId) {
+              console.log(id);
+              console.log(ChatObject.activeChatId);
+
               changeMessagesStatus(id, type, "seen")
                 .then(() => {
                   console.log("changed to seen in line 193");
-                  setChats([...localstorageMessages]);
+                  setChats((prevMessages) => [...localstorageMessages]);
                 })
                 .catch((error) => {
                   "Error updating message status:", error;
                 });
-            } else {
+            } else if (id !== ChatObject.activeChatId) {
               changeMessagesStatus(id, type, "received")
                 .then(() => {
                   console.log("changed to received in line 202");
@@ -222,7 +222,7 @@ const ChatCard = ({
             if (index !== -1) {
               localstorageMessages[index] = modifiedMessage;
               localStorage.setItem(id, JSON.stringify(localstorageMessages));
-              if (id === currentChatId) {
+              if (id === ChatObject.activeChatId) {
                 setChats([...localstorageMessages]);
               }
               "Modified message updated in local storage:", modifiedMessage;
@@ -242,7 +242,7 @@ const ChatCard = ({
             if (index !== -1) {
               localstorageMessages.splice(index, 1);
               localStorage.setItem(id, JSON.stringify(localstorageMessages));
-              if (id === currentChatId) {
+              if (id === ChatObject.activeChatId) {
                 setChats([...localstorageMessages]);
               }
             }
@@ -315,7 +315,7 @@ const ChatCard = ({
       className={`${
         ChatObject.activeChatId == id
           ? "bg-[#f0f2f5] hover:bg-[#f0f2f5] dark:bg-gray-600 dark:hover:bg-gray-600"
-          : "hover:bg-[#f5f6f6] dark:hover:bg-gray-700"
+          : "hover:bg-hover-light dark:hover:bg-hover-dark"
       } relative flex w-[100%] cursor-pointer flex-row items-center justify-between rounded-xl
         px-4 py-3 align-middle`}
       onClick={() => {
@@ -338,8 +338,8 @@ const ChatCard = ({
           )}
         </div>
         <div className=" ml-3  w-[90%] truncate">
-          <h3>{name}</h3>
-          <div className="flex flex-row text-sm text-[#6c757d] dark:text-[#aaaaaa]">
+          <h3 className=" text-[17px] font-normal ">{name}</h3>
+          <div className="flex flex-row text-sm text-muted-light dark:text-muted-dark">
             {isMessageSentByMe && (
               <i className="mr-1 flex items-center">
                 {message.status === "pending" && <BiTimeFive />}
@@ -375,7 +375,7 @@ const ChatCard = ({
       </div>
       <p className="">{timestamp}</p>
       {unReadCount !== 0 && (
-        <p className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500">
+        <p className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-blue text-white">
           {unReadCount}
         </p>
       )}

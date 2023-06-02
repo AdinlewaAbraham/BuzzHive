@@ -9,6 +9,7 @@ import { AiOutlineArrowDown } from "react-icons/ai";
 import AboutProfile from "./AboutProfile";
 import MessageCard from "./MessageCard";
 import Img from "../Img";
+import { FaUserAlt } from "react-icons/fa";
 
 const ContentContainer = () => {
   const {
@@ -27,6 +28,7 @@ const ContentContainer = () => {
   const [showProfile, setshowProfile] = useState(false);
   const [IsMobile, setIsMobile] = useState(false);
   const secondDivRef = useRef(null);
+  const [invalidURL, setinvalidURL] = useState(true);
 
   useEffect(() => {
     function widthResizer() {
@@ -44,7 +46,8 @@ const ContentContainer = () => {
     if (ChatObject.photoUrl && ChatObject.photoUrl.props) {
       setPhotoUrl(ChatObject.photoUrl.props.src);
     }
-  }, [ChatObject]);
+    console.log(ChatObject.photoUrl);
+  }, [ChatObject.photoUrl]);
   useEffect(() => {
     if (!IsMobile) setshowChats(true);
   }, [IsMobile]);
@@ -57,7 +60,7 @@ const ContentContainer = () => {
   }, [Chats]);
   if (ChatObject.activeChatId == "") {
     return (
-      <div className="hidden flex-1  items-center justify-center overflow-hidden bg-gray-300 dark:bg-[#12171d] md:flex">
+      <div className="hidden flex-1  items-center justify-center overflow-hidden bg-light-secondary dark:bg-dark-secondary md:flex">
         no active chat right now
       </div>
     );
@@ -73,7 +76,7 @@ const ContentContainer = () => {
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
-        <div className=" inset relative flex-col overflow-y-auto  bg-[#f0f2f5] dark:bg-[#12171d] md:flex ">
+        <div className=" inset relative flex-col overflow-y-auto  bg-[#E0E0E0] dark:bg-[#12171d] md:flex ">
           {showProfile && (
             <AboutProfile
               setshowProfile={setshowProfile}
@@ -110,14 +113,25 @@ const ContentContainer = () => {
                   }`}
                 >
                   <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500">
-                    <Img
-                      src={ChatObject.photoUrl}
-                      type={ChatObject.activeChatType}
-                      styles="justify-center flex rounded-full items-center"
-                      imgStyles="rounded-full w-full h-full"
-                      groupSize={80}
-                      personalSize={60}
-                    />
+                    <div className="flex items-center justify-center rounded-full bg-inherit text-[30px]">
+                      {ChatObject.photoUrl && invalidURL ? (
+                        <img
+                          src={ChatObject.photoUrl}
+                          alt="profile pic"
+                          className={`h-full rounded-full object-cover`}
+                          onError={() => setinvalidURL(false)}
+                        />
+                      ) : ChatObject.activeChatType === "group" ? (
+                        <i className="text-[30px]">
+                          {" "}
+                          <MdGroup />
+                        </i>
+                      ) : (
+                        <i className="text-[25px]">
+                          <FaUserAlt />
+                        </i>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="ml-[10px]">{ChatObject.displayName}</div>

@@ -9,11 +9,11 @@
 @layer components {
   .sidebar-icon {
     @apply relative mx-1 mb-0 flex 
-    h-10 w-10 cursor-pointer items-center justify-center rounded-lg 
-     bg-inherit text-[#54656f]  transition-all 
-  duration-150 ease-linear hover:bg-[#e8e8e8] 
-    dark:text-[#aaabaf] dark:hover:bg-[#1d232a] md:my-1
-    md:mx-auto;
+    h-11 w-11 cursor-pointer items-center justify-center rounded-lg 
+     bg-inherit text-[#54656f] transition-all 
+  duration-150 ease-linear hover:bg-hover-light
+    dark:text-[#aaabaf] dark:hover:bg-hover-dark md:my-0
+    md:mx-0;
   }
 
   .sidebar-tooltip {
@@ -64,4 +64,23 @@
 .ImgParentComp:hover .ImgChildComp {
   background-color: rgba(155, 145, 145, 0.2);
   opacity: 1;
+}
+
+
+.lineComingFromTop {
+  animation: comingFromTop 1s ease-in-out;
+}
+
+@keyframes comingFromTop {
+  0% {
+    height: 50%;
+    bottom: 30%;
+    opacity: 1;
+  } 
+  100% {
+    height: 80%;
+    bottom: 30%;
+    opacity: 0;
+    color: red;
+  }
 }

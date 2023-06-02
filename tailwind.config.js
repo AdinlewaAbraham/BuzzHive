@@ -24,13 +24,24 @@ module.exports = {
           100: "#f2f3f5",
         },
         dark: {
-          100: "#212229",
-          200: "#1e1f25",
-          300: "#1d1e23",
-          400: "#131517",
-          500: "#141619",
+          primary: "#1d232a",
+          secondary: "#12171d",
         },
-        myblue:{},
+        light: {
+          primary: "#fcfcfc",
+          secondary: "#E0E0E0",
+        },
+        accent: {
+          blue: "#3B82F6"
+        },
+        muted: {
+          light: "#212529bf",
+          dark: "#aaa",
+        },
+        hover: {
+          light: "#f5f6f6",
+          dark: "#36393f",
+        },
       },
     },
   },

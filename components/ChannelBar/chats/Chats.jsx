@@ -96,10 +96,15 @@ const Chats = () => {
   return (
     <div className="">
       <div className="h-[95px]">
-        <div className="flex items-center justify-between px-2 ">
-          <h1 className="text-2xl ">Chats</h1>{" "}
+        <div className="flex h-[66px] items-center justify-between px-2">
+          <h1 className="text-2xl ">Chats</h1>
           <div className="relative flex items-center text-[#54656f] dark:text-[#aaabaf] ">
-            <i className="mr-6 cursor-pointer">
+            <i
+              className="mr-6 cursor-pointer"
+              onClick={() => {
+                setSelectedChannel("addcontact");
+              }}
+            >
               <HiUserAdd size={27} />
             </i>
             <i
@@ -116,7 +121,7 @@ const Chats = () => {
           <input
             type="text"
             placeholder="Search"
-            className="my-5 w-[90%] rounded-lg bg-[#f0f2f5] px-3 py-2 outline-none dark:bg-[#12171d]"
+            className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
           />
         </div>
       </div>
@@ -126,7 +131,7 @@ const Chats = () => {
         <>
           {sortedChats.length !== 0 ? (
             <div
-              className="my-element scrollbar-thumb-rounded-[2px] mt-2 flex h-[calc(100vh-195px)] flex-col items-center overflow-y-auto
+              className="my-element scrollbar-thumb-rounded-[2px] mt-6 flex h-[calc(100vh-195px)] flex-col items-center overflow-y-auto
                overflow-x-hidden pt-[2px] pr-[2px] scrollbar-thin  scrollbar-track-[transparent] scrollbar-thumb-[#ced0d1]
             dark:scrollbar-thumb-gray-500 md:h-[calc(100vh-125px)] "
             >
@@ -143,7 +148,7 @@ const Chats = () => {
                   message={{
                     text: chat.lastMessage,
                     type: chat.lastMessageType,
-                    status: chat.lastMessageStatus
+                    status: chat.lastMessageStatus,
                   }}
                   unReadCount={chat.unReadmessagesCount}
                   set_Chats={set_Chats}
