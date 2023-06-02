@@ -22,6 +22,21 @@ const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
   );
   const [comingFromTop, setcomingFromTop] = useState(true);
 
+  const [IsMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    function widthResizer() {
+      const width = window.innerWidth < 768;
+      setIsMobile(width);
+    }
+
+    widthResizer();
+
+    window.addEventListener("resize", widthResizer);
+
+    return () => window.removeEventListener("resize", widthResizer);
+  }, []);
+
   function handleClick() {
     const channels = {
       chats: 1,
@@ -45,12 +60,13 @@ const SideBarIcon = ({ icon, text = "tooltip", clickevent }) => {
       <span
         className={`${
           selectedChannel === clickevent
-            ? ` opacity-1 bottom-[25%] ${
+            ? ` opacity-1  bottom-[25%] ${
                 !comingFromTop && "top-[25%]"
               } h-[50%] `
             : " bottom-[25%] h-[80%] opacity-0"
-        } absolute left-0 w-1 bg-accent-blue transition-[all] ease-in-out duration-700 `}
+        } absolute left-0 w-1 bg-accent-blue transition-[height] duration-700 ease-in-out `}
       ></span>
+
       <div
         className={`sidebar-icon group flex items-center ${
           selectedChannel === clickevent && "bg-hover-light dark:bg-hover-dark"
