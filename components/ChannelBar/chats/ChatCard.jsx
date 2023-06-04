@@ -109,6 +109,8 @@ const ChatCard = ({
     unReadCount;
     JSON.parse(localStorage.getItem("user"));
     setactiveId(id);
+    sessionStorage.setItem("activeChatId", new String(id) );
+    console.log(sessionStorage.getItem("activeChatId"))
     setChatObject({
       activeChatId: id,
       activeChatType: type,

@@ -1,19 +1,22 @@
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../firebaseUtils/firebase";
-import { v4 as uuid } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { sendMessage } from "./sendMessage";
 import { sendGroupMessage } from "../groupUtils/sendGroupMessage";
+import { URL } from "next/dist/compiled/@edge-runtime/primitives/url";
 export const handlePicVidUpload = async (
   downscaledBlob,
   blurredPixelatedBlob,
   ChatObject,
   mediaCaption,
   User,
-  time
+  time,
+  setChatsFunc
 ) => {
   if (!downscaledBlob) return;
   console.log(downscaledBlob);
-  const id = uuid();
+  const id = uuidv4();
+  const propId = `trackingId${id}`;
   const isImage = downscaledBlob.type.includes("image");
   const storageRef = ref(
     storage,
@@ -54,12 +57,58 @@ export const handlePicVidUpload = async (
   }
   try {
     const uploadTask = uploadBytesResumable(storageRef, downscaledBlob);
+    //const thumbnail = blurredPixelatedBlob
+    const dataObj = {
+      name: downscaledBlob.name,
+      size: downscaledBlob.size,
+      type: downscaledBlob.type,
+      status: "uploading",
+      progress: 0,
+      thumbnail: new Blob([blurredPixelatedBlob], { type: "image/jpeg" }),
+    };
+    console.log(blurredPixelatedBlob);
+    const message = {
+      type: isImage ? "image" : "video",
+      id: propId,
+      reactions: [],
+      senderId: User.id,
+      text: mediaCaption || "",
+      timestamp: time,
+      dataObject: dataObj || {},
+      status: "pending",
+    };
+    const Chats = JSON.parse(localStorage.getItem(ChatObject.activeChatId));
     uploadTask.on(
       "state_changed",
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+
         console.log("Upload is " + progress + "% done");
+        const newAcctiveChatId = JSON.parse(
+          sessionStorage.getItem("activeChatId")
+        );
+        if (ChatObject.activeChatId === newAcctiveChatId) {
+          const messageIndex = Chats.findIndex((chat) => chat.id === propId);
+          if (messageIndex === -1) {
+            setChatsFunc([
+              ...Chats,
+              {
+                ...message,
+                dataObject: { ...message.dataObject, progress: progress },
+              },
+            ]);
+          } else {
+            setChatsFunc([
+              ...Chats,
+              {
+                ...message,
+                dataObject: { ...message.dataObject, progress: progress },
+              },
+            ]);
+          }
+        }
+
         switch (snapshot.state) {
           case "paused":
             console.log("Upload is paused");

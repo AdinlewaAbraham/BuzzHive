@@ -14,7 +14,7 @@ const MediaInput = ({
   setpicVidmediaToNull,
   setblurredPicVidmedia,
 }) => {
-  const { ChatObject } = useContext(SelectedChannelContext);
+  const { ChatObject, setChats } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
   const [mediaCaption, setmediaCaption] = useState("");
   const [ImageBase64, setImageBase64] = useState();
@@ -51,8 +51,11 @@ const MediaInput = ({
   }, [ImageBase64, picVidmedia.name]);
 
   console.log(picVidmedia);
+  function setChatsFunc(state) {
+    setChats(state);
+  }
   return (
-    <div className="absolute bottom-2 left-2 w-[80%] z-10 media-container">
+    <div className="media-container absolute bottom-2 left-2 z-10 w-[80%]">
       {picVidmedia.type.startsWith("image/") ? (
         <img src={URL.createObjectURL(picVidmedia)} alt="Downscaled media" />
       ) : (
@@ -63,7 +66,7 @@ const MediaInput = ({
               alt=""
               width={300}
               height={300}
-              className="fixed z-[99]  top-[150px]"
+              className="fixed top-[150px]  z-[99]"
             />
           )}
           {/* dont want to render this comp below because i only need the thumbnail */}
@@ -79,18 +82,18 @@ const MediaInput = ({
         </>
       )}
 
-      <div className="flex bg-black justify-between items-center p-2">
+      <div className="flex items-center justify-between bg-black p-2">
         <BsEmojiSmile />
         <input
           type="text"
-          className="px-4 py-2 bg-transparent w-full outline-none placeholder-[#aaabaf]"
+          className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
           placeholder="Caption (optional)"
           onChange={(e) => {
             setmediaCaption(e.target.value);
           }}
         />
         <div
-          className="bg-blue-600 flex items-center px-2 py-2 rounded-md"
+          className="flex items-center rounded-md bg-blue-600 px-2 py-2"
           onClick={async () => {
             const time = new Date();
             await handlePicVidUpload(
@@ -99,7 +102,8 @@ const MediaInput = ({
               ChatObject,
               mediaCaption,
               User,
-              time
+              time,
+              setChatsFunc
             ).then(() => {
               setpicVidmediaToNull(null);
             });

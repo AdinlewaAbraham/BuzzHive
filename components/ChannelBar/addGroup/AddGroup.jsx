@@ -8,8 +8,6 @@ import { MdGroup } from "react-icons/md";
 import { AiFillPlusCircle } from "react-icons/ai";
 import Goback from "../Goback";
 
-import Modal from "react-modal";
-
 const UserCard = (p) => {
   return (
     <div
@@ -100,12 +98,12 @@ const AddGroup = () => {
     <div className="relative h-full min-h-[430px]">
       <Goback text="New group" />
       {selectedUsers.length > 0 && (
-        <div className="mt-3 flex flex-col">
+        <div className="mb-3 flex flex-col">
           <div
             className="my-element scrollbar-thumb-rounded-[2px] flex max-h-[100px] flex-wrap
-           items-center overflow-y-auto rounded-lg bg-light-secondary  py-1 scrollbar-thin scrollbar-track-blue-300
-              scrollbar-thumb-blue-700 dark:bg-dark-secondary dark:scrollbar-track-[transparent]
-               dark:scrollbar-thumb-gray-500 "
+           items-center overflow-y-auto rounded-lg bg-light-secondary  py-1 scrollbar-thin scrollbar-track-transparent
+              scrollbar-thumb-scrollbar-light dark:bg-dark-secondary dark:scrollbar-track-[transparent]
+               dark:scrollbar-thumb-scrollbar-dark "
           >
             {selectedUsers.map((user) => (
               <div
@@ -209,11 +207,11 @@ const AddGroup = () => {
         </div>
       ) : (
         <>
-          <div className="my-3 flex w-full items-center justify-center">
+          <div className="mb-3 flex w-full items-center justify-center">
             <input
               type="text"
               className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
-              placeholder="search"
+              placeholder="Search"
             />
           </div>
           {selectedUsers.length > 0 && (
@@ -234,7 +232,7 @@ const AddGroup = () => {
 
           <div
             className="my-element scrollbar-thumb-rounded-[2px] hover:scrollbar- relative mt-[10px] max-h-[calc(100vh-200px)]  overflow-y-auto scrollbar-thin
-              scrollbar-track-blue-300 scrollbar-thumb-blue-700 dark:scrollbar-track-[transparent] dark:scrollbar-thumb-gray-500 "
+              scrollbar-thumb-scrollbar-light scrollbar-track-[transparent] dark:scrollbar-thumb-scrollbar-dark "
           >
             <h2
               className="sticky top-0 mb-1 rounded-lg bg-light-primary p-2 pt-0

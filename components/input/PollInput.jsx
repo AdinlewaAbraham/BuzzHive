@@ -6,7 +6,7 @@ import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 
 const PollInput = () => {
-  const { ChatObject } = useContext(SelectedChannelContext);
+  const { ChatObject, setChats } = useContext(SelectedChannelContext);
   const [inputs, setInputs] = useState([
     { id: "1", value: "" },
     { id: "2", value: "" },
@@ -45,7 +45,7 @@ const PollInput = () => {
   const handleDrop = (e, id) => {
     setcurrentDraggedOptionId(null);
     e.preventDefault();
-    console.log(e);
+    (e);
     const sourceId = e.dataTransfer.getData("text/plain");
     const newInputs = [...inputs];
     const sourceIndex = newInputs.findIndex((input) => input.id === sourceId);
@@ -75,14 +75,14 @@ const PollInput = () => {
   function handlePollSend() {
     if (!ChatObject.activeChatId) return;
     const newarr = [...inputs].filter((option) => option.value !== "");
-    console.log(newarr);
+    (newarr);
     const options = mapInputs(newarr);
     if (options.length < 2) {
       alert("Please add value ");
       return;
     }
-    console.log(options);
-    console.log(inputs);
+    (options);
+    (inputs);
     if (!pollQuestion) {
       alert("Please add poll question");
       return;
@@ -93,8 +93,21 @@ const PollInput = () => {
       allowMultipleAnswers: allowMultipleAnswers,
     };
     const User = JSON.parse(localStorage.getItem("user"));
-    console.log(User);
+    (User);
     const time = new Date();
+
+    const pollObject = {
+      type: "poll",
+      id: "propId",
+      reactions: [],
+      senderId: User.id,
+      text: null,
+      timestamp: time,
+      dataObject: dataOBJ || {},
+      status: "pending",
+    };
+
+    setChats((prevChats)=>[...prevChats, pollObject])
     if (ChatObject.activeChatType === "group") {
       sendGroupMessage(
         User.id,
@@ -120,7 +133,7 @@ const PollInput = () => {
       );
     }
   }
-  console.log(ChatObject);
+  (ChatObject);
   return (
     <div className="detectMe absolute bottom-2 left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg p-4  dark:bg-black">
       <input
@@ -180,7 +193,7 @@ const PollInput = () => {
           <input
             type="checkbox"
             onChange={(e) => {
-              console.log(e.target.checked);
+              (e.target.checked);
               setallowMultipleAnswers(e.target.checked);
             }}
             checked={allowMultipleAnswers}

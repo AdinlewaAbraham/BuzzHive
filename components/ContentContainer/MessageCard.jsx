@@ -4,14 +4,12 @@ import { UserContext } from "../App";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Emoji } from "emoji-picker-react";
 import reactTomessage from "@/utils/messagesUtils/reactToMessage";
-import { RenderFileType } from "../input/FileInput";
-import ImageComponent from "./ImageComponent";
-import VideoComponent from "./VideoComponent";
-import PollComponent from "./PollComponent";
-import { onSnapshot, doc } from "firebase/firestore";
-import { db } from "@/utils/firebaseUtils/firebase";
+import ImageComponent from "./imageComponent/ImageComponent";
+import VideoComponent from "./videoComponent/VideoComponent";
+import PollComponent from "./pollComponent/PollComponent";
 import { BsCheckAll, BsCheckLg } from "react-icons/bs";
 import { BiTimeFive } from "react-icons/bi";
+import FileComponent from "./fileComponent/FileComponent";
 const MessageCard = ({ chat }) => {
   if (!chat) return;
   const { ChatObject, setReplyObject, ReplyObject, setChats } = useContext(
@@ -24,41 +22,6 @@ const MessageCard = ({ chat }) => {
 
   const currentId = User.id;
   const timestamp = chat.timestamp;
-
-  //this checks for updates like when user reacts to messagee then updates localstorage
-  // useEffect(() => {
-  //   const { activeChatId, activeChatType } = ChatObject;
-  //   const queryLocation =
-  //     activeChatType === "group" ? "groups" : "conversations";
-  //   if (!chat.id) return;
-  //   const q = doc(db, queryLocation, activeChatId, "messages", chat.id);
-
-  //   const unsubscribe = onSnapshot(q, (doc) => {
-  //     setChats((prevChats) => {
-  //       (prevChats);
-  //       const updatedChats = [...prevChats]
-  //         .filter((chat) => chat)
-  //         .map((message) => {
-  //           if (message.id === doc.id) {
-  //             if (
-  //               message.status === "received" &&
-  //               doc.data().status === "sent"
-  //             ) {
-  //               return message; // Do not update status if current status is "received"
-  //             }
-  //             return doc.data();
-  //           }
-  //           return message;
-  //         });
-  //       localStorage.setItem(activeChatId, JSON.stringify(updatedChats));
-  //       return updatedChats;
-  //     });
-  //   });
-
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, [ChatObject, chat.id]);
 
   const handleEmojiClick = (emoji) => {
     reactTomessage(
@@ -107,12 +70,14 @@ const MessageCard = ({ chat }) => {
       <div
         className={`relative max-w-[80%] rounded-lg p-2 text-left ${
           chat.senderId === currentId
-            ? " ml-2 mr-5 bg-[#296eff]  text-right text-white"
+            ? " ml-2 mr-5 bg-accent-blue  text-right text-white"
             : "mr-2 ml-5 bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
         }  ${
           (chat.type === "pic/video" ||
             chat.type === "image" ||
-            chat.type === "video") &&
+            chat.type === "video" ||
+            chat.type === "file" ||
+            chat.type === "poll" ) &&
           "w-[300px]"
         }`}
       >
@@ -129,53 +94,51 @@ const MessageCard = ({ chat }) => {
             <p className="text-[12px]">{chat.replyObject.replyText}</p>
           </div>
         )}
-        {chat.type === "file" && (
-          <div>
-            <div className={`flex w-full ${chat.text && "mb-2"}`}>
-              <div className="mr-2 flex items-center justify-center rounded-full bg-blue-900 p-3">
-                <RenderFileType type={chat.dataObject.type} size={40} />
-              </div>
-              <div className="text-start">
-                <p>{chat.dataObject.name}</p>
-                <p>{chat.dataObject.size}</p>
-              </div>
-            </div>
-          </div>
-        )}
+        {chat.type === "file" && <FileComponent chat={chat} />}
         {(chat.type === "pic/video" ||
           chat.type === "image" ||
           chat.type === "video") && (
           <div>
-            {chat.dataObject.type}
-            {chat.dataObject.type.startsWith("image") ? (
-              <ImageComponent
-                blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                downloadSRC={chat.dataObject.downloadURL}
-                messageId={chat.id}
-              />
-            ) : (
+            {console.log(chat.dataObject)}
+            <>
+              {chat.dataObject.status === "uploading" && (
+                <div>
+                  <img
+                    src={URL.createObjectURL(chat.dataObject.thumbnail)}
+                    width={300}
+                    alt=""
+                  />
+                  <i className="text-red-500">{chat.dataObject.progress}</i>
+                </div>
+              )}
               <>
-                {chat}
-                <VideoComponent
-                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                  downloadSRC={chat.dataObject.downloadURL}
-                  messageId={chat.id}
-                  messageText={chat.text}
-                />
+                {chat.dataObject.type.startsWith("image") ? (
+                  <ImageComponent
+                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                    downloadSRC={chat.dataObject.downloadURL}
+                    messageId={chat.id}
+                  />
+                ) : (
+                  <VideoComponent
+                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                    downloadSRC={chat.dataObject.downloadURL}
+                    messageId={chat.id}
+                    messageText={chat.text}
+                    dataObject={chat.dataObject}
+                  />
+                )}
               </>
-            )}
-
-            {chat.dataObject.name}
+            </>
           </div>
         )}
         {chat.type === "poll" && <PollComponent PollObject={chat} />}
-        {chat.type !== "poll" && chat.text}
+        {chat.type !== "poll" && chat.type !== "file" && chat.text}
         {chat.senderId === User.id && (
           <div className="flex justify-end">
             {chat.status === "pending" && <BiTimeFive />}
             {chat.status === "sent" && <BsCheckLg />}
             {chat.status === "received" && <BsCheckAll />}
-            {chat.status === "seen" && <BsCheckAll color="red" />}
+            {chat.status === "seen" && <BsCheckAll color="hotpink" />}
           </div>
         )}
 

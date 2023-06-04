@@ -44,17 +44,21 @@ export const RenderFileType = ({ type, size }) => {
 
 const FileInput = ({ file, setfile }) => {
   const { User } = useContext(UserContext);
-  const { ChatObject } = useContext(SelectedChannelContext);
+  const { ChatObject, setChats, Chats } = useContext(SelectedChannelContext);
   const [fileCaption, setfileCaption] = useState("");
 
+  function setChatsFunc(chats) {
+    setChats(chats);
+  }
+
   return (
-    <div className="file-input absolute bottom-2 left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg p-4  dark:bg-black">
+    <div className="file-input absolute bottom-2 left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg bg-white  p-4 shadow-md dark:bg-black">
       <div className="flex flex-col items-center justify-center">
         <RenderFileType type={file.type} size={100} />
         {file.name}
       </div>
 
-      <div className="flex items-center justify-between bg-black p-2">
+      <div className="flex items-center justify-between p-2">
         <BsEmojiSmile />
         <input
           type="text"
@@ -65,13 +69,22 @@ const FileInput = ({ file, setfile }) => {
           }}
         />
         <div
-          className="flex items-center rounded-md bg-blue-600 px-2 py-2"
+          className="flex items-center rounded-md bg-accent-blue px-2 py-2"
           onClick={async () => {
-            await handleFileUpload(file, ChatObject, fileCaption, User).then(
-              () => {
-                setfile(null);
-                console.log("ran");
-              }
+            const capturedId = JSON.parse(
+              JSON.stringify(ChatObject.activeChatId)
+            );
+            const capturedFile = file;
+            setfile(null);
+            await handleFileUpload(
+              capturedFile,
+              ChatObject,
+              fileCaption,
+              User,
+              setChatsFunc,
+              Chats,
+              capturedId,
+              ChatObject.activeChatId
             );
           }}
         >

@@ -42,6 +42,10 @@ module.exports = {
           light: "#f5f6f6",
           dark: "#36393f",
         },
+        scrollbar: {
+dark: "#666b7a",
+light: "#666b7a",
+        },
       },
     },
   },

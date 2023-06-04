@@ -20,12 +20,12 @@ const AddContact = () => {
   return (
     <div onScroll={handleOnScroll} className="">
       <Goback text="Add contact" />
-      <div className="my-3 flex w-full items-center justify-center ">
+      <div className="mb-3 mt-0 flex w-full items-center justify-center ">
         <input
           className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
           type="text"
           name=""
-          placeholder="search"
+          placeholder="Search"
           id=""
         />
       </div>

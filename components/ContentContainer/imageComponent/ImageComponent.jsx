@@ -3,19 +3,19 @@ import axios from "axios";
 import { FiDownload } from "react-icons/fi";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { useContext } from "react";
-import { UserContext } from "../App";
+import { UserContext } from "../../App";
 
 const ImageComponent = ({ blurredSRC, downloadSRC, messageId }) => {
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
-  (messageId);
+  messageId;
   const [imageSrc, setImageSrc] = useState(blurredSRC);
   const [downloadProgress, setDownloadProgress] = useState(null);
   const [isDownloaded, setisDownloaded] = useState(false);
   const [loadingImg, setloadingImg] = useState(true);
 
   function dataURItoBlob(dataURI) {
-    (dataURI);
+    dataURI;
     const byteString = atob(dataURI.split(",")[1]);
     const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
     const ab = new ArrayBuffer(byteString.length);
@@ -80,7 +80,7 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId }) => {
     <div className="relative">
       <div className="">
         {loadingImg ? (
-          <img src={blurredSRC} className=" object-cover" width={300}/>
+          <img src={blurredSRC} className=" object-cover" width={300} />
         ) : (
           <img
             src={imageSrc}
@@ -89,10 +89,10 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId }) => {
             width={300}
           />
         )}
-      </div>{" "}
-      <div className="absolute flex justify-center top-[50%] left-[50%] items-center ">
-        {(downloadProgress)}
-        {(isDownloaded)}
+      </div>
+      <div className="absolute top-[50%] left-[50%] flex items-center justify-center ">
+        {downloadProgress}
+        {isDownloaded}
         {downloadProgress !== 100 &&
           !isDownloaded &&
           downloadProgress !== 0 && (

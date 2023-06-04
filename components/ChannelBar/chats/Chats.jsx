@@ -98,7 +98,7 @@ const Chats = () => {
       <div className="h-[95px]">
         <div className="flex h-[66px] items-center justify-between px-2">
           <h1 className="text-2xl ">Chats</h1>
-          <div className="relative flex items-center text-[#54656f] dark:text-[#aaabaf] ">
+          <div className="relative flex items-center text-muted-light dark:text-muted-dark">
             <i
               className="mr-6 cursor-pointer"
               onClick={() => {
@@ -132,8 +132,8 @@ const Chats = () => {
           {sortedChats.length !== 0 ? (
             <div
               className="my-element scrollbar-thumb-rounded-[2px] mt-6 flex h-[calc(100vh-195px)] flex-col items-center overflow-y-auto
-               overflow-x-hidden pt-[2px] pr-[2px] scrollbar-thin  scrollbar-track-[transparent] scrollbar-thumb-[#ced0d1]
-            dark:scrollbar-thumb-gray-500 md:h-[calc(100vh-125px)] "
+               overflow-x-hidden pt-[2px] pr-[2px] scrollbar-thin  scrollbar-track-[transparent] scrollbar-thumb-scrollbar-light
+            dark:scrollbar-thumb-scrollbar-dark md:h-[calc(100vh-125px)] "
             >
               {sortedChats.map((chat) => (
                 <ChatCard //this is soo stupid of me too late to change this

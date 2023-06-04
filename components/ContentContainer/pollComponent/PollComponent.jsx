@@ -1,49 +1,49 @@
 import React, { useContext, useMemo, useState } from "react";
 import { FaUserAlt } from "react-icons/fa";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
-import { UserContext } from "../App";
+import { UserContext } from "../../App";
 import { modifyPollVote } from "@/utils/messagesUtils/modifyPollVote";
 
 const PollComponent = ({ PollObject }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
-  (PollObject);
-  (PollObject.dataObject);
+  PollObject;
+  PollObject.dataObject;
   const { options, question, allowMultipleAnswers } = PollObject.dataObject;
-  (allowMultipleAnswers);
+  allowMultipleAnswers;
   const caclTotalVotes = useMemo(() => {
     return options.reduce((total, option) => total + option.voteCount, 0);
   }, [options]);
-  (caclTotalVotes);
+  caclTotalVotes;
 
   async function handleVote(optionId) {
     // logic for updating chats locally
     const messages = JSON.parse(localStorage.getItem(ChatObject.activeChatId));
-    (messages);
+    messages;
     const messageIndex = messages.findIndex(
       (message) => message.id === PollObject.id
     );
     const message = messages[messageIndex];
     const messageOptions = message["dataObject"]["options"];
-    (message.dataObject.allowMultipleAnswers);
+    message.dataObject.allowMultipleAnswers;
     if (!allowMultipleAnswers) {
-      (allowMultipleAnswers);
+      allowMultipleAnswers;
       for (let i = 0; i < messageOptions.length; i++) {
         if (messageOptions[i]["id"] === optionId) {
-          (true);
+          true;
           continue;
         }
-        (i);
+        i;
         const votes = messageOptions[i]["votes"];
-        (messageOptions[i]["votes"]);
-        (messageOptions[i]);
-        (votes)
+        messageOptions[i]["votes"];
+        messageOptions[i];
+        votes;
         if (!votes) return;
         const optionVotedFor = votes.findIndex((vote) => vote.id === User.id);
         if (optionVotedFor !== -1) {
-          ("removing " + optionVotedFor);
-          ("removing " + messageOptions[i]["id"]);
-          (messageOptions[i]);
+          "removing " + optionVotedFor;
+          "removing " + messageOptions[i]["id"];
+          messageOptions[i];
           await modifyPollVote(
             ChatObject.activeChatType,
             PollObject.id,
@@ -59,13 +59,13 @@ const PollComponent = ({ PollObject }) => {
     const optionIndex = messageOptions.findIndex(
       (option) => option.id === optionId
     );
-    (optionIndex);
-    (messageOptions);
+    optionIndex;
+    messageOptions;
     const votes = messageOptions[optionIndex]["votes"];
     if (!votes) return;
-    (votes);
+    votes;
     const containsId = votes.some((vote) => vote.id === User.id);
-    (containsId);
+    containsId;
     modifyPollVote(
       ChatObject.activeChatType,
       PollObject.id,
@@ -76,7 +76,7 @@ const PollComponent = ({ PollObject }) => {
     );
   }
   return (
-    <div className="text-left">
+    <div className="text-left ">
       <h3>{question}</h3>
 
       <p>{allowMultipleAnswers ? "select one or more" : "select one"}</p>

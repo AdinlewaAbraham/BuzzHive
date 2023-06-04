@@ -280,9 +280,9 @@ const Input = () => {
           {showMediaPicker && (
             <div
               className="detectMe MediaPicker absolute bottom-[65px]  w-[160px] rounded-lg px-1 py-2 text-[15px]
-                dark:bg-black [&>div>div>svg]:mr-2 [&>div>div]:flex
+                dark:bg-dark-primary bg-light-primary  [&>div>div>svg]:mr-2 [&>div>div]:flex
             [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 
-            [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-gray-500"
+            [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-hover-light dark:hover:[&>div]:bg-hover-dark"
             >
               <div className="file-input px-0 py-0">
                 <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
@@ -359,7 +359,7 @@ const Input = () => {
         </div>
         <input
           type="text"
-          className="w-full  bg-transparent px-4 py-2 text-white placeholder-muted-light outline-none dark:placeholder-muted-dark"
+          className="w-full  bg-transparent px-4 py-2 placeholder-muted-light outline-none dark:placeholder-muted-dark"
           placeholder="Type a message"
           value={message}
           onKeyDown={handleInputKeyDown}

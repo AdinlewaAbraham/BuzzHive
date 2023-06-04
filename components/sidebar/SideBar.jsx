@@ -68,7 +68,7 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
               ? `${IsMobile ?  "" : "lineComingFromTop"} `
               : `${IsMobile ?" " : "lineComingFromBottom"} `
           } `
-        } absolute  bottom-0 z-50 h-1 bg-accent-blue transition-[width] md:left-0 md:w-1 md:transition-[height]`}
+        } absolute  bottom-0 z-[1] h-1 bg-accent-blue transition-[width] md:left-0 md:w-1 md:transition-[height]`}
       ></span>
 
       <div
