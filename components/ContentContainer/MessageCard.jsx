@@ -10,6 +10,7 @@ import PollComponent from "./pollComponent/PollComponent";
 import { BsCheckAll, BsCheckLg } from "react-icons/bs";
 import { BiTimeFive } from "react-icons/bi";
 import FileComponent from "./fileComponent/FileComponent";
+import UploadCircularAnimation from "./UploadCircularAnimation";
 const MessageCard = ({ chat }) => {
   if (!chat) return;
   const { ChatObject, setReplyObject, ReplyObject, setChats } = useContext(
@@ -77,7 +78,7 @@ const MessageCard = ({ chat }) => {
             chat.type === "image" ||
             chat.type === "video" ||
             chat.type === "file" ||
-            chat.type === "poll" ) &&
+            chat.type === "poll") &&
           "w-[300px]"
         }`}
       >
@@ -101,41 +102,36 @@ const MessageCard = ({ chat }) => {
           <div>
             {console.log(chat.dataObject)}
             <>
-              {chat.dataObject.status === "uploading" && (
-                <div>
-                  <img
-                    src={URL.createObjectURL(chat.dataObject.thumbnail)}
-                    width={300}
-                    alt=""
-                  />
-                  <i className="text-red-500">{chat.dataObject.progress}</i>
-                </div>
+              {chat.dataObject.type.startsWith("image") ? (
+                <ImageComponent
+                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                  downloadSRC={chat.dataObject.downloadURL}
+                  messageId={chat.id}
+                  chat={chat}
+                />
+              ) : (
+                <VideoComponent
+                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                  downloadSRC={chat.dataObject.downloadURL}
+                  messageId={chat.id}
+                  messageText={chat.text}
+                  dataObject={chat.dataObject}
+                />
               )}
-              <>
-                {chat.dataObject.type.startsWith("image") ? (
-                  <ImageComponent
-                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                    downloadSRC={chat.dataObject.downloadURL}
-                    messageId={chat.id}
-                    chat={chat}
-                  />
-                ) : (
-                  <VideoComponent
-                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                    downloadSRC={chat.dataObject.downloadURL}
-                    messageId={chat.id}
-                    messageText={chat.text}
-                    dataObject={chat.dataObject}
-                  />
-                )}
-              </>
             </>
           </div>
         )}
         {chat.type === "poll" && <PollComponent PollObject={chat} />}
-        {chat.type !== "poll" && chat.type !== "file" && chat.text}
+        {chat.type !== "poll" && <p className="text-start">{chat.text}</p>}
         {chat.senderId === User.id && (
-          <div className="flex justify-end">
+          <div
+            className={`flex justify-end ${
+              (chat.type === "pic/video" ||
+                chat.type === "image" ||
+                chat.type === "video") && !chat.text &&
+              "absolute bottom-3 right-4 z-30"
+            }`}
+          >
             {chat.status === "pending" && <BiTimeFive />}
             {chat.status === "sent" && <BsCheckLg />}
             {chat.status === "received" && <BsCheckAll />}

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { sendMessage } from "./sendMessage";
 import { sendGroupMessage } from "../groupUtils/sendGroupMessage";
 import { useContext } from "react";
+import { openDB } from "idb";
 
 export const handleFileUpload = async (
   file,
@@ -12,7 +13,7 @@ export const handleFileUpload = async (
   User,
   setChatsFunc,
   Chats,
-  sendingFromChatRoomId,
+  sendingFromChatRoomId
 ) => {
   const time = new Date();
   try {
@@ -22,7 +23,6 @@ export const handleFileUpload = async (
     console.log(ChatObject);
 
     const id = uuidv4();
-    const propId = `trackingId${id}`;
     const storageRef = ref(
       storage,
       `${ChatObject.activeChatType}/${ChatObject.activeChatId}/files/${id}`
@@ -39,7 +39,7 @@ export const handleFileUpload = async (
     };
     const message = {
       type: "file",
-      id: propId,
+      id: id,
       reactions: [],
       senderId: User.id,
       text: fileCaption || "",
@@ -48,13 +48,30 @@ export const handleFileUpload = async (
       status: "pending",
     };
 
+    
+  async function initializeFileDB() {
+    const db = await openDB("myFilesDatabase", 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains("files")) {
+          db.createObjectStore("files");
+        }
+      },
+    });
+    return db;
+  }
+    const db = await initializeFileDB();
+    const tx = db.transaction("files", "readwrite");
+    const store = tx.objectStore("files");
+    await store.put(file, `file-${id}`);
+    await tx.done;
+
     uploadTask.on("state_changed", (snapshot) => {
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
       const newAcctiveChatId = JSON.parse(
         sessionStorage.getItem("activeChatId")
       );
       if (sendingFromChatRoomId === newAcctiveChatId) {
-        const messageIndex = Chats.findIndex((chat) => chat.id === propId);
+        const messageIndex = Chats.findIndex((chat) => chat.id === id);
         if (messageIndex === -1) {
           setChatsFunc([
             ...Chats,
@@ -98,24 +115,26 @@ export const handleFileUpload = async (
       await sendGroupMessage(
         User.id,
         ChatObject.activeChatId,
-        fileCaption || fileCaption !== "" ? fileCaption : file.name,
+        fileCaption || "",
         User.name,
         "file",
         time,
         null,
-        fileObj
+        fileObj,
+        id
       );
     } else {
       await sendMessage(
         User.id,
         ChatObject.otherUserId,
-        fileCaption || fileCaption !== "" ? fileCaption : file.name,
+        fileCaption || "",
         User.id,
         User.name,
         "file",
         time,
         null,
-        fileObj
+        fileObj,
+        id
       );
     }
     console.log("File available at", downloadURL);

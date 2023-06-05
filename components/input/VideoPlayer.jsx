@@ -1,13 +1,18 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { VscPlay } from "react-icons/vsc";
 import { CiPause1 } from "react-icons/ci";
 
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
+import { formatDuration } from "@/utils/actualUtils/formatDuration";
 
-function VideoPlayer({ src }) {
+function VideoPlayer({ src, setvideoLengthFunc }) {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    setvideoLengthFunc(duration);
+  }, [duration]);
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -21,34 +26,24 @@ function VideoPlayer({ src }) {
   const handleDurationChange = () => {
     setDuration(videoRef.current.duration);
   };
-  function formatDuration(duration) {
-    let seconds = Math.floor(duration % 60);
-    let minutes = Math.floor((duration / 60) % 60);
-    let hours = Math.floor(duration / 3600);
-
-    seconds = seconds < 10 ? `0${seconds}` : seconds;
-    minutes = minutes < 10 ? `0${minutes}` : minutes;
-    hours = hours < 10 ? `0${hours}` : hours;
-
-    if (hours > 0) {
-      return `${hours}:${minutes}:${seconds}`;
-    }
-    return `${minutes}:${seconds}`;
-  }
 
   return (
-    <div className="relative media-container">
-      <video onClick={handlePlayPause} 
+    <div className="media-container relative">
+      <video
+        onClick={handlePlayPause}
         ref={videoRef}
         onDurationChange={handleDurationChange}
-        className="w-full block mx-auto bg-red-800 fff"
+        className="fff mx-auto block w-full bg-red-800"
       >
         <source src={src} type="video/mp4" />
       </video>
-      <div className="absolute bottom-0 left-0 w-full flex justify-start items-center p-2 pb-6">
-        <p className="text-[50px] mr-2 absolute ">{formatDuration(duration)}</p>
-        <div className="flex items-center w-full justify-center">
-          <button onClick={handlePlayPause} className="transition-all media-container">
+      <div className="absolute bottom-0 left-0 flex w-full items-center justify-start p-2 pb-6">
+        <p className="absolute mr-2 text-[50px] ">{formatDuration(duration)}</p>
+        <div className="flex w-full items-center justify-center">
+          <button
+            onClick={handlePlayPause}
+            className="media-container transition-all"
+          >
             {isPlaying ? <CiPause1 size={30} /> : <VscPlay size={30} />}
           </button>
         </div>

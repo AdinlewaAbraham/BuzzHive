@@ -3,7 +3,7 @@ import { RenderFileType } from "@/components/input/FileInput";
 import UploadCircularAnimation from "../UploadCircularAnimation";
 import { UserContext } from "@/components/App";
 import DownloadCircularAnimation from "../DownloadCircularAnimation";
-import { HiOutlineDownload } from "react-icons/hi";
+import { FaFileDownload } from "react-icons/fa";
 import { openDB } from "idb";
 import { BsDot } from "react-icons/bs";
 
@@ -136,31 +136,29 @@ const FileComponent = ({ chat }) => {
     const parts = fileName.split(".");
     return { baseName: parts[0], extName: parts[parts.length - 1] };
   };
-  const fileName = "example.txt";
   const { baseName, extName } = getFileExtension(chat.dataObject.name);
-  console.log(baseName);
   return (
     <div
       className={`flex cursor-pointer items-center truncate ${
-        chat.text && "mb-2"
+        chat.text !== "" && "mb-2"
       }`}
       onClick={handleOuterDivClick}
     >
-      <div className="mr-1 flex items-center justify-center rounded-full p-3">
+      <div className="mr-1 flex items-center justify-center rounded-full p-3 text-[40px] h-[50px] text-white">
         {chat.dataObject.status === "uploading" || chat.status === "pending" ? (
-          <UploadCircularAnimation progress={chat.dataObject.progress} />
+          <UploadCircularAnimation progress={chat.dataObject.progress} size={"md"} />
         ) : isDownloaded ? (
           <i onclick={() => {}}>
-            {" "}
-            <RenderFileType type={chat.dataObject.type} size={40} />
+            <RenderFileType type={chat.dataObject.type}/>
           </i>
         ) : isDownloading ? (
-          <DownloadCircularAnimation progress={downloadProgress} />
+          <DownloadCircularAnimation progress={downloadProgress} size={"md"} />
         ) : (
           <div onClick={() => downloadFile()}>
-            <HiOutlineDownload size={30} />
+            <FaFileDownload size={40} />
           </div>
         )}
+        
       </div>
       <div className="text-start">
         <p className="whitespace-nowrap">{baseName}</p>

@@ -9,7 +9,7 @@ import UploadCircularAnimation from "../UploadCircularAnimation";
 
 const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
   const { User } = useContext(UserContext);
-  const [downloadProgress, setDownloadProgress] = useState(null);
+  const [downloadProgress, setDownloadProgress] = useState(0);
   const [isDownloaded, setisDownloaded] = useState(false);
   const [isDownloading, setisDownloading] = useState(false);
   const [loadingImg, setloadingImg] = useState(true);
@@ -44,6 +44,7 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
     );
     if (imageBlob) {
       setimageBlob(imageBlob);
+      console.log(imageBlob);
       setisDownloaded(true);
     } else if (User.autoDownloadSettings.file) {
       downloadImage(downloadSRC, "image");
@@ -60,8 +61,8 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
 
   const downloadImage = async (Url, type) => {
     if (!Url) return;
-    console.log(Url)
-    console.log(type)
+    console.log(Url);
+    console.log(type);
     setisDownloading(true);
     try {
       const response = await axios({
@@ -70,6 +71,7 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
         responseType: "blob",
         onDownloadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
+          console.log((loaded / total) * 100)
           setDownloadProgress((loaded / total) * 100);
         },
       });
@@ -94,48 +96,55 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
       throw error;
     }
   };
+  console.log(imageBlob);
+
   return (
-    <div className="relative">
+    <div className="relative flex items-center justify-center">
       <div className="">
-        {loadingImg && !imageBlob ? (
+        {!imageBlob || chat.dataObject.status === "uploading" ? (
           <>
             {!blurredImageBlob ? (
               <>loadingImg</>
             ) : (
               <img
                 src={URL.createObjectURL(blurredImageBlob)}
-                className=" object-cover"
+                className="object-cover"
                 width={300}
               />
             )}
           </>
         ) : (
-          <img
-            src={URL.createObjectURL(imageBlob)}
-            alt="Preview"
-            className=" object-cover"
-            width={300}
-          />
+          <>
+            {!imageBlob ? (
+              <>No image available</>
+            ) : (
+              <img
+                src={URL.createObjectURL(imageBlob)}
+                alt="Preview"
+                className="object-cover"
+                width={300}
+              />
+            )}
+          </>
         )}
       </div>
-      {chat.dataObject.status === "uploading" && !loadingImg ? (
-        <div>
+      {chat.dataObject.status === "uploading" && (
+        <div className="absolute">
           <UploadCircularAnimation progress={chat.dataObject.progress} />
         </div>
-      ) : (
+      )}
+
+      {console.log(isDownloaded)}
+      {!isDownloaded && (
         <>
-          {!isDownloaded && (
-            <>
-              {isDownloading ? (
-                <div>
-                  <DownloadCircularAnimation progress={downloadProgress} />
-                </div>
-              ) : (
-                <button onClick={() => downloadImage(downloadSRC, "image")}>
-                  <FiDownload color="black" size={30} />
-                </button>
-              )}
-            </>
+          {isDownloading ? (
+           <div className="absolute">
+              <DownloadCircularAnimation progress={downloadProgress} />
+            </div>
+          ) : (
+            <button  className="absolute" onClick={() => downloadImage(downloadSRC, "image")}>
+              <FiDownload color="black" size={30} />
+            </button>
           )}
         </>
       )}

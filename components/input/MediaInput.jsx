@@ -18,6 +18,7 @@ const MediaInput = ({
   const { User } = useContext(UserContext);
   const [mediaCaption, setmediaCaption] = useState("");
   const [ImageBase64, setImageBase64] = useState();
+  const [videoLength, setvideoLength] = useState(0);
   const isImage = picVidmedia.type.startsWith("image");
   console.log(isImage);
 
@@ -42,17 +43,17 @@ const MediaInput = ({
       const ImgFile = await base64toFile(ImageBase64, picVidmedia.name);
       const downloadScaledImgFile = await downScalePicVid(ImgFile, 0.7, 1, 0);
       setblurredPicVidmedia(downloadScaledImgFile);
-      console.log(downloadScaledImgFile);
-      console.log(blurredPicVidmedia);
     }
     processImage();
 
     return () => {};
   }, [ImageBase64, picVidmedia.name]);
 
-  console.log(picVidmedia);
   function setChatsFunc(state) {
     setChats(state);
+  }
+  function setvideoLengthFunc(state) {
+    setvideoLength(state);
   }
   return (
     <div className="media-container absolute bottom-2 left-2 z-10 w-[80%]">
@@ -60,15 +61,6 @@ const MediaInput = ({
         <img src={URL.createObjectURL(picVidmedia)} alt="Downscaled media" />
       ) : (
         <>
-          {blurredPicVidmedia && (
-            <img
-              src={URL.createObjectURL(blurredPicVidmedia)}
-              alt=""
-              width={300}
-              height={300}
-              className="fixed top-[150px]  z-[99]"
-            />
-          )}
           {/* dont want to render this comp below because i only need the thumbnail */}
           <VideoThumbnail
             videoUrl={URL.createObjectURL(picVidmedia)}
@@ -78,7 +70,10 @@ const MediaInput = ({
             height={null}
             renderThumbnail={false}
           />
-          <VideoPlayer src={URL.createObjectURL(picVidmedia)} />
+          <VideoPlayer
+            src={URL.createObjectURL(picVidmedia)}
+            setvideoLengthFunc={setvideoLengthFunc}
+          />
         </>
       )}
 
@@ -103,7 +98,8 @@ const MediaInput = ({
               mediaCaption,
               User,
               time,
-              setChatsFunc
+              setChatsFunc,
+              videoLength
             ).then(() => {
               setpicVidmediaToNull(null);
             });

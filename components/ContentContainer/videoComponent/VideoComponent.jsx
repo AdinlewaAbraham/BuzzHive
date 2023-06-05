@@ -7,6 +7,11 @@ import MediaPlayer from "./MediaPlayer";
 import { openDB } from "idb";
 import { BsFillImageFill } from "react-icons/bs";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
+import DownloadCircularAnimation from "../DownloadCircularAnimation";
+import UploadCircularAnimation from "../UploadCircularAnimation";
+import { FiDownload } from "react-icons/fi";
+import { BsCameraVideo } from "react-icons/bs";
+import { formatDuration } from "@/utils/actualUtils/formatDuration";
 
 const VideoComponent = ({
   blurredSRC,
@@ -17,6 +22,8 @@ const VideoComponent = ({
 }) => {
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
+
+  console.log(dataObject);
 
   const [blurredImgSRC, setblurredImgSRC] = useState(blurredSRC);
   const [videoSrc, setVideoSrc] = useState(null);
@@ -88,9 +95,7 @@ const VideoComponent = ({
     request.addEventListener("progress", (event) => {
       if (event.lengthComputable) {
         const percentComplete = Math.round((event.loaded / event.total) * 100);
-        if (percentComplete === 100) {
-          setisDownloading(true);
-        }
+
         setDownloadProgress(percentComplete);
       }
     });
@@ -107,6 +112,7 @@ const VideoComponent = ({
         const store = tx.objectStore("videos");
         await store.put(blob, `video-${messageId}`);
         await tx.done;
+        setisDownloading(false);
       } else {
         console.error(`Failed to download video (${request.status})`);
       }
@@ -139,7 +145,7 @@ const VideoComponent = ({
         />
       )}
 
-      <div className="relative flex items-center justify-center">
+      <div className=" flex items-center justify-center">
         <div
           className="relative z-[2] flex items-center justify-center"
           onClick={() => {
@@ -157,30 +163,62 @@ const VideoComponent = ({
               {imageError ? (
                 <BsFillImageFill size={250} />
               ) : (
-                <img
-                  src={blurredImgSRC}
-                  width={300}
-                  onError={() => setImageError(true)}
-                />
-              )}
-              <div className="absolute text-blue-500">
-                {isDownloaded ? (
-                  <BsFillPlayBtnFill size={30} />
-                ) : (
-                  <div>
-                    {" "}
-                    {isDownloading && (
-                      <div className="text-red-500">{DownloadProgress}</div>
-                    )}{" "}
-                    download
-                  </div>
-                )}
-              </div>
-              {!isDownloaded && (
-                <div className="absolute bottom-0 left-2 flex text-black">
-                  <HiDownload size={30} /> {dataObject.size.toFixed(2)} MB
+                <div className={`relative `}>
+                  {!isDownloaded && (
+                    <div className="absolute inset-0 backdrop-blur-sm"></div>
+                  )}
+                  <img
+                    src={blurredImgSRC}
+                    width={300}
+                    onError={() => setImageError(true)}
+                  />
                 </div>
               )}
+              <div className="absolute text-blue-500">
+                {isDownloaded
+                  ? !isDownloading &&
+                    dataObject.status !== "uploading" && (
+                      <BsFillPlayBtnFill size={30} />
+                    )
+                  : !isDownloading && <FiDownload color="black" size={30} />}
+              </div>
+
+              {isDownloading && (
+                <div className=" absolute ">
+                  <DownloadCircularAnimation progress={DownloadProgress} />
+                </div>
+              )}
+              {dataObject.status === "uploading" && (
+                <div className=" absolute ">
+                  <UploadCircularAnimation progress={dataObject.progress} />
+                </div>
+              )}
+              {!isDownloaded && (
+                <div className="absolute bottom-0 left-2 flex text-black ">
+                  {isDownloading ? (
+                    <div>
+                      <div className="flex items-center">
+                        <BsCameraVideo />
+                        {dataObject.length && <>{dataObject.length}</>}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <FiDownload />
+                      {(dataObject.size / (1024 * 1024)).toFixed(2)}MB
+                    </div>
+                  )}
+                </div>
+              )}
+              {dataObject.status === "uploading" ||
+                (isDownloaded && (
+                  <div className="absolute  bottom-0 left-2 flex items-center">
+                    <BsCameraVideo />
+                    {dataObject.length && (
+                      <>{formatDuration(dataObject.length, true)}</>
+                    )}
+                  </div>
+                ))}
             </>
           )}
         </div>

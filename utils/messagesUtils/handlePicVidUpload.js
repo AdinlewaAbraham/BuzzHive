@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 import { sendMessage } from "./sendMessage";
 import { sendGroupMessage } from "../groupUtils/sendGroupMessage";
 import { openDB } from "idb";
-import { URL } from "next/dist/compiled/@edge-runtime/primitives/url";
 export const handlePicVidUpload = async (
   downscaledBlob,
   blurredPixelatedBlob,
@@ -12,7 +11,7 @@ export const handlePicVidUpload = async (
   mediaCaption,
   User,
   time,
-  setChatsFunc
+  setChatsFunc, videoLength
 ) => {
   if (!downscaledBlob) return;
   console.log(downscaledBlob);
@@ -180,6 +179,7 @@ export const handlePicVidUpload = async (
             name: downscaledBlob.name,
             size: downscaledBlob.size,
             type: downscaledBlob.type,
+            length: isImage ? null : videoLength,
           };
           ChatObject.activeChatType == "group"
             ? sendGroupMessage(

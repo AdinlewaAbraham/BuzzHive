@@ -1,46 +1,74 @@
 import React, { useContext, useState } from "react";
-import {
-  AiOutlineFilePdf,
-  AiOutlineFileWord,
-  AiOutlineFileExcel,
-  AiOutlineFileText,
-  AiOutlineSend,
-  AiOutlineFile,
-} from "react-icons/ai";
+
 import { BsEmojiSmile } from "react-icons/bs";
 import { handleFileUpload } from "@/utils/messagesUtils/handleFileUpload";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { UserContext } from "../App";
+import { AiOutlineSend } from "react-icons/ai";
+import { FaFilePdf, FaFileWord, FaFileExcel, FaFileAlt, FaPaperPlane, FaFileAudio, FaFileCsv, FaFileArchive, FaFilePowerpoint, FaFileCode, FaFileImage, FaFileVideo } from "react-icons/fa";
 
 export const RenderFileType = ({ type, size }) => {
   let fileType;
 
   switch (type) {
     case "application/pdf":
-      fileType = <AiOutlineFilePdf size={size} />;
+      fileType = <FaFilePdf size={size} />;
       break;
 
     case "application/msword":
     case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-      fileType = <AiOutlineFileWord size={size} />;
+      fileType = <FaFileWord size={size} />;
       break;
 
     case "application/vnd.ms-excel":
     case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-      fileType = <AiOutlineFileExcel size={size} />;
+      fileType = <FaFileExcel size={size} />;
       break;
 
     case "text/plain":
-      fileType = <AiOutlineFileText size={size} />;
+      fileType = <FaFileAlt size={size} />;
+      break;
+
+    case "audio/mpeg":
+    case "audio/mp3":
+      fileType = <FaFileAudio size={size} />;
+      break;
+
+    case "text/csv":
+      fileType = <FaFileCsv size={size} />;
+      break;
+
+    case "application/zip":
+      fileType = <FaFileArchive size={size} />;
+      break;
+
+    case "application/vnd.ms-powerpoint":
+    case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      fileType = <FaFilePowerpoint size={size} />;
+      break;
+
+    case "image/jpeg":
+    case "image/png":
+      fileType = <FaFileImage size={size} />;
+      break;
+
+    case "video/mp4":
+    case "video/mpeg":
+      fileType = <FaFileVideo size={size} />;
       break;
 
     default:
-      fileType = <AiOutlineFile size={size} />;
+      if (type.startsWith("text/") || type.startsWith("application/") || type.endsWith("+xml")) {
+        fileType = <FaFileCode size={size} />;
+      } else {
+        fileType = <FaFileAlt size={size} />;
+      }
       break;
   }
 
   return fileType;
 };
+
 
 const FileInput = ({ file, setfile }) => {
   const { User } = useContext(UserContext);
