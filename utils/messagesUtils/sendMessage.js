@@ -12,14 +12,14 @@ export async function sendMessage(
   type,
   time,
   replyObj,
-  fileObj
+  fileObj, createdId
 ) {
   const customId = uuidv4();
 
   console.log(customId);
   const message = {
     type: type,
-    id: customId,
+    id: createdId || customId,
     text: messageText,
     senderId: senderId,
     senderDisplayName: senderDisplayName,

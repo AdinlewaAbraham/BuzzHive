@@ -11,13 +11,13 @@ export const sendGroupMessage = async (
   type,
   time,
   replyObj,
-  dataObj
+  dataObj, createdId
 ) => {
   const groupRef = doc(db, "groups", groupID);
   const customId = uuidv4();
   const message = {
     type: type,
-    id: customId,
+    id: createdId || customId,
     text: messageText,
     timestamp: time,
     senderId: senderId,

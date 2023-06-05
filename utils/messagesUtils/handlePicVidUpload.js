@@ -3,6 +3,7 @@ import { storage } from "../firebaseUtils/firebase";
 import { v4 as uuidv4 } from "uuid";
 import { sendMessage } from "./sendMessage";
 import { sendGroupMessage } from "../groupUtils/sendGroupMessage";
+import { openDB } from "idb";
 import { URL } from "next/dist/compiled/@edge-runtime/primitives/url";
 export const handlePicVidUpload = async (
   downscaledBlob,
@@ -16,7 +17,6 @@ export const handlePicVidUpload = async (
   if (!downscaledBlob) return;
   console.log(downscaledBlob);
   const id = uuidv4();
-  const propId = `trackingId${id}`;
   const isImage = downscaledBlob.type.includes("image");
   const storageRef = ref(
     storage,
@@ -25,6 +25,27 @@ export const handlePicVidUpload = async (
     }/${id}`
   );
   let blurredPixelatedBlobDownloadURL;
+  async function initializeImageDB() {
+    const db = await openDB("myImagesDatabase", 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains("images")) {
+          db.createObjectStore("images");
+        }
+      },
+    });
+    return db;
+  }
+  async function initializeVideoDB() {
+    const db = await openDB("myvideosDatabase", 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains("videos")) {
+          db.createObjectStore("videos");
+        }
+      },
+    });
+    return db;
+  }
+
   if (blurredPixelatedBlob) {
     console.log(blurredPixelatedBlob);
     const blurredPixelatedRef = ref(
@@ -38,6 +59,20 @@ export const handlePicVidUpload = async (
         blurredPixelatedRef,
         blurredPixelatedBlob
       );
+      // save to db
+      if (isImage) {
+        const db = await initializeImageDB();
+        const tx = db.transaction("images", "readwrite");
+        const store = tx.objectStore("images");
+        await store.put(blurredPixelatedBlob, `blurredImage-${id}`);
+        await tx.done;
+      } else {
+        const db = await initializeVideoDB();
+        const tx = db.transaction("videos", "readwrite");
+        const store = tx.objectStore("videos");
+        await store.put(blurredPixelatedBlob, `Thumbnail-${id}`);
+        await tx.done;
+      }
       blurredPixelatedUploadTask.then(() => {
         getDownloadURL(blurredPixelatedRef).then(
           (blurredPixelatedDownloadURL) => {
@@ -56,6 +91,20 @@ export const handlePicVidUpload = async (
     }
   }
   try {
+    // save to db
+    if (isImage) {
+      const db = await initializeImageDB();
+      const tx = db.transaction("images", "readwrite");
+      const store = tx.objectStore("images");
+      await store.put(downscaledBlob, `image-${id}`);
+      await tx.done;
+    } else {
+      const db = await initializeVideoDB();
+      const tx = db.transaction("videos", "readwrite");
+      const store = tx.objectStore("videos");
+      await store.put(downscaledBlob, `video-${id}`);
+      await tx.done;
+    }
     const uploadTask = uploadBytesResumable(storageRef, downscaledBlob);
     //const thumbnail = blurredPixelatedBlob
     const dataObj = {
@@ -69,7 +118,7 @@ export const handlePicVidUpload = async (
     console.log(blurredPixelatedBlob);
     const message = {
       type: isImage ? "image" : "video",
-      id: propId,
+      id: id,
       reactions: [],
       senderId: User.id,
       text: mediaCaption || "",
@@ -78,6 +127,7 @@ export const handlePicVidUpload = async (
       status: "pending",
     };
     const Chats = JSON.parse(localStorage.getItem(ChatObject.activeChatId));
+
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -89,7 +139,7 @@ export const handlePicVidUpload = async (
           sessionStorage.getItem("activeChatId")
         );
         if (ChatObject.activeChatId === newAcctiveChatId) {
-          const messageIndex = Chats.findIndex((chat) => chat.id === propId);
+          const messageIndex = Chats.findIndex((chat) => chat.id === id);
           if (messageIndex === -1) {
             setChatsFunc([
               ...Chats,
@@ -140,17 +190,20 @@ export const handlePicVidUpload = async (
                 isImage ? "image" : "video",
                 time,
                 null,
-                picORvideoObj
+                picORvideoObj,
+                id
               )
             : sendMessage(
                 User.id,
-                ChatObject.activeChatId,
+                ChatObject.otherUserId,
                 mediaCaption,
+                User.id,
                 User.name,
                 isImage ? "image" : "video",
                 time,
                 null,
-                picORvideoObj
+                picORvideoObj,
+                id
               );
           console.log("File available at", downloadURL);
         });

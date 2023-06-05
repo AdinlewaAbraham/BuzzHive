@@ -117,6 +117,7 @@ const MessageCard = ({ chat }) => {
                     blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
                     downloadSRC={chat.dataObject.downloadURL}
                     messageId={chat.id}
+                    chat={chat}
                   />
                 ) : (
                   <VideoComponent

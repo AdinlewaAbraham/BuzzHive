@@ -1,109 +1,144 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FiDownload } from "react-icons/fi";
-import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { useContext } from "react";
 import { UserContext } from "../../App";
+import { openDB } from "idb";
+import DownloadCircularAnimation from "../DownloadCircularAnimation";
+import UploadCircularAnimation from "../UploadCircularAnimation";
 
-const ImageComponent = ({ blurredSRC, downloadSRC, messageId }) => {
+const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
   const { User } = useContext(UserContext);
-  const { ChatObject } = useContext(SelectedChannelContext);
-  messageId;
-  const [imageSrc, setImageSrc] = useState(blurredSRC);
   const [downloadProgress, setDownloadProgress] = useState(null);
   const [isDownloaded, setisDownloaded] = useState(false);
+  const [isDownloading, setisDownloading] = useState(false);
   const [loadingImg, setloadingImg] = useState(true);
 
-  function dataURItoBlob(dataURI) {
-    dataURI;
-    const byteString = atob(dataURI.split(",")[1]);
-    const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], { type: mimeString });
-  }
+  const [imageBlob, setimageBlob] = useState();
+  const [blurredImageBlob, setblurredImageBlob] = useState();
 
-  useEffect(() => {
+  async function initializeDB() {
+    const db = await openDB("myImagesDatabase", 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains("images")) {
+          db.createObjectStore("images");
+        }
+      },
+    });
+    return db;
+  }
+  const getImgFromIndexedDB = async (key) => {
+    const db = await initializeDB();
+    const tx = db.transaction("images", "readonly");
+    const store = tx.objectStore("images");
+    const value = await store.get(key);
+    await tx.done;
+    return value;
+  };
+
+  const getStoredFiles = async () => {
     setloadingImg(true);
-    const imageFromStorage = localStorage.getItem(downloadSRC);
-    if (imageFromStorage) {
-      const blob = dataURItoBlob(imageFromStorage);
-      const url = URL.createObjectURL(blob);
-      setImageSrc(url);
+    const imageBlob = await getImgFromIndexedDB(`image-${chat.id}`);
+    const blurredImageBlob = await getImgFromIndexedDB(
+      `blurredImage-${chat.id}`
+    );
+    if (imageBlob) {
+      setimageBlob(imageBlob);
       setisDownloaded(true);
-      setloadingImg(false);
+    } else if (User.autoDownloadSettings.file) {
+      downloadImage(downloadSRC, "image");
     }
+    if (blurredImageBlob) {
+      setblurredImageBlob(blurredImageBlob);
+    } else {
+      downloadImage(blurredSRC, "blurredImage");
+    }
+  };
+  useEffect(() => {
+    getStoredFiles();
   }, [downloadSRC]);
 
-  const handleDownload = async () => {
-    const messages = JSON.parse(localStorage.getItem(ChatObject.activeChatId));
+  const downloadImage = async (Url, type) => {
+    if (!Url) return;
+    console.log(Url)
+    console.log(type)
+    setisDownloading(true);
     try {
       const response = await axios({
-        url: downloadSRC,
+        url: Url,
         method: "GET",
         responseType: "blob",
         onDownloadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
-          const messageIndex = messages.findIndex(
-            (message) => message.id === messageId
-          );
           setDownloadProgress((loaded / total) * 100);
         },
       });
 
       const blob = response.data;
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = () => {
-        const base64data = reader.result;
-        localStorage.setItem(downloadSRC, base64data);
-        setisDownloaded(true);
-        setImageSrc(base64data);
-        setloadingImg(false);
-      };
+
+      if (type === "blurredImage") {
+        setblurredImageBlob(blob);
+      } else {
+        setimageBlob(blob);
+      }
+
+      setloadingImg(false);
+      setisDownloaded(true);
+      const db = await initializeDB();
+      const tx = db.transaction("images", "readwrite");
+      const store = tx.objectStore("images");
+      await store.put(blob, `${type}-${chat.id}`);
+      await tx.done;
     } catch (error) {
       console.error(error);
+      throw error;
     }
   };
-
-  useEffect(() => {
-    if (User.autoDownloadSettings.picture) {
-      ("i ran");
-      handleDownload();
-    }
-  }, []);
-
   return (
     <div className="relative">
       <div className="">
-        {loadingImg ? (
-          <img src={blurredSRC} className=" object-cover" width={300} />
+        {loadingImg && !imageBlob ? (
+          <>
+            {!blurredImageBlob ? (
+              <>loadingImg</>
+            ) : (
+              <img
+                src={URL.createObjectURL(blurredImageBlob)}
+                className=" object-cover"
+                width={300}
+              />
+            )}
+          </>
         ) : (
           <img
-            src={imageSrc}
+            src={URL.createObjectURL(imageBlob)}
             alt="Preview"
             className=" object-cover"
             width={300}
           />
         )}
       </div>
-      <div className="absolute top-[50%] left-[50%] flex items-center justify-center ">
-        {downloadProgress}
-        {isDownloaded}
-        {downloadProgress !== 100 &&
-          !isDownloaded &&
-          downloadProgress !== 0 && (
-            <div>
-              <button onClick={handleDownload}>
-                <FiDownload color="black" size={20} />
-              </button>
-              {downloadProgress && downloadProgress.toFixed(2) + "%"}
-            </div>
+      {chat.dataObject.status === "uploading" && !loadingImg ? (
+        <div>
+          <UploadCircularAnimation progress={chat.dataObject.progress} />
+        </div>
+      ) : (
+        <>
+          {!isDownloaded && (
+            <>
+              {isDownloading ? (
+                <div>
+                  <DownloadCircularAnimation progress={downloadProgress} />
+                </div>
+              ) : (
+                <button onClick={() => downloadImage(downloadSRC, "image")}>
+                  <FiDownload color="black" size={30} />
+                </button>
+              )}
+            </>
           )}
-      </div>
+        </>
+      )}
     </div>
   );
 };

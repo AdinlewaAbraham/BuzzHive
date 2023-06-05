@@ -15,7 +15,6 @@ const FileComponent = ({ chat }) => {
   const [fileBlob, setfileBlob] = useState();
   const { User } = useContext(UserContext);
 
-  console.log(chat);
 
   async function initializeDB() {
     const db = await openDB("myFilesDatabase", 1, {
@@ -108,8 +107,7 @@ const FileComponent = ({ chat }) => {
 
         window.open(fileURL, "_blank");
       } else {
-          downloadFile();
-        
+        downloadFile();
       }
     };
 
@@ -143,7 +141,7 @@ const FileComponent = ({ chat }) => {
   console.log(baseName);
   return (
     <div
-      className={`flex truncate cursor-pointer items-center ${
+      className={`flex cursor-pointer items-center truncate ${
         chat.text && "mb-2"
       }`}
       onClick={handleOuterDivClick}
@@ -171,10 +169,9 @@ const FileComponent = ({ chat }) => {
           <i>
             <BsDot size={20} />
           </i>
-          <p className="uppercase">{extName}{" "}File</p>
+          <p className="uppercase">{extName} File</p>
         </p>
       </div>
-      
     </div>
   );
 };

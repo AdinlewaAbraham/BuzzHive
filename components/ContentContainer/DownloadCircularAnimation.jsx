@@ -3,6 +3,7 @@ import { HiOutlineDownload } from "react-icons/hi";
 import { CircularProgress } from "@mui/joy";
 
 const DownloadCircularAnimation = ({ progress, size }) => {
+  console.log(progress)
   return (
     <CircularProgress
       size="lg"
