@@ -54,7 +54,7 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
   return (
     <div className="relative flex items-center justify-center md:w-[5%] md:min-w-[70px] md:max-w-[70px] ">
       <span
-        className={` delay-600 duration-300 ease-out ${
+        className={`duration-150 ease-out ${
           selectedChannel === clickevent
             ? ` opacity-1  right-[25%] md:bottom-[25%] ${
                 channels[prevSelectedChannel] > channels[clickevent] &&

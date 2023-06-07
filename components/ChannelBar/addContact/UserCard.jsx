@@ -26,7 +26,7 @@ const UserCard = ({ name, id, image, user }) => {
   return (
     <div
       key={user.id}
-      className="flex cursor-pointer items-center truncate rounded-lg px-4  py-3 hover:bg-hover-light dark:hover:bg-hover-dark "
+      className="flex cursor-pointer items-center truncate rounded-lg px-4  py-3 hover:bg-hover-light dark:hover:bg-hover-dark"
       onClick={() => {
         handleUserClick();
       }}
@@ -34,8 +34,10 @@ const UserCard = ({ name, id, image, user }) => {
       <div className="mr-4 h-[45px] w-[45px] rounded-full">
         <Img
           src={user.photoUrl}
-          styles="rounded-full"
+          styles="rounded-full bg-"
           imgStyles="rounded-full"
+          personalSize="60"
+          groupSize="60"
         />
       </div>
       <div>

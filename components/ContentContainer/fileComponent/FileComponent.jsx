@@ -15,7 +15,6 @@ const FileComponent = ({ chat }) => {
   const [fileBlob, setfileBlob] = useState();
   const { User } = useContext(UserContext);
 
-
   async function initializeDB() {
     const db = await openDB("myFilesDatabase", 1, {
       upgrade(db) {
@@ -98,40 +97,35 @@ const FileComponent = ({ chat }) => {
     getStoredFiles();
   }, []);
 
-  const handleOuterDivClick = () => {
-    const openFileOrDownload = async () => {
-      if (isDownloaded) {
-        console.log(fileBlob);
-        const fileURL = URL.createObjectURL(fileBlob);
-        console.log(fileURL);
-
-        window.open(fileURL, "_blank");
-      } else {
-        downloadFile();
-      }
-    };
-
-    openFileOrDownload();
+  const openFile = () => {
+    const fileURL = URL.createObjectURL(fileBlob);
+    console.log(fileBlob);
+    console.log(chat);
+    window.open(fileURL, "_blank");
   };
-  const saveFileToComputer = async (fileBlob) => {
+  const saveFileToComputer = async () => {
     try {
-      // Request access to the user's file system
-      const handle = await window.showSaveFilePicker();
+      const options = {
+        suggestedName: chat.dataObject.name,
+      };
 
-      // Create a writable stream to the selected file
+      const handle = await window.showSaveFilePicker(options);
+
+      // Get the chosen file extension
+      const extension = handle.name.split(".").pop();
+
       const writableStream = await handle.createWritable();
 
-      // Write the file data from the Blob to the stream
       await writableStream.write(fileBlob);
 
-      // Close the stream to complete the file save
       await writableStream.close();
 
-      console.log("File saved successfully");
+      console.log("File saved successfully!");
     } catch (error) {
       console.error("Error saving file:", error);
     }
   };
+
   const getFileExtension = (fileName) => {
     const parts = fileName.split(".");
     return { baseName: parts[0], extName: parts[parts.length - 1] };
@@ -139,36 +133,79 @@ const FileComponent = ({ chat }) => {
   const { baseName, extName } = getFileExtension(chat.dataObject.name);
   return (
     <div
-      className={`flex cursor-pointer items-center truncate ${
+      className={`truncate rounded-sm bg-blue-400 p-2 ${
         chat.text !== "" && "mb-2"
       }`}
-      onClick={handleOuterDivClick}
     >
-      <div className="mr-1 flex items-center justify-center rounded-full p-3 text-[40px] h-[50px] text-white">
-        {chat.dataObject.status === "uploading" || chat.status === "pending" ? (
-          <UploadCircularAnimation progress={chat.dataObject.progress} size={"md"} />
-        ) : isDownloaded ? (
-          <i onclick={() => {}}>
-            <RenderFileType type={chat.dataObject.type}/>
-          </i>
-        ) : isDownloading ? (
-          <DownloadCircularAnimation progress={downloadProgress} size={"md"} />
+      <div className="mb-4 flex">
+        <div className="mr-2 flex h-[50px] items-center justify-center rounded-full text-[40px] text-white">
+          {chat.dataObject.status === "uploading" ||
+          chat.status === "pending" ? (
+            <UploadCircularAnimation
+              progress={chat.dataObject.progress}
+              size={"md"}
+            />
+          ) : isDownloaded ? (
+            <i onclick={() => {}}>
+              <RenderFileType type={chat.dataObject.type} />
+            </i>
+          ) : isDownloading ? (
+            <DownloadCircularAnimation
+              progress={downloadProgress}
+              size={"md"}
+            />
+          ) : (
+            <div onClick={() => downloadFile()}>
+              <RenderFileType type={chat.dataObject.type} />
+            </div>
+          )}
+        </div>
+        <div className="truncate text-start">
+          <p className="overflow-hidden truncate whitespace-nowrap ">
+            {baseName}
+          </p>
+          <p className=" flex items-center text-[13px] text-[#0c1424]">
+            {(chat.dataObject.size / (1024 * 1024)).toFixed(2)}MB
+            <i>
+              <BsDot size={20} />
+            </i>
+            <p className="uppercase">{extName} File</p>
+          </p>
+        </div>
+      </div>
+      <div
+        className={`[&>div>button]:w [&>div>button]:w-full [&>div>button]:rounded-sm
+       [&>div>button]:bg-blue-300 ${
+         (isDownloading || chat.dataObject.status === "uploading") &&
+         "[&>div>button]:hover:cursor-not-allowed"
+       }`}
+      >
+        {isDownloaded ? (
+          <div className="flex w-full">
+            <button
+              className="mr-1"
+              onClick={openFile}
+              disabled={isDownloading || chat.dataObject.status === "uploading"}
+            >
+              Open
+            </button>
+            <button
+              onClick={saveFileToComputer}
+              disabled={isDownloading || chat.dataObject.status === "uploading"}
+            >
+              Save as...
+            </button>
+          </div>
         ) : (
-          <div onClick={() => downloadFile()}>
-            <FaFileDownload size={40} />
+          <div>
+            <button
+              onClick={downloadFile}
+              disabled={isDownloading || chat.dataObject.status === "uploading"}
+            >
+              Download
+            </button>
           </div>
         )}
-        
-      </div>
-      <div className="text-start">
-        <p className="whitespace-nowrap">{baseName}</p>
-        <p className=" flex items-center text-[13px] text-[#0c1424]">
-          {(chat.dataObject.size / (1024 * 1024)).toFixed(2)}MB
-          <i>
-            <BsDot size={20} />
-          </i>
-          <p className="uppercase">{extName} File</p>
-        </p>
       </div>
     </div>
   );

@@ -60,6 +60,16 @@ const MessageCard = ({ chat }) => {
     setshowMessageMenu(false);
   };
 
+  if (chat.type === "announcement") {
+    return (
+      <div className="flex items-center justify-center truncate">
+        <p className="my-2 max-w-[50%] rounded-md dark:bg-black bg-white  p-3 text-center text-[13px] truncate">
+          {chat.text}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`my-2 flex items-center justify-start ${
@@ -128,7 +138,8 @@ const MessageCard = ({ chat }) => {
             className={`flex justify-end ${
               (chat.type === "pic/video" ||
                 chat.type === "image" ||
-                chat.type === "video") && !chat.text &&
+                chat.type === "video") &&
+              !chat.text &&
               "absolute bottom-3 right-4 z-30"
             }`}
           >
