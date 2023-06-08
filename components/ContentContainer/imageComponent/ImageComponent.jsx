@@ -11,7 +11,7 @@ import { Skeleton } from "@mui/material";
 
 const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
   const { User } = useContext(UserContext);
-  const {deleteMediaTrigger} = useContext(SelectedChannelContext)
+  const { deleteMediaTrigger } = useContext(SelectedChannelContext);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isDownloaded, setisDownloaded] = useState(false);
   const [isDownloading, setisDownloading] = useState(false);
@@ -42,11 +42,11 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
     const imageBlob = await getImgFromIndexedDB(`image-${chat.id}`);
     if (imageBlob) {
       setisDownloaded(true);
-      console.log(true)
+      console.log(true);
     } else {
       setisDownloaded(false);
       setimageBlob(null);
-      setisDownloading(false)
+      setisDownloading(false);
     }
   };
 
@@ -78,15 +78,14 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
     validateImage();
   }, [deleteMediaTrigger, User]);
 
-  const downloadImage = async (Url, type) => {
-    if (!Url) return;
-    console.log(Url);
+  const downloadImage = async (url, type) => {
+    if (!url) return;
+    console.log(url);
     console.log(type);
     setisDownloading(true);
     try {
-      const response = await axios({
-        url: Url,
-        method: "GET",
+      const response = await axios.get("/api/downloadImage", {
+        params: { url },
         responseType: "blob",
         onDownloadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
@@ -122,7 +121,12 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
         {!imageBlob || chat.dataObject.status === "uploading" ? (
           <>
             {!blurredImageBlob ? (
-              <Skeleton animation="wave"  variant="rectangular" width={285} height={240} />
+              <Skeleton
+                animation="wave"
+                variant="rectangular"
+                width={285}
+                height={240}
+              />
             ) : (
               <img
                 src={URL.createObjectURL(blurredImageBlob)}
