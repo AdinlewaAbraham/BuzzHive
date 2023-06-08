@@ -10,63 +10,44 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CircularProgress } from "@mui/joy";
 import { openDB } from "idb";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
+import { BsCheckAll, BsChevronDown } from "react-icons/bs";
+import { TbLogout } from "react-icons/tb";
+import { getAuth, signOut } from "firebase/auth";
+import { TbFileShredder } from "react-icons/tb";
+import { TbVideoOff } from "react-icons/tb";
+import Image from "next/image";
+import { MdOutlineImageNotSupported } from "react-icons/md";
 
-const DeleteOption = ({ option }) => {
-  const [loading, setloading] = useState(false);
-  const [complete, setcomplete] = useState(false);
-
-  const {setdeleteMediaTrigger} = useContext(SelectedChannelContext)
-  async function handleDelete(option) {
-    setloading(true);
-    const optionsDatabaseLocation = {
-      files: "myFilesDatabase",
-      videos: "myvideosDatabase",
-      photos: "myImagesDatabase",
-    };
-    const optionsContainsLocation = {
-      files: "files",
-      videos: "videos",
-      photos: "images",
-    };
-    const db = await openDB(optionsDatabaseLocation[option], 1, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains(optionsContainsLocation[option])) {
-          db.createObjectStore(optionsContainsLocation[option]);
-        }
-      },
-    });
-
-    const transaction = db.transaction(
-      optionsContainsLocation[option],
-      "readwrite"
-    );
-    const store = transaction.objectStore(optionsContainsLocation[option]);
-    store.clear();
-    setloading(false);
-    setcomplete(true);
-    setdeleteMediaTrigger((prev)=>!prev)
-    setTimeout(() => {
-      setcomplete(false);
-      setdeleteMediaTrigger((prev)=>!prev)
-    }, 1000);
-  }
+const DeleteOption = ({ option, onClickFunc, loading, complete }) => {
   return (
     <button
       onClick={() => {
-        handleDelete(option);
+        onClickFunc();
       }}
-      key={option}
-      className="flex items-center"
+      key={option.text}
+      className={` my-1 flex max-w-[max-content] items-center
+      rounded-lg bg-light-secondary p-2
+        text-red-400 transition-all duration-500
+          dark:bg-dark-secondary`}
     >
-      Delete all {option}{" "}
-      {loading && <CircularProgress size="sm" variant="plain" />}{" "}
-      {complete && (
-        <svg
+      <i className="mr-1 flex items-center text-[20px]">{option.icon}</i>
+      Delete all {option.text}
+      {loading === option.text && (
+        <i className="ml-1 flex items-center justify-center">
+          <CircularProgress size="sm" variant="plain" />
+        </i>
+      )}
+      {complete === option.text && (
+        <motion.svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
           height="24"
           viewBox="0 0 24 24"
-          style={{ marginRight: "8px", strokeWidth: "2px" }}
+          style={{ marginLeft: "4px", strokeWidth: "1px" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
         >
           <motion.path
             fill="none"
@@ -77,16 +58,110 @@ const DeleteOption = ({ option }) => {
             animate={{ pathLength: 1, opacity: 1 }}
             transition={{ duration: 0.15 }}
           />
-        </svg>
+        </motion.svg>
       )}
     </button>
   );
 };
 
+const SelectMenu = ({ optionsArr, selectedMenuText, onClickFunc }) => {
+  const [showMenuOptions, setshowMenuOptions] = useState(false);
+  const selectedMenu = optionsArr.find(
+    (option) => option.text == selectedMenuText
+  );
+  return (
+    <div className="relative">
+      <div
+        className="flex w-[50%] cursor-pointer
+       items-center
+       justify-between rounded-lg
+        bg-light-secondary p-2 dark:bg-dark-secondary"
+        onClick={() => setshowMenuOptions(!showMenuOptions)}
+      >
+        <div className="flex items-center">
+          <i className="mr-2">{selectedMenu.icon}</i> {selectedMenu.text}{" "}
+        </div>
+        <i>
+          <BsChevronDown size={10} />
+        </i>
+      </div>
+      {showMenuOptions && (
+        <div
+          className="absolute top-0 left-0 flex w-[50%] flex-col
+        rounded-lg bg-light-secondary p-2 dark:bg-dark-secondary 
+        
+        "
+        >
+          {optionsArr
+            .sort((a, b) => {
+              if (a.text === selectedMenuText) return -1;
+              if (b.text === selectedMenuText) return 1;
+              return 0;
+            })
+            .map((option, index) => (
+              <div
+                onClick={() => {
+                  setshowMenuOptions(false);
+                  onClickFunc(option);
+                }}
+                className={`relative flex cursor-pointer items-center ${
+                  index !== optionsArr.length - 1 && "mb-1"
+                } p-2 px-2 ${
+                  index === 0 && "bg-hover-light dark:bg-hover-dark"
+                } rounded-lg hover:bg-hover-light hover:dark:bg-hover-dark `}
+              >
+                {index === 0 && (
+                  <span className=" absolute bottom-[25%] top-[25%] left-0 z-[1] w-1 rounded-sm bg-accent-blue"></span>
+                )}
+                <i className="mr-2">{option.icon}</i>
+                {option.text}
+              </div>
+            ))}
+        </div>
+      )}
+    </div>
+  );
+};
+const Modal = ({ modalObject, setshowModal }) => {
+  return (
+    <div className="Poll-input fixed inset-0 z-50 flex  items-center justify-center bg-gray-900 bg-opacity-50">
+      <div
+        className="w-[35%]
+       max-w-[500px] rounded-lg dark:bg-dark-secondary bg-light-secondary"
+      >
+        <div className="rounded-t-lg p-5 dark:bg-dark-primary bg-light-primary">
+          <h1 className="text-xl font-medium">{modalObject.header}</h1>
+          <p className="mt-1 text-sm">{modalObject.description}</p>
+        </div>
+        <div className="z-[99] flex rounded-lg p-5 [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
+          <button
+            className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
+            onClick={() => {
+              setshowModal(false);
+            }}
+          >
+            {modalObject.returnText}
+          </button>
+          <button
+            className="bg-blue-500 p-4"
+            onClick={() => {
+              setshowModal(false);
+              modalObject.disCardFunc();
+            }}
+          >
+            {modalObject.discardText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 const Settings = () => {
   const [Mounted, setMounted] = useState(false);
   const { systemTheme, theme, setTheme } = useTheme();
   const { User, setUser } = useContext(UserContext);
+  const [showModal, setshowModal] = useState(false);
+  const [modalObject, setmodalObject] = useState({});
   const { setChats, setChatObject, ChatObject } = useContext(
     SelectedChannelContext
   );
@@ -94,32 +169,6 @@ const Settings = () => {
     setMounted(true);
   }, []);
 
-  const renderThemeChanger = () => {
-    if (!Mounted) return null;
-    const currenTheme = theme === "system" ? systemTheme : theme;
-
-    if (currenTheme === "dark") {
-      return (
-        <i
-          onClick={() => {
-            setTheme("light");
-          }}
-        >
-          <BsSun size={50} />
-        </i>
-      );
-    } else {
-      return (
-        <i
-          onClick={() => {
-            setTheme("dark");
-          }}
-        >
-          <BsMoon color="black" size={50} />
-        </i>
-      );
-    }
-  };
   const handleOptionClick = (option) => {
     const userRef = doc(db, "users", User.id);
 
@@ -146,16 +195,147 @@ const Settings = () => {
       unsub();
     };
   }, []);
+
+  const [loading, setloading] = useState(false);
+  const [complete, setcomplete] = useState(false);
+  const { setdeleteMediaTrigger } = useContext(SelectedChannelContext);
+  async function handleDelete(option) {
+    setloading(option);
+    const optionsDatabaseLocation = {
+      files: "myFilesDatabase",
+      videos: "myvideosDatabase",
+      photos: "myImagesDatabase",
+    };
+    const optionsContainsLocation = {
+      files: "files",
+      videos: "videos",
+      photos: "images",
+    };
+    const db = await openDB(optionsDatabaseLocation[option], 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(optionsContainsLocation[option])) {
+          db.createObjectStore(optionsContainsLocation[option]);
+        }
+      },
+    });
+
+    const transaction = db.transaction(
+      optionsContainsLocation[option],
+      "readwrite"
+    );
+    const store = transaction.objectStore(optionsContainsLocation[option]);
+    store.clear();
+
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        setloading(false);
+        resolve();
+      }, 1000);
+    });
+    setcomplete(option);
+    setdeleteMediaTrigger((prev) => !prev);
+    setTimeout(() => {
+      setcomplete(false);
+      setdeleteMediaTrigger((prev) => !prev);
+    }, 1000);
+  }
   return (
     <div className=" h-screen">
+      {showModal && (
+        <Modal modalObject={modalObject} setshowModal={setshowModal} />
+      )}
       <Goback text={"Settings"} />
       <div className="scrollBar h-[calc(100vh-70px-66px)] overflow-scroll md:h-[calc(100vh-66px)]">
-        <div
-          className="[&>button]:text-danger flex flex-col [&>button]:my-1 
-        [&>button]:flex [&>button]:max-w-[max-content] [&>button]:rounded-lg
-         [&>button]:bg-light-secondary [&>button]:p-2 [&>button]:text-red-400 [&>button]:dark:bg-dark-secondary "
-        >
-          <h2 className="mb-4 text-xl font-medium">Storage</h2>
+        <div className="flex flex-col">
+          <h2 className="mb-4 text-xl font-medium">Account</h2>
+          <h3 className="mb-2">Privacy</h3>
+          <h5 className="text-muted-light dark:text-muted-dark">
+            Read receipts
+          </h5>
+          <div>
+            <SelectMenu
+              onClickFunc={(option) => {
+                const userRef = doc(db, "users", User.id);
+                updateDoc(userRef, {
+                  isReadReceiptsOn: option.text === "ON" ? true : false,
+                });
+              }}
+              optionsArr={[
+                { text: "OFF", icon: <BsCheckAll /> },
+                {
+                  text: "ON",
+                  icon: <BsCheckAll color="blue" />,
+                },
+              ]}
+              selectedMenuText={User.isReadReceiptsOn ? "ON" : "OFF"}
+            />
+          </div>
+          <h5 className="text-muted-light dark:text-muted-dark">Log out</h5>
+
+          <button
+            onClick={() => {
+              setmodalObject({
+                header: "Log out confirmation",
+                description: "Are you sure you want to log out?",
+                returnText: "No",
+                discardText: "Yes",
+                disCardFunc: () => {
+                  const auth = getAuth();
+                  signOut(auth)
+                    .then(() => {
+                      console.log("Sign-out successful.");
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                },
+              });
+              setshowModal(true);
+            }}
+            className="my-1 flex max-w-[max-content] items-center justify-center
+      rounded-lg bg-light-secondary p-2
+          dark:bg-dark-secondary"
+          >
+            <i className="mr-1 flex items-center">
+              {" "}
+              <TbLogout size="22" />
+            </i>
+            Log out
+          </button>
+        </div>
+        <div className="flex flex-col">
+          <h2 className="mb-4 mt-1 text-xl font-medium">Personalization</h2>
+          <h3 className="mb-2">Theme</h3>
+          <h5 className=" mb-1 text-muted-light dark:text-muted-dark">
+            App color theme
+          </h5>
+          <div>
+            <SelectMenu
+              onClickFunc={(option) => {
+                if (!Mounted) return null;
+                const userRef = doc(db, "users", User.id);
+                updateDoc(userRef, {
+                  darkMode: option.text === "Dark" ? true : false,
+                });
+                if (option.text === "Dark") {
+                  setTheme("dark");
+                } else {
+                  setTheme("light");
+                }
+              }}
+              optionsArr={[
+                { text: "Dark", icon: <BsMoon /> },
+                {
+                  text: "Light",
+                  icon: <BsSun />,
+                },
+              ]}
+              selectedMenuText={User.darkMode ? "Dark" : "Light"}
+            />
+          </div>
+        </div>
+        <div className=" flex flex-col ">
+          <h2 className="mb-4 mt-1 text-xl font-medium">Storage</h2>
           <h3 className="mb-2">Automatic downloads</h3>
           <p className="text-sm text-muted-light dark:text-muted-dark">
             Choose which media will be automatically downloaded from the
@@ -192,19 +372,42 @@ const Settings = () => {
               </div>
             ))}
           </div>
-          <h3 className="my-2">Delete downloads</h3>
+          <h3 className="my-2 p-1">Delete downloads</h3>
           <p className="text-sm text-muted-light dark:text-muted-dark">
             Free up space by deleting locally stored media files.
           </p>
-          {["files", "videos", "photos"].map((option) => (
-            <DeleteOption option={option} />
+          {[
+            { text: "files", icon: <TbFileShredder /> },
+            {
+              text: "videos",
+              icon: <TbVideoOff />,
+            },
+            {
+              text: "photos",
+              icon: <MdOutlineImageNotSupported />,
+            },
+          ].map((option) => (
+            <DeleteOption
+              option={option}
+              onClickFunc={() => {
+                setmodalObject({
+                  header: `Clear all your ${option.text}`,
+                  description: `All the locally saved ${option.text} will be cleared`,
+                  returnText: "Cancel",
+                  discardText: `Clear ${option.text}`,
+                  disCardFunc: () => {
+                    handleDelete(option.text);
+                  },
+                });
+                setshowModal(true);
+              }}
+              loading={loading}
+              complete={complete}
+            />
           ))}
         </div>
-
-        {renderThemeChanger()}
       </div>
     </div>
   );
 };
-
 export default Settings;

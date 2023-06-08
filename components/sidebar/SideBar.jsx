@@ -54,7 +54,7 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
   return (
     <div className="relative flex items-center justify-center md:mb-1 md:w-[5%] md:min-w-[70px] md:max-w-[70px]">
       <span
-        className={`duration-150 ease-out ${
+        className={`duration-150 ease-out rounded-sm  ${
           selectedChannel === clickevent
             ? ` opacity-1  right-[25%] md:bottom-[25%] ${
                 channels[prevSelectedChannel] > channels[clickevent] &&
@@ -97,32 +97,6 @@ const SideBar = () => {
     setMounted(true);
   }, []);
 
-  const renderThemeChanger = () => {
-    if (!Mounted) return null;
-    const currenTheme = theme === "system" ? systemTheme : theme;
-
-    if (currenTheme === "dark") {
-      return (
-        <i
-          onClick={() => {
-            setTheme("light");
-          }}
-        >
-          <SideBarIcon icon={<BsSun size={20} />} />
-        </i>
-      );
-    } else {
-      return (
-        <i
-          onClick={() => {
-            setTheme("dark");
-          }}
-        >
-          <SideBarIcon icon={<BsMoon color="black" size={20} />} />
-        </i>
-      );
-    }
-  };
 
   async function clearIndexedDB() {
     try {
@@ -161,14 +135,6 @@ const SideBar = () => {
       <i className="flex cursor-pointer md:mx-auto md:flex-col">
         <i
           onClick={() => {
-            const auth = getAuth();
-            signOut(auth)
-              .then(() => {
-                console.log("Sign-out successful.");
-              })
-              .catch((error) => {
-                console.log(error);
-              });
           }}
         >
           <SideBarIcon icon={<BiLogOut size="27" />} />
@@ -180,16 +146,7 @@ const SideBar = () => {
         >
           <SideBarIcon icon={<MdOutlineDelete size="27" />} />
         </i>
-        <i
-          onClick={() => {
-            clearIndexedDB();
-          }}
-        >
-          <SideBarIcon icon={<FcDeleteDatabase size="27" />} />
-        </i>
-        {/* {renderThemeChanger()} */}
       </i>
-      {renderThemeChanger()}
       <div className="flex items-center justify-center md:flex-col ">
         <SideBarIcon
           icon={<AiOutlineSetting size={22} />}

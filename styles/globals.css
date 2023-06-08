@@ -18,7 +18,7 @@
 
   .sidebar-tooltip {
     @apply absolute bottom-[55px] z-50 m-2 w-auto min-w-max origin-left scale-0
-    rounded-md bg-gray-900  p-2 text-xs
+    rounded-md bg-gray-900  p-2 text-xs opacity-0 md:opacity-100
     font-bold text-white 
     shadow-md transition-all delay-300 duration-100 dark:bg-black md:bottom-auto md:left-14;
   }

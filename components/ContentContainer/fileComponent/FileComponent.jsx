@@ -6,6 +6,7 @@ import DownloadCircularAnimation from "../DownloadCircularAnimation";
 import { FaFileDownload } from "react-icons/fa";
 import { openDB } from "idb";
 import { BsDot } from "react-icons/bs";
+import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
 const FileComponent = ({ chat }) => {
   const downloadSRC = chat.dataObject.downloadURL;
@@ -14,7 +15,7 @@ const FileComponent = ({ chat }) => {
   const [downloadProgress, setdownloadProgress] = useState(0);
   const [fileBlob, setfileBlob] = useState();
   const { User } = useContext(UserContext);
-
+  const { deleteMediaTrigger } = useContext(SelectedChannelContext);
   async function initializeDB() {
     const db = await openDB("myFilesDatabase", 1, {
       upgrade(db) {
@@ -94,10 +95,24 @@ const FileComponent = ({ chat }) => {
       setisDownloaded(false);
     }
   };
+  const validateImage = async () => {
+    const storedFile = await getFileFromIndexedDB(`file-${chat.id}`);
+    if (storedFile) {
+      setfileBlob(storedFile);
+      setisDownloaded(true);
+    } else {
+      setisDownloaded(false);
+      setfileBlob(null)
+    }
+  };
 
   useEffect(() => {
     getStoredFiles();
   }, [User]);
+
+  useEffect(() => {
+    validateImage();
+  }, [deleteMediaTrigger, User]);
 
   const openFile = () => {
     const fileURL = URL.createObjectURL(fileBlob);

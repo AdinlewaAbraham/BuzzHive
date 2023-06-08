@@ -192,7 +192,7 @@ const AddGroup = () => {
     setaddUsersLoading(true);
     const usersRef = collection(db, "users");
     const lastUser = users[users.length - 1];
-    if(!lastUser) return;
+    if (!lastUser) return;
     const q = query(
       usersRef,
       orderBy("name"),
@@ -242,6 +242,9 @@ const AddGroup = () => {
     }
     setSelectedChannel("chats");
   }
+  function cancelCreateGroup() {
+    setOpen(true);
+  }
   return (
     <div className="relative h-full min-h-[430px]">
       <ModalComp
@@ -260,7 +263,7 @@ const AddGroup = () => {
           <div
             ref={ref}
             className="scrollBar flex max-h-[116px] flex-wrap
-           items-center overflow-y-auto rounded-lg bg-light-secondary  py-1  "
+           items-center overflow-y-auto rounded-lg bg-light-secondary py-1  dark:bg-dark-secondary  "
           >
             {[...selectedUsers].map((user) => (
               <div
@@ -381,7 +384,7 @@ const AddGroup = () => {
               </p>
             </button>
             <button
-              onClick={goBack}
+              onClick={cancelCreateGroup}
               disabled={creatingGroupLoading}
               className={`w-1/2 rounded-lg bg-gray-500 py-2 ${
                 creatingGroupLoading && "cursor-wait"

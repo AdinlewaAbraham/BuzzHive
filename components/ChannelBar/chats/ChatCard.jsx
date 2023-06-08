@@ -79,7 +79,6 @@ const ChatCard = ({
     if (unReadCount == 0) {
       const data = JSON.parse(localStorage.getItem(id));
       if (data) {
-        data;
         const filteredData = data.filter((message) => {
           if (!message) return;
           return message.type !== "unread";
@@ -192,14 +191,15 @@ const ChatCard = ({
               console.log(id);
               console.log(ChatObject.activeChatId);
 
-              changeMessagesStatus(id, type, "seen")
-                .then(() => {
-                  console.log("changed to seen in line 193");
-                  setChats((prevMessages) => [...localstorageMessages]);
-                })
-                .catch((error) => {
-                  "Error updating message status:", error;
-                });
+              if (User.isReadReceiptsOn) {
+                changeMessagesStatus(id, type, "seen")
+                  .then(() => {
+                    setChats((prevMessages) => [...localstorageMessages]);
+                  })
+                  .catch((error) => {
+                    "Error updating message status:", error;
+                  });
+              }
             } else if (id !== ChatObject.activeChatId) {
               changeMessagesStatus(id, type, "received")
                 .then(() => {
@@ -267,9 +267,9 @@ const ChatCard = ({
     if (ChatObject.activeChatId === "") return;
 
     setChats(null);
-    changeMessagesStatus(ChatObject.activeChatId, type, "seen").then(() => {
-      console.log("changed to seen in line 267");
-    });
+    if (User.isReadReceiptsOn) {
+      changeMessagesStatus(ChatObject.activeChatId, type, "seen");
+    }
 
     if (
       localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&
@@ -325,7 +325,7 @@ const ChatCard = ({
       }}
     >
       <div className="flex w-full  flex-row items-center ">
-        <div className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500 ">
+        <div className="flex absolute h-[50px] w-[50px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500 ">
           {img && invalidURL ? (
             <img
               src={img}
@@ -339,7 +339,7 @@ const ChatCard = ({
             <FaUserAlt size={22} />
           )}
         </div>
-        <div className=" ml-3  w-[90%] truncate">
+        <div className=" ml-[62px]  w-[90%] truncate">
           <h3 className=" text-[17px] font-normal ">{name}</h3>
           <div className="flex flex-row text-sm text-muted-light dark:text-muted-dark">
             {isMessageSentByMe && (
