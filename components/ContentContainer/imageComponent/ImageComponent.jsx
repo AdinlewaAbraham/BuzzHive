@@ -76,16 +76,18 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
   }, [downloadSRC, User]);
   useEffect(() => {
     validateImage();
+    console.log('validateImage')
   }, [deleteMediaTrigger, User]);
 
-  const downloadImage = async (url, type) => {
-    if (!url) return;
-    console.log(url);
+  const downloadImage = async (Url, type) => {
+    if (!Url) return;
+    console.log(Url);
     console.log(type);
     setisDownloading(true);
     try {
-      const response = await axios.get("/api/downloadImage", {
-        params: { url },
+      const response = await axios({
+        url: Url,
+        method: "GET",
         responseType: "blob",
         onDownloadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;

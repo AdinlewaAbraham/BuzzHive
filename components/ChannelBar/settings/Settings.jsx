@@ -185,6 +185,7 @@ const Settings = () => {
     if (!User) {
       return;
     }
+    console.log('stop')
     const q = doc(db, "users", User.id);
     const unsub = onSnapshot(q, async (doc) => {
       if (!doc.data()) return;
@@ -195,7 +196,7 @@ const Settings = () => {
     return () => {
       unsub();
     };
-  }, [User, setUser]);
+  }, []);
 
   const [loading, setloading] = useState(false);
   const [complete, setcomplete] = useState(false);
