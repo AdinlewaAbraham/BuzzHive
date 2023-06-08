@@ -32,7 +32,7 @@ module.exports = {
           secondary: "#E0E0E0",
         },
         accent: {
-          blue: "#3B82F6"
+          blue: "#3B82F6",
         },
         muted: {
           light: "#212529bf",
@@ -43,8 +43,8 @@ module.exports = {
           dark: "#36393f",
         },
         scrollbar: {
-dark: "#666b7a",
-light: "#666b7a",
+          dark: "#666b7a",
+          light: "#666b7a",
         },
       },
     },

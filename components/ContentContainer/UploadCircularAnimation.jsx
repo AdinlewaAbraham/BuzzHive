@@ -12,7 +12,7 @@ const UploadCircularAnimation = ({ progress, size }) => {
       thickness={4}
     >
       <i className="text-muted-light dark:text-muted-dark">
-        <HiOutlineUpload size={size === "md" ? 20 : 30} />
+        <HiOutlineUpload size={size === "md" ? 20 : 30} color="black" />
       </i>
     </CircularProgress>
   );

@@ -12,7 +12,7 @@ const DownloadCircularAnimation = ({ progress, size }) => {
       thickness={4}
     >
       <i className="text-muted-light dark:text-muted-dark">
-        <HiOutlineDownload size={size === "md" ? 20 : 30} />
+        <HiOutlineDownload size={size === "md" ? 20 : 30} color="black" />
       </i>
     </CircularProgress>
   );

@@ -131,9 +131,8 @@ const Chats = () => {
         <>
           {sortedChats.length !== 0 ? (
             <div
-              className="my-element scrollbar-thumb-rounded-[2px] mt-6 flex h-[calc(100vh-195px)] flex-col items-center overflow-y-auto
-               overflow-x-hidden pt-[2px] pr-[2px] scrollbar-thin  scrollbar-track-[transparent] scrollbar-thumb-scrollbar-light
-            dark:scrollbar-thumb-scrollbar-dark md:h-[calc(100vh-125px)] "
+              className="scrollBar  mt-6 flex md:h-[calc(100vh-120px)] h-[calc(100vh-190px)] flex-col items-center overflow-y-auto
+               overflow-x-hidden pt-[2px] pr-[2px] "
             >
               {sortedChats.map((chat) => (
                 <ChatCard //this is soo stupid of me too late to change this

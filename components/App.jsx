@@ -45,16 +45,16 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    (User);
     if (!User) {
       return;
     }
     const q = doc(db, "users", User.id);
     const unsub = onSnapshot(q, async (doc) => {
-      (doc.data());
+      console.log(doc.data());
+      if (!doc.data()) return
       setUser(doc.data());
       localStorage.setItem("user", JSON.stringify(doc.data()));
-      (localStorage.getItem("user"));
+      localStorage.getItem("user");
     });
     return () => {
       unsub();
@@ -79,7 +79,7 @@ const App = () => {
       {isAuthed ? (
         <UserContext.Provider value={{ User, setUser }}>
           <SelectedChannelProvider>
-            <div className="flex flex-col-reverse h-full md:flex-row w-full overflow-y-hidden">
+            <div className="flex h-full w-full flex-col-reverse overflow-y-hidden md:flex-row">
               <SideBar />
               <ChannelBar />
               <ContentContainer />
@@ -88,9 +88,9 @@ const App = () => {
         </UserContext.Provider>
       ) : null}
       {!isAuthed ? (
-        <div className="h-screen flex justify-center items-center">
+        <div className="flex h-screen items-center justify-center">
           <button
-            className="bg-green-600 px-2 py-4 rounded-lg"
+            className="rounded-lg bg-green-600 px-2 py-4"
             onClick={() => {
               SigninWithGoogle();
             }}

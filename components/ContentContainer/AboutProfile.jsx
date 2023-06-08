@@ -18,6 +18,7 @@ import { UserContext } from "../App";
 import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
 import { MdOutlineModeEditOutline } from "react-icons/md";
+import Goback from "../ChannelBar/Goback";
 
 const Menu = ({ icon, header, context }) => {
   return (
@@ -123,16 +124,14 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
     });
   (ChatObject);
   return (
-    <div className="dark:bg-[#12171d] inset-0 absolute z-30 ">
+    <div className="dark:bg-dark-secondary bg-light-secondary inset-0 absolute z-30 ">
       <div
-        className=" p-[16px] flex items-center absolute w-full top-0 cursor-pointer"
+        className=" p-[16px] pt-0 flex items-center absolute w-full top-0 cursor-pointer"
         onClick={() => {
           setshowProfile(false);
         }}
       >
-        <div className="cursor-pointer mr-3">
-          <BiArrowBack size={30} />
-        </div>
+       <Goback />
         <h3>contact info</h3>
       </div>
       <div className="">

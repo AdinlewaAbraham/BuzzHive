@@ -162,33 +162,44 @@ const Input = () => {
     <>
       {showPopup && (
         <div
-          className="Poll-input fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50"
+          className="Poll-input fixed inset-0 z-50 flex  items-center justify-center bg-gray-900 bg-opacity-50"
           ref={popupRef}
         >
-          <div className="absolute rounded-lg bg-black p-4">
-            <p>Do you want to forfeit your input?</p>
-            <button
-              className="bg-blue-500 p-4"
-              onClick={() => {
-                setfile(null);
-                setpicVidmedia(null);
-                setblurredPicVidmedia(null);
-                setShowPopup(false);
-                setshowPollInput(false);
-                setshowSendContact(false);
-              }}
-            >
-              Discard
-            </button>
-            <button
-              className="detectMe p-4"
-              onClick={() => {
-                ("clicked");
-                setShowPopup(false);
-              }}
-            >
-              return to media
-            </button>
+          <div
+            className="w-[35%]
+           max-w-[500px] rounded-lg dark:bg-dark-secondary"
+          >
+            <div className="p-5 dark:bg-dark-primary rounded-t-lg">
+              <h1 className="text-xl font-medium">Discard unsent message</h1>
+              <p className="text-sm mt-1">
+                Your message, including attached media, will not be sent if you
+                leave this screen
+              </p>
+            </div>
+            <div className="z-[99] flex rounded-lg p-5 [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
+              <button
+                className="detectMe p-4  dark:bg-dark-primary bg-light-primary mr-1"
+                onClick={() => {
+                  ("clicked");
+                  setShowPopup(false);
+                }}
+              >
+                return to media
+              </button>
+              <button
+                className="bg-blue-500 p-4"
+                onClick={() => {
+                  setfile(null);
+                  setpicVidmedia(null);
+                  setblurredPicVidmedia(null);
+                  setShowPopup(false);
+                  setshowPollInput(false);
+                  setshowSendContact(false);
+                }}
+              >
+                Discard
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -254,8 +265,16 @@ const Input = () => {
               <div
                 key={id}
                 className={` detectme MediaPicker
-                ${id === "showMediaPicker" && showMediaPicker && "bg-hover-light dark:bg-hover-dark"} 
-                ${id === "showEmojiPicker" && showEmojiPicker && "bg-hover-light dark:bg-hover-dark"} 
+                ${
+                  id === "showMediaPicker" &&
+                  showMediaPicker &&
+                  "bg-hover-light dark:bg-hover-dark"
+                } 
+                ${
+                  id === "showEmojiPicker" &&
+                  showEmojiPicker &&
+                  "bg-hover-light dark:bg-hover-dark"
+                } 
                 ${id === "showEmojiPicker" && "mr-1"} 
                 cursor-pointer rounded-lg bg-transparent p-[10px] px-[15px]
                  text-muted-light hover:bg-hover-light dark:text-muted-dark dark:hover:bg-hover-dark`}
@@ -279,8 +298,8 @@ const Input = () => {
           )}
           {showMediaPicker && (
             <div
-              className="detectMe MediaPicker absolute bottom-[65px]  w-[160px] rounded-lg px-1 py-2 text-[15px]
-                dark:bg-dark-primary bg-light-primary  [&>div>div>svg]:mr-2 [&>div>div]:flex
+              className="detectMe MediaPicker absolute bottom-[65px]  w-[160px] rounded-lg bg-light-primary px-1 py-2
+                text-[15px] dark:bg-dark-primary  [&>div>div>svg]:mr-2 [&>div>div]:flex
             [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 
             [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-hover-light dark:hover:[&>div]:bg-hover-dark"
             >

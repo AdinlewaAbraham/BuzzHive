@@ -20,7 +20,7 @@ export const createUser = async (uid, displayname, email, photoUrl, bio) => {
       darkMode: false,
       unReadMessages: {},
       autoDownloadSettings: {
-        picture: false,
+        photos: false,
         videos: false,
         files: false,
       },

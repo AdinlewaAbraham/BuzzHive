@@ -15,6 +15,7 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import { createUser } from "@/utils/userUtils/createUser";
 import { useRef } from "react";
 import { CircularProgress } from "@mui/joy";
+import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
 const AddContact = () => {
   const { User } = useContext(UserContext);
@@ -23,6 +24,9 @@ const AddContact = () => {
   const [lastUser, setLastUser] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [addUsersLoading, setaddUsersLoading] = useState(false);
+
+  const { setSelectedChannel, setprevSelectedChannel, prevSelectedChannel } =
+    useContext(SelectedChannelContext);
 
   const fetchUsers = async () => {
     console.log("running");
@@ -86,7 +90,7 @@ const AddContact = () => {
     console.log(triggerHeight);
     console.log(container.scrollHeight);
     if (triggerHeight >= container.scrollHeight - 20 && hasMore) {
-       addUsers();
+      addUsers();
       console.log("fetching users...");
     }
   };
@@ -98,25 +102,13 @@ const AddContact = () => {
   const divStyles = {
     maxHeight: `calc(100vh - 125px)`,
   };
-
-  const addUser = async () => {
-    console.log(faker.datatype.uuid());
-    for (let i = 0; i < 50; i++) {
-      await createUser(
-        faker.datatype.uuid(),
-        faker.internet.userName(),
-        faker.internet.email(),
-        faker.image.avatar(),
-        "hello"
-      );
-    }
-  };
+  function goBack() {
+    setSelectedChannel(prevSelectedChannel);
+    setprevSelectedChannel("addcontact");
+  }
   return (
     <div className="">
-      <Goback text="Add contact" />
-      {/* <button onClick={addUser} className="bg-slate-600 p-2">
-        add user
-      </button> */}
+      <Goback text="Add contact" clickFunc={goBack} />
       <div className="mb-3 mt-0 flex w-full items-center justify-center ">
         <input
           className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
@@ -145,9 +137,9 @@ const AddContact = () => {
           style={divStyles}
           ref={scrollContainerRef}
           onScroll={handleOnScroll}
-          className={`my-element scrollbar-thumb-rounded-[2px] hover:scrollbar- relative mt-[10px]
-            overflow-y-auto scrollbar-thin
-          scrollbar-track-[transparent] scrollbar-thumb-scrollbar-light dark:scrollbar-thumb-scrollbar-dark `}
+          className={`scrollBar  relative mt-[10px]
+            overflow-y-auto 
+           `}
         >
           {users
             .filter((user) => user.id !== User.id)
@@ -160,7 +152,7 @@ const AddContact = () => {
               />
             ))}
           {addUsersLoading && (
-            <div className="flex items-center justify-center mb-5">
+            <div className="mb-5 flex items-center justify-center">
               <i className="mr-1">
                 <CircularProgress variant="plain" size="sm" />
               </i>{" "}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useTheme } from "next-themes";
 import { BsSun, BsMoon, BsChatSquareText } from "react-icons/bs";
-import { MdOutlineChat } from "react-icons/md";
+import { MdOutlineChat, MdOutlinePermIdentity } from "react-icons/md";
 import {
   MdOutlineDelete,
   MdPersonAddAlt,
@@ -52,7 +52,7 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
     setSelectedChannel(clickevent ? clickevent : selectedChannel);
   }
   return (
-    <div className="relative flex items-center justify-center md:w-[5%] md:min-w-[70px] md:max-w-[70px] ">
+    <div className="relative flex items-center justify-center md:mb-1 md:w-[5%] md:min-w-[70px] md:max-w-[70px]">
       <span
         className={`duration-150 ease-out ${
           selectedChannel === clickevent
@@ -65,8 +65,8 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
           prevSelectedChannel === clickevent &&
           `${
             channels[selectedChannel] < channels[prevSelectedChannel]
-              ? `${IsMobile ?  "" : "lineComingFromTop"} `
-              : `${IsMobile ?" " : "lineComingFromBottom"} `
+              ? `${IsMobile ? "" : "lineComingFromTop"} `
+              : `${IsMobile ? " " : "lineComingFromBottom"} `
           } `
         } absolute  bottom-0 z-[1] h-1 bg-accent-blue transition-[width] md:left-0 md:w-1 md:transition-[height]`}
       ></span>
@@ -89,6 +89,7 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
 const SideBar = () => {
   const [Mounted, setMounted] = useState(false);
 
+  const [invalidURL, setinvalidURL] = useState(true);
   const { systemTheme, theme, setTheme } = useTheme();
   const { User } = useContext(UserContext);
 
@@ -197,13 +198,22 @@ const SideBar = () => {
         />
         <SideBarIcon
           icon={
-            <Img
-              src={User.photoUrl}
-              type="personal"
-              styles="rounded-lg flex justify-center items-center cursor-pointer w-[30px] h-[30px]"
-              imgStyles="rounded-lg"
-              personalSize="80"
-            />
+            <div
+              className={`flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-lg bg-inherit [&>i]:flex [&>i]:h-full [&>i]:items-center [&>i]:justify-center `}
+            >
+              {User.photoURL && invalidURL ? (
+                <img
+                  src={User.photoURL}
+                  alt="profile pic"
+                  className={`h-full w-full rounded-lg object-cover`}
+                  onError={() => setinvalidURL(false)}
+                />
+              ) : (
+                <i>
+                  <MdOutlinePermIdentity size="30" />
+                </i>
+              )}
+            </div>
           }
           clickevent="profileSettings"
           text="Profile"

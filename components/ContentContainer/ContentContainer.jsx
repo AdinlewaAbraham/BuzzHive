@@ -152,8 +152,7 @@ const ContentContainer = () => {
               <>you have nothing </>
             ) : (
               <div
-                className="my-element  my-element scrollbar-thumb-rounded-[2px]  w-full overflow-y-auto  scrollbar-thin scrollbar-track-[transparent]
-                scrollbar-thumb-scrollbar-light dark:scrollbar-thumb-scrollbar-dark  "
+                className="scrollBar w-full overflow-y-auto "
               >
                 {sortedChats &&
                   sortedChats.map((chat) => <MessageCard chat={chat} />)}

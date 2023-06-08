@@ -59,8 +59,10 @@ const VideoComponent = ({
     if (storedVideo) {
       setVideoSrc(storedVideo);
       setisDownloaded(true);
-    } else if (User.autoDownloadSettings.video) {
+    } else if (User.autoDownloadSettings.videos) {
       downloadVideo();
+    } else {
+      setisDownloaded(false);
     }
 
     const storedVideoThumnail = await getVideoFromIndexedDB(
@@ -84,7 +86,7 @@ const VideoComponent = ({
 
   useEffect(() => {
     getStoredVideoandVideoThumbnail();
-  }, [messageId]);
+  }, [messageId, User]);
 
   const downloadVideo = async () => {
     const request = new XMLHttpRequest();

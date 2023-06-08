@@ -88,14 +88,16 @@ const FileComponent = ({ chat }) => {
     if (storedFile) {
       setfileBlob(storedFile);
       setisDownloaded(true);
-    } else if (User.autoDownloadSettings.file) {
+    } else if (User.autoDownloadSettings.files) {
       downloadFile();
+    } else {
+      setisDownloaded(false);
     }
   };
 
   useEffect(() => {
     getStoredFiles();
-  }, []);
+  }, [User]);
 
   const openFile = () => {
     const fileURL = URL.createObjectURL(fileBlob);

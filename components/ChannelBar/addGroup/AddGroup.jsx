@@ -5,8 +5,6 @@ import React, {
   useState,
   useRef,
 } from "react";
-import { BiArrowBack } from "react-icons/bi";
-import useFetchUsers from "@/hooks/useFetchUsers";
 import { UserContext } from "../../App";
 import { createGroup } from "@/utils/groupUtils/createGroup";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
@@ -25,6 +23,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
+import ModalComp from "@/components/ModalComp";
 
 const UserCard = (p) => {
   return (
@@ -53,7 +52,8 @@ const UserCard = (p) => {
 
 const AddGroup = () => {
   const { User } = useContext(UserContext);
-  const { setSelectedChannel } = useContext(SelectedChannelContext);
+  const { setSelectedChannel, prevSelectedChannel, setprevSelectedChannel } =
+    useContext(SelectedChannelContext);
   const [selectedUsers, setselectedUsers] = useState([]);
   const [activeUsers, setactiveUsers] = useState([]);
   const [showAddGroupMenu, setshowAddGroupMenu] = useState(false);
@@ -66,6 +66,7 @@ const AddGroup = () => {
   const [lastUser, setLastUser] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [addUsersLoading, setaddUsersLoading] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const [creatingGroupLoading, setcreatingGroupLoading] = useState(false);
 
@@ -191,10 +192,11 @@ const AddGroup = () => {
     setaddUsersLoading(true);
     const usersRef = collection(db, "users");
     const lastUser = users[users.length - 1];
+    if(!lastUser) return;
     const q = query(
       usersRef,
       orderBy("name"),
-      startAfter(lastUser.name),
+      startAfter(lastUser?.name),
       limit(10)
     );
     try {
@@ -229,17 +231,36 @@ const AddGroup = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+  function goBack() {
+    if (showAddGroupMenu) {
+      setshowAddGroupMenu(false);
+      return;
+    }
+    if (selectedUsers.length > 0) {
+      setOpen(true);
+      return;
+    }
+    setSelectedChannel("chats");
+  }
   return (
     <div className="relative h-full min-h-[430px]">
-      <Goback text="New group" />
+      <ModalComp
+        open={open}
+        setOpen={setOpen}
+        discardFunc={() => {
+          setSelectedChannel("chats");
+          setOpen(false);
+        }}
+        header="Cancel creating group"
+        description="Your group members will not be saved"
+      />
+      <Goback text="New group" clickFunc={goBack} />
       {selectedUsers.length > 0 && (
         <div className={`${!showAddGroupMenu && "mb-3"} flex flex-col`}>
           <div
             ref={ref}
-            className="my-element scrollbar-thumb-rounded-[2px] flex max-h-[116px] flex-wrap
-           items-center overflow-y-auto rounded-lg bg-light-secondary  py-1 scrollbar-thin scrollbar-track-transparent
-              scrollbar-thumb-scrollbar-light dark:bg-dark-secondary dark:scrollbar-track-[transparent]
-               dark:scrollbar-thumb-scrollbar-dark "
+            className="scrollBar flex max-h-[116px] flex-wrap
+           items-center overflow-y-auto rounded-lg bg-light-secondary  py-1  "
           >
             {[...selectedUsers].map((user) => (
               <div
@@ -255,8 +276,10 @@ const AddGroup = () => {
                 />
                 {user.name}
                 <i
-                  className="text-danger absolute right-1 cursor-pointer p-1
-                   opacity-0 transition-all duration-300 group-hover:bg-accent-blue group-hover:opacity-100  "
+                  className={`text-danger absolute right-1 cursor-pointer p-1
+                   opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${
+                     !showAddGroupMenu && "group-hover:opacity-100  "
+                   } `}
                   onClick={() => handleRemoveUser(user.id)}
                 >
                   <GiCancel />
@@ -271,13 +294,12 @@ const AddGroup = () => {
         <div className={`flex  flex-col justify-between`}>
           <div
             style={showAddGroupMenudivStyles}
-            className={`my-element scrollbar-thumb-rounded-[2px] hover:scrollbar- relative mt-[10px]
+            className={`scrollBar relative
            flex flex-col justify-between
             overflow-y-auto px-1 
-          pb-5 scrollbar-thin
-           scrollbar-track-[transparent] scrollbar-thumb-scrollbar-light dark:scrollbar-thumb-scrollbar-dark`}
+          pb-5 `}
           >
-            <div className="-center  my-5 flex items-center">
+            <div className="-center  my-7 flex items-center">
               <label
                 for="dropzone-file"
                 className="cursor-pointier flex w-full cursor-pointer items-center justify-start rounded-lg "
@@ -359,6 +381,7 @@ const AddGroup = () => {
               </p>
             </button>
             <button
+              onClick={goBack}
               disabled={creatingGroupLoading}
               className={`w-1/2 rounded-lg bg-gray-500 py-2 ${
                 creatingGroupLoading && "cursor-wait"
@@ -387,7 +410,10 @@ const AddGroup = () => {
               >
                 Next
               </button>
-              <button className="w-1/2 rounded-lg  bg-gray-500 py-2">
+              <button
+                onClick={goBack}
+                className="w-1/2 rounded-lg  bg-gray-500 py-2"
+              >
                 Cancel
               </button>
             </div>
@@ -397,46 +423,51 @@ const AddGroup = () => {
             style={divStyles}
             ref={scrollContainerRef}
             onScroll={handleOnScroll}
-            className={`my-element scrollbar-thumb-rounded-[2px] hover:scrollbar- relative mt-[10px]
-                overflow-y-auto scrollbar-thin
-              scrollbar-track-[transparent] scrollbar-thumb-scrollbar-light dark:scrollbar-thumb-scrollbar-dark `}
+            className={` scrollBar relative
+                mt-[10px] overflow-y-auto`}
           >
-            <h2
-              className="sticky top-0 mb-1 rounded-lg bg-light-primary p-2 pt-0
+            {activeUsers.length > 0 && (
+              <>
+                {" "}
+                <h2
+                  className="sticky top-0 mb-1 rounded-lg bg-light-primary p-2 pt-0
              text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark "
-            >
-              Active chats
-            </h2>
-            <div>
-              {activeUsers
-                .slice()
-                .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds)
-                .map((user) => {
-                  const userObj = {
-                    id: user.otherParticipant,
-                    photoUrl: user.senderDisplayImg,
-                    name: user.senderDisplayName,
-                  };
-                  return (
-                    <div
-                      className={`${user.type == "group" ? "hidden" : ""}`}
-                      key={`active${user.id}`}
-                    >
-                      <UserCard
-                        id={user.id}
-                        photoUrl={user.senderDisplayImg}
-                        name={user.senderDisplayName}
-                        isSelected={selectedUsers.some(
-                          (u) => JSON.stringify(u) === JSON.stringify(userObj)
-                        )}
-                        onSelect={(isSelected) =>
-                          handleSelect(userObj, isSelected)
-                        }
-                      />
-                    </div>
-                  );
-                })}
-            </div>
+                >
+                  Active chats
+                </h2>
+                <div>
+                  {activeUsers
+                    .slice()
+                    .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds)
+                    .map((user) => {
+                      const userObj = {
+                        id: user.otherParticipant,
+                        photoUrl: user.senderDisplayImg,
+                        name: user.senderDisplayName,
+                      };
+                      return (
+                        <div
+                          className={`${user.type == "group" ? "hidden" : ""}`}
+                          key={`active${user.id}`}
+                        >
+                          <UserCard
+                            id={user.id}
+                            photoUrl={user.senderDisplayImg}
+                            name={user.senderDisplayName}
+                            isSelected={selectedUsers.some(
+                              (u) =>
+                                JSON.stringify(u) === JSON.stringify(userObj)
+                            )}
+                            onSelect={(isSelected) =>
+                              handleSelect(userObj, isSelected)
+                            }
+                          />
+                        </div>
+                      );
+                    })}
+                </div>
+              </>
+            )}
             <h2
               className="sticky top-0 mb-1 mt-1 rounded-lg bg-light-primary p-2
              text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark"
@@ -500,5 +531,4 @@ const AddGroup = () => {
     </div>
   );
 };
-
 export default AddGroup;

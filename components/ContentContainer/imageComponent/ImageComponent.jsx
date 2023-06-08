@@ -6,9 +6,11 @@ import { UserContext } from "../../App";
 import { openDB } from "idb";
 import DownloadCircularAnimation from "../DownloadCircularAnimation";
 import UploadCircularAnimation from "../UploadCircularAnimation";
+import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
 const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
   const { User } = useContext(UserContext);
+  const {deleteMediaTrigger} = useContext(SelectedChannelContext)
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isDownloaded, setisDownloaded] = useState(false);
   const [isDownloading, setisDownloading] = useState(false);
@@ -35,29 +37,45 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
     await tx.done;
     return value;
   };
+  const validateImage = async () => {
+    const imageBlob = await getImgFromIndexedDB(`image-${chat.id}`);
+    if (imageBlob) {
+      setisDownloaded(true);
+      console.log(true)
+    } else {
+      setisDownloaded(false);
+      setimageBlob(null);
+      setisDownloading(false)
+    }
+  };
 
-  const getStoredFiles = async () => {
+  const getStoredImages = async () => {
     setloadingImg(true);
     const imageBlob = await getImgFromIndexedDB(`image-${chat.id}`);
     const blurredImageBlob = await getImgFromIndexedDB(
       `blurredImage-${chat.id}`
     );
-    if (imageBlob) {
-      setimageBlob(imageBlob);
-      console.log(imageBlob);
-      setisDownloaded(true);
-    } else if (User.autoDownloadSettings.file) {
-      downloadImage(downloadSRC, "image");
-    }
     if (blurredImageBlob) {
       setblurredImageBlob(blurredImageBlob);
     } else {
-      downloadImage(blurredSRC, "blurredImage");
+      await downloadImage(blurredSRC, "blurredImage");
+    }
+    if (imageBlob) {
+      setimageBlob(imageBlob);
+      setisDownloaded(true);
+    } else if (User.autoDownloadSettings.photos) {
+      await downloadImage(downloadSRC, "image");
+    } else {
+      setisDownloaded(false);
+      setimageBlob(null);
     }
   };
   useEffect(() => {
-    getStoredFiles();
-  }, [downloadSRC]);
+    getStoredImages();
+  }, [downloadSRC, User]);
+  useEffect(() => {
+    validateImage();
+  }, [deleteMediaTrigger, User]);
 
   const downloadImage = async (Url, type) => {
     if (!Url) return;
@@ -71,7 +89,7 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
         responseType: "blob",
         onDownloadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
-          console.log((loaded / total) * 100)
+          console.log((loaded / total) * 100);
           setDownloadProgress((loaded / total) * 100);
         },
       });
@@ -138,11 +156,14 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
       {!isDownloaded && (
         <>
           {isDownloading ? (
-           <div className="absolute">
+            <div className="absolute">
               <DownloadCircularAnimation progress={downloadProgress} />
             </div>
           ) : (
-            <button  className="absolute" onClick={() => downloadImage(downloadSRC, "image")}>
+            <button
+              className="absolute"
+              onClick={() => downloadImage(downloadSRC, "image")}
+            >
               <FiDownload color="black" size={30} />
             </button>
           )}

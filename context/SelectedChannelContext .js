@@ -22,8 +22,8 @@ const SelectedChannelContext = createContext({
   setReplyObject: () => {},
   ShowAddGroup: false,
   setShowAddGroup: () => {},
-  isPopupOpen: false,
-  setisPopupOpen: () => {},
+  deleteMediaTrigger: false,
+  setdeleteMediaTrigger: () => {},
   IsChatsLoading: false,
   setIsChatsLoading: () => {},
   showChats: false,
@@ -37,7 +37,7 @@ const SelectedChannelContext = createContext({
 });
 
 export const SelectedChannelProvider = ({ children }) => {
-  const [isPopupOpen, setisPopupOpen] = useState(false);
+  const [deleteMediaTrigger, setdeleteMediaTrigger] = useState(false);
   const [ShowAddGroup, setShowAddGroup] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState("chats");
   const [prevSelectedChannel, setprevSelectedChannel] = useState("chats");
@@ -71,8 +71,8 @@ export const SelectedChannelProvider = ({ children }) => {
         setChatObject,
         ShowAddGroup,
         setShowAddGroup,
-        isPopupOpen,
-        setisPopupOpen,
+        deleteMediaTrigger,
+        setdeleteMediaTrigger,
         showChats,
         setshowChats,
         activeId,

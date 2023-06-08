@@ -109,8 +109,8 @@ const ChatCard = ({
     unReadCount;
     JSON.parse(localStorage.getItem("user"));
     setactiveId(id);
-    sessionStorage.setItem("activeChatId", new String(id) );
-    console.log(sessionStorage.getItem("activeChatId"))
+    sessionStorage.setItem("activeChatId", new String(id));
+    console.log(sessionStorage.getItem("activeChatId"));
     setChatObject({
       activeChatId: id,
       activeChatType: type,
@@ -318,8 +318,8 @@ const ChatCard = ({
         ChatObject.activeChatId == id
           ? "bg-[#f0f2f5] hover:bg-[#f0f2f5] dark:bg-gray-600 dark:hover:bg-gray-600"
           : "hover:bg-hover-light dark:hover:bg-hover-dark"
-      } relative flex w-[100%] cursor-pointer flex-row items-center justify-between rounded-xl
-        px-4 py-3 align-middle`}
+      } relative mb-1 flex w-[100%] cursor-pointer flex-row items-center justify-between rounded-xl
+        px-4 py-3 align-middle `}
       onClick={() => {
         handleChatClick();
       }}

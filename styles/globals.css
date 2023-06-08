@@ -22,27 +22,29 @@
     font-bold text-white 
     shadow-md transition-all delay-300 duration-100 dark:bg-black md:bottom-auto md:left-14;
   }
+.scrollBar {
+  @apply scrollbar-thin
+  scrollbar-track-[transparent] scrollbar-thumb-scrollbar-light dark:scrollbar-thumb-scrollbar-dark;
 }
+}
+  /* target element with overflow */
+  .scrollBar::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+  }
 
-/* target element with overflow */
-.my-element::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-}
+  /* Firefox */
+  .scrollBar::-moz-scrollbar-thumb {
+    border-radius: 999px;
+  }
 
-/* Firefox */
-.my-element::-moz-scrollbar-thumb {
-  border-radius: 999px;
-}
-
-/* IE 10+ */
-.my-element::-ms-scrollbar-thumb {
-  border-radius: 999px;
-}
-
-/* standard */
-.my-element::scrollbar-thumb {
-  border-radius: 999px;
-}
+  /* IE 10+ */
+  .scrollBar::-ms-scrollbar-thumb {
+    border-radius: 999px;
+  }
+  /* standard */
+  .scrollBar::scrollbar-thumb {
+    border-radius: 999px;
+  }
 
 .skeleton {
   background-color: #ccc;
@@ -65,3 +67,20 @@
   background-color: rgba(155, 145, 145, 0.2);
   opacity: 1;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
