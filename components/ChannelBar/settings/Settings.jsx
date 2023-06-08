@@ -100,6 +100,7 @@ const SelectMenu = ({ optionsArr, selectedMenuText, onClickFunc }) => {
             })
             .map((option, index) => (
               <div
+              key={index}
                 onClick={() => {
                   setshowMenuOptions(false);
                   onClickFunc(option);
@@ -194,7 +195,7 @@ const Settings = () => {
     return () => {
       unsub();
     };
-  }, []);
+  }, [User, setUser]);
 
   const [loading, setloading] = useState(false);
   const [complete, setcomplete] = useState(false);
@@ -388,6 +389,7 @@ const Settings = () => {
             },
           ].map((option) => (
             <DeleteOption
+            key={option.text}
               option={option}
               onClickFunc={() => {
                 setmodalObject({

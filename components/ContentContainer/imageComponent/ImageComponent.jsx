@@ -7,6 +7,7 @@ import { openDB } from "idb";
 import DownloadCircularAnimation from "../DownloadCircularAnimation";
 import UploadCircularAnimation from "../UploadCircularAnimation";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
+import { Skeleton } from "@mui/material";
 
 const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
   const { User } = useContext(UserContext);
@@ -114,7 +115,6 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
       throw error;
     }
   };
-  console.log(imageBlob);
 
   return (
     <div className="relative flex items-center justify-center">
@@ -122,7 +122,7 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
         {!imageBlob || chat.dataObject.status === "uploading" ? (
           <>
             {!blurredImageBlob ? (
-              <>loadingImg</>
+              <Skeleton animation="wave"  variant="rectangular" width={285} height={240} />
             ) : (
               <img
                 src={URL.createObjectURL(blurredImageBlob)}

@@ -12,7 +12,6 @@ import { BiTimeFive } from "react-icons/bi";
 import FileComponent from "./fileComponent/FileComponent";
 import UploadCircularAnimation from "./UploadCircularAnimation";
 const MessageCard = ({ chat }) => {
-  if (!chat) return;
   const { ChatObject, setReplyObject, ReplyObject, setChats } = useContext(
     SelectedChannelContext
   );
@@ -155,7 +154,7 @@ const MessageCard = ({ chat }) => {
             className={`absolute bottom-[-20px] right-0 flex max-w-[500px] rounded-lg  bg-white p-[5px]`}
           >
             {chat.reactions.map(({ emoji }) => (
-              <Emoji unified={emoji} size="15" />
+              <Emoji unified={emoji} size="15" key={emoji} />
             ))}
           </div>
         )}
@@ -171,6 +170,7 @@ const MessageCard = ({ chat }) => {
             <div className=" absolute bottom-[25px] left-[-100px] z-20 flex w-[200px] rounded-lg bg-blue-700 p-[20px]">
               {["1f423", "1f423", "1f433", "1f423", "1f423"].map((emoji) => (
                 <div
+                key={emoji}
                   className="mx-[5px]"
                   onClick={() => handleEmojiClick(emoji)}
                 >

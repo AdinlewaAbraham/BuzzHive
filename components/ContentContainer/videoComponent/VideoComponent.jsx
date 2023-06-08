@@ -12,6 +12,7 @@ import UploadCircularAnimation from "../UploadCircularAnimation";
 import { FiDownload } from "react-icons/fi";
 import { BsCameraVideo } from "react-icons/bs";
 import { formatDuration } from "@/utils/actualUtils/formatDuration";
+import { Skeleton } from "@mui/material";
 
 const VideoComponent = ({
   blurredSRC,
@@ -159,7 +160,12 @@ const VideoComponent = ({
           }}
         >
           {loadingThumbnail ? (
-            <div>loading...</div>
+              <Skeleton
+                animation="wave"
+                variant="rectangular"
+                width={285}
+                height={240}
+              />
           ) : (
             <>
               {imageError ? (
