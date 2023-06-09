@@ -33,20 +33,20 @@ const AddContact = () => {
     setLoading(true);
     const usersRef = collection(db, "users");
     console.log(lastUser);
-    let q = query(usersRef, limit(10));
+    let q = query(usersRef, limit(15));
 
     if (lastUser) {
       (q = query(usersRef, orderBy("name"), startAfter(lastUser.data().name))),
-        limit(10);
+        limit(15);
     } else {
-      q = query(usersRef, orderBy("name"), limit(10));
+      q = query(usersRef, orderBy("name"), limit(15));
     }
     try {
       const querySnapshot = await getDocs(q);
       const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
       setUsers((prevUsers) => [...prevUsers, ...fetchedUsers]);
       setLastUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      if (querySnapshot.docs.length < 10) {
+      if (querySnapshot.docs.length < 15) {
         setHasMore(false);
       }
     } catch (error) {
@@ -64,7 +64,7 @@ const AddContact = () => {
       usersRef,
       orderBy("name"),
       startAfter(lastUser.name),
-      limit(10)
+      limit(15)
     );
     try {
       const querySnapshot = await getDocs(q);
@@ -89,7 +89,7 @@ const AddContact = () => {
     let triggerHeight = container.scrollTop + container.offsetHeight;
     console.log(triggerHeight);
     console.log(container.scrollHeight);
-    if (triggerHeight >= container.scrollHeight - 20 && hasMore) {
+    if (triggerHeight >= container.scrollHeight - 30 && hasMore) {
       addUsers();
       console.log("fetching users...");
     }
