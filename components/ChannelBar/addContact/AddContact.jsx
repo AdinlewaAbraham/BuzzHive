@@ -71,7 +71,7 @@ const AddContact = () => {
       const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
       setUsers((prevUsers) => [...prevUsers, ...fetchedUsers]);
       setLastUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      if (querySnapshot.docs.length < 10) {
+      if (querySnapshot.docs.length < 15) {
         setHasMore(false);
       }
     } catch (error) {

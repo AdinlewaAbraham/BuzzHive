@@ -96,7 +96,7 @@ const Chats = () => {
   return (
     <div className="">
       <div className="h-[95px]">
-        <div className="flex h-[66px] items-center justify-between px-2">
+        <div className="flex h-[66px] items-center justify-between px-4">
           <h1 className="text-2xl ">Chats</h1>
           <div className="relative flex items-center text-muted-light dark:text-muted-dark">
             <i

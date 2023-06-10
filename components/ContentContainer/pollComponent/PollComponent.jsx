@@ -77,7 +77,7 @@ const PollComponent = ({ PollObject }) => {
   }
   return (
     <div className="text-left ">
-      <h3>{question}</h3>
+      <h3 className="max-w-[300px]  whitespace-normal break-words ">{question}</h3>
 
       <p>{allowMultipleAnswers ? "select one or more" : "select one"}</p>
       {options.map((option) => (

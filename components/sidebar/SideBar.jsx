@@ -1,21 +1,14 @@
 import { useState, useEffect, useContext } from "react";
-import { useTheme } from "next-themes";
-import { BsSun, BsMoon, BsChatSquareText } from "react-icons/bs";
 import { MdOutlineChat, MdOutlinePermIdentity } from "react-icons/md";
 import {
-  MdOutlineDelete,
   MdPersonAddAlt,
   MdOutlineGroupAdd,
 } from "react-icons/md";
 import { AiOutlineSetting } from "react-icons/ai";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
-import { getAuth, signOut } from "firebase/auth";
 import { UserContext } from "../App";
 
-import { BiLogOut } from "react-icons/bi";
 import { deleteDB } from "idb";
-import { FcDeleteDatabase } from "react-icons/fc";
-import Img from "../Img";
 const SideBarIcon = ({ icon, text, clickevent }) => {
   const {
     setSelectedChannel,
@@ -90,7 +83,6 @@ const SideBar = () => {
   const [Mounted, setMounted] = useState(false);
 
   const [invalidURL, setinvalidURL] = useState(true);
-  const { systemTheme, theme, setTheme } = useTheme();
   const { User } = useContext(UserContext);
 
   useEffect(() => {
@@ -132,21 +124,6 @@ const SideBar = () => {
         />
       </i>
 
-      <i className="flex cursor-pointer md:mx-auto md:flex-col">
-        <i
-          onClick={() => {
-          }}
-        >
-          <SideBarIcon icon={<BiLogOut size="27" />} />
-        </i>
-        <i
-          onClick={() => {
-            localStorage.clear();
-          }}
-        >
-          <SideBarIcon icon={<MdOutlineDelete size="27" />} />
-        </i>
-      </i>
       <div className="flex items-center justify-center md:flex-col ">
         <SideBarIcon
           icon={<AiOutlineSetting size={22} />}

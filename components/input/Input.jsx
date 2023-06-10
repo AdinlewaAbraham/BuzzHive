@@ -94,19 +94,6 @@ const Input = () => {
     setmessage("");
   }
 
-  const [showEmojiPicker, setshowEmojiPicker] = useState(false);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (e.target.closest(".detectme") === null) {
-        setshowEmojiPicker(false);
-      }
-    };
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [setshowEmojiPicker]);
   function handleInputKeyDown(e) {
     if (e.key == "Enter") {
       handleSend();
@@ -169,18 +156,17 @@ const Input = () => {
             className="w-[35%]
            max-w-[500px] rounded-lg dark:bg-dark-secondary"
           >
-            <div className="p-5 dark:bg-dark-primary rounded-t-lg">
+            <div className="rounded-t-lg p-5 dark:bg-dark-primary">
               <h1 className="text-xl font-medium">Discard unsent message</h1>
-              <p className="text-sm mt-1">
+              <p className="mt-1 text-sm">
                 Your message, including attached media, will not be sent if you
                 leave this screen
               </p>
             </div>
             <div className="z-[99] flex rounded-lg p-5 [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
               <button
-                className="detectMe p-4  dark:bg-dark-primary bg-light-primary mr-1"
+                className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
                 onClick={() => {
-                  ("clicked");
                   setShowPopup(false);
                 }}
               >
@@ -247,13 +233,6 @@ const Input = () => {
         <div className="relative flex">
           {[
             {
-              id: "showEmojiPicker",
-              icon: <BsEmojiSmile />,
-              onclick: () => {
-                setshowEmojiPicker(!showEmojiPicker);
-              },
-            },
-            {
               id: "showMediaPicker",
               icon: <ImAttachment />,
               onclick: () => {
@@ -270,12 +249,7 @@ const Input = () => {
                   showMediaPicker &&
                   "bg-hover-light dark:bg-hover-dark"
                 } 
-                ${
-                  id === "showEmojiPicker" &&
-                  showEmojiPicker &&
-                  "bg-hover-light dark:bg-hover-dark"
-                } 
-                ${id === "showEmojiPicker" && "mr-1"} 
+               
                 cursor-pointer rounded-lg bg-transparent p-[10px] px-[15px]
                  text-muted-light hover:bg-hover-light dark:text-muted-dark dark:hover:bg-hover-dark`}
                 onClick={onclick}
@@ -284,18 +258,6 @@ const Input = () => {
               </div>
             );
           })}
-          {showEmojiPicker && (
-            <div className="detectme fixed bottom-[60px] left-[20%] ">
-              <EmojiPicker
-                width={"150%"}
-                height={400}
-                theme="dark"
-                onEmojiClick={() => {
-                  setshowEmojiPicker(true);
-                }} /*width={}*/
-              />
-            </div>
-          )}
           {showMediaPicker && (
             <div
               className="detectMe MediaPicker absolute bottom-[65px]  w-[160px] rounded-lg bg-light-primary px-1 py-2

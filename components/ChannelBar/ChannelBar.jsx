@@ -10,7 +10,7 @@ const ChannelBar = () => {
   const { selectedChannel } = useContext(SelectedChannelContext);
   return (
     <div
-      className="max-h-screen h-[calc(100vh-70px)] md:h-screen w-full md:w-[30%] md:min-w-[400px] p-3 pt-0 
+      className="max-h-screen h-[calc(100vh-70px)] md:h-screen w-full md:w-[30%] md:min-w-[400px] p-4 pt-0 
     bg-light-primary dark:bg-dark-primary md:mr-[0px]  overflow-y-hidden"
     >
       {selectedChannel === "chats" && <Chats />}

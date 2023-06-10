@@ -26,6 +26,9 @@
   @apply scrollbar-thin
   scrollbar-track-[transparent] scrollbar-thumb-scrollbar-light dark:scrollbar-thumb-scrollbar-dark;
 }
+.text-muted {
+  @apply text-muted-light dark:text-muted-dark
+}
 }
   /* target element with overflow */
   .scrollBar::-webkit-scrollbar-thumb {
@@ -68,6 +71,9 @@
   opacity: 1;
 }
 
+.custom-menu-paper {
+  box-shadow: none;
+}
 
 
 
