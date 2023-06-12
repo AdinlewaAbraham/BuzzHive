@@ -8,6 +8,8 @@ import { onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import { UserContext } from "../../App";
 import { HiUserAdd } from "react-icons/hi";
+import { motion } from "framer-motion";
+import { CircularProgress } from "@mui/joy";
 
 const Chats = () => {
   const { User } = useContext(UserContext);
@@ -16,6 +18,7 @@ const Chats = () => {
   const [sortedChats, setSortedChats] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const chats = whatToReturn;
   const { setSelectedChannel } = useContext(SelectedChannelContext);
@@ -121,46 +124,88 @@ const Chats = () => {
           <input
             type="text"
             placeholder="Search"
-            className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+            className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light 
+            outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+
           />
         </div>
       </div>
-      {sortedChats.length === 0 && !Loading && Chats == null ? (
-        <>you have nothing </>
-      ) : (
-        <>
-          {sortedChats.length !== 0 ? (
-            <div
-              className="scrollBar  mt-6 flex md:h-[calc(100vh-120px)] h-[calc(100vh-190px)] flex-col items-center overflow-y-auto
-               overflow-x-hidden pt-[2px] pr-[2px] "
+      <motion.div
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -10, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {sortedChats.length === 0 && !Loading && Chats == null ? (
+          <div className="mt-6 flex flex-col items-center justify-center">
+            <h2>You have no chats at the moment.</h2>
+            <button
+              onClick={() => {
+                setSelectedChannel("addcontact");
+              }}
+              className="mt-2 rounded-lg bg-accent-blue p-2 "
             >
-              {sortedChats.map((chat) => (
-                <ChatCard //this is soo stupid of me too late to change this
-                  key={chat.id}
-                  otherUserId={chat.otherParticipant}
-                  type={chat.type}
-                  id={chat.id}
-                  img={chat.senderDisplayImg}
-                  name={chat.senderDisplayName}
-                  sender={chat.lastMessageSenderName}
-                  isMessageSentByMe={chat.senderId === User.id}
-                  message={{
-                    text: chat.lastMessage,
-                    type: chat.lastMessageType,
-                    status: chat.lastMessageStatus,
-                  }}
-                  unReadCount={chat.unReadmessagesCount}
-                  set_Chats={set_Chats}
-                  chat={chat}
-                  //  timestamp={chat.timestamp}
-                />
-              ))}
-            </div>
-          ) : (
-            <>loading....</>
-          )}
-        </>
-      )}
+              Add Chat
+            </button>
+          </div>
+        ) : (
+          <>
+            {sortedChats.length !== 0 ? (
+              <div
+                className="scrollBar  mt-6 flex h-[calc(100vh-190px)] flex-col items-center overflow-y-auto overflow-x-hidden
+               pt-[2px] pr-[2px] md:h-[calc(100vh-120px)] "
+              >
+                {sortedChats
+                  .filter(
+                    (chat) =>
+                      chat.senderDisplayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((chat) => (
+                    <ChatCard //this is soo stupid of me too late to change this
+                      key={chat.id}
+                      otherUserId={chat.otherParticipant}
+                      type={chat.type}
+                      id={chat.id}
+                      img={chat.senderDisplayImg}
+                      name={chat.senderDisplayName}
+                      sender={chat.lastMessageSenderName}
+                      isMessageSentByMe={chat.senderId === User.id}
+                      message={{
+                        text: chat.lastMessage,
+                        type: chat.lastMessageType,
+                        status: chat.lastMessageStatus,
+                      }}
+                      unReadCount={chat.unReadmessagesCount}
+                      set_Chats={set_Chats}
+                      chat={chat}
+                      timestamp={chat.timestamp}
+                    />
+                  ))}
+              </div>
+            ) : (
+              <div className="scrollBar mt-6 h-[calc(100vh-190px)] overflow-y-auto overflow-x-hidden md:h-[calc(100vh-120px)]">
+                {[1, 2, 3, 4, 5].map((key) => (
+                  <div
+                    className=" flex
+                     cursor-pointer items-center px-4   py-4 "
+                    key={key}
+                    style={{ width: "100%" }}
+                  >
+                    <i className="skeleton absolute h-[50px] w-[50px] rounded-full"></i>
+                    <div className="ml-[60px] w-full">
+                      <div className="skeleton mb-[10px] h-[10px] w-[30%] rounded-md"></div>
+                      <div className="skeleton h-[15px] w-[80%] rounded-md"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </motion.div>
     </div>
   );
 };

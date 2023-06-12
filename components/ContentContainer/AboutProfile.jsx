@@ -124,7 +124,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
     });
   (ChatObject);
   return (
-    <div className="dark:bg-dark-secondary bg-light-secondary inset-0 absolute z-30 ">
+    <div className="dark:bg-dark-secondary bg-light-secondary inset-0 left-[1px] absolute z-30 ">
       <div
         className=" p-[16px] pt-0 flex items-center absolute w-full top-0 cursor-pointer"
         onClick={() => {

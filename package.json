@@ -17,6 +17,7 @@
     "@faker-js/faker": "^8.0.2",
     "@fluentui/react": "^8.109.2",
     "@fluentui/react-cards": "^0.205.83",
+    "@formkit/auto-animate": "^1.0.0-beta.6",
     "@heroicons/react": "^2.0.16",
     "@mui/icons-material": "^5.11.16",
     "@mui/joy": "^5.0.0-alpha.82",

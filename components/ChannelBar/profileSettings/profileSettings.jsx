@@ -15,6 +15,7 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "@/utils/firebaseUtils/firebase";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const EditProfileInfo = ({ title, toBeEdited }) => {
   const [showInput, setshowInput] = useState(false);
@@ -100,61 +101,68 @@ const ProfileSettings = () => {
   return (
     <div className="px-2">
       <Goback text={"Profile"} />
-      <section className="flex items-center justify-center">
-        <div
-          className={`flex  ${
-            User.photoUrl === null ? "pt-[3px]" : ""
-          } group relative h-[100px] w-[100px] cursor-pointer justify-center bg-inherit 
+      <motion.div
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -10, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <section className="flex items-center justify-center">
+          <div
+            className={`flex  ${
+              User.photoUrl === null ? "pt-[3px]" : ""
+            } group relative h-[100px] w-[100px] cursor-pointer justify-center bg-inherit 
           [&>i]:flex [&>i]:h-full [&>i]:items-center [&>i]:justify-center `}
-        >
-          {isUploading && (
-            <div
-              className="absolute inset-0 flex cursor-wait items-center
+          >
+            {isUploading && (
+              <div
+                className="absolute inset-0 flex cursor-wait items-center
            justify-center bg-gray-900 bg-opacity-50 "
-            >
-              <CircularProgress size="sm" variant="plain" />
-            </div>
-          )}
-          {!isUploading && (
-            <label
-              className="absolute inset-0 flex cursor-pointer items-center
-           justify-center bg-gray-900 bg-opacity-50 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-            >
-              <div>
-                <MdOutlineModeEditOutline size={20} />
+              >
+                <CircularProgress size="sm" variant="plain" />
               </div>
-              <input
-                type="file"
-                accept="image/png, image/jpeg"
-                className="hidden h-full w-full cursor-pointer"
-                onChange={(e) => handleProfilePicChange(e.target.files[0])}
+            )}
+            {!isUploading && (
+              <label
+                className="absolute inset-0 flex cursor-pointer items-center
+           justify-center bg-gray-900 bg-opacity-50 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+              >
+                <div>
+                  <MdOutlineModeEditOutline size={20} />
+                </div>
+                <input
+                  type="file"
+                  accept="image/png, image/jpeg"
+                  className="hidden h-full w-full cursor-pointer"
+                  onChange={(e) => handleProfilePicChange(e.target.files[0])}
+                />
+              </label>
+            )}
+            {User.photoUrl && invalidURL ? (
+              <Image
+                width={100}
+                height={100}
+                src={User.photoUrl}
+                alt="profile pic"
+                className={`h-full w-full rounded-full object-cover`}
+                onError={() => setinvalidURL(false)}
               />
-            </label>
-          )}
-          {User.photoUrl && invalidURL ? (
-            <Image
-              width={100}
-              height={100}
-              src={User.photoUrl}
-              alt="profile pic"
-              className={`h-full w-full rounded-full object-cover`}
-              onError={() => setinvalidURL(false)}
-            />
-          ) : (
-            <i>
-              <FaUserAlt size="75" />
-            </i>
-          )}
+            ) : (
+              <i>
+                <FaUserAlt size="75" />
+              </i>
+            )}
+          </div>
+        </section>
+        <div className="mb-7 text-center">
+          <h4>{User.name}</h4>
+          <p className="text-muted-light dark:text-muted-dark">{User.bio}</p>
         </div>
-      </section>
-      <div className="mb-7 text-center">
-        <h4>{User.name}</h4>
-        <p className="text-muted-light dark:text-muted-dark">{User.bio}</p>
-      </div>
-      <section>
-        <EditProfileInfo title={"Display Name"} toBeEdited={User.name} />
-        <EditProfileInfo title={"Bio"} toBeEdited={User.bio} />
-      </section>
+        <section>
+          <EditProfileInfo title={"Display Name"} toBeEdited={User.name} />
+          <EditProfileInfo title={"Bio"} toBeEdited={User.bio} />
+        </section>
+      </motion.div>
     </div>
   );
 };

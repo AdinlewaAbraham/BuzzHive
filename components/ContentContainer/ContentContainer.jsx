@@ -5,11 +5,17 @@ import { MdGroup } from "react-icons/md";
 import { IoMdPerson } from "react-icons/io";
 import { AiOutlineSearch } from "react-icons/ai";
 import { BiArrowBack } from "react-icons/bi";
-import { AiOutlineArrowDown } from "react-icons/ai";
+import { AiOutlineArrowDown, AiOutlineLine } from "react-icons/ai";
 import AboutProfile from "./AboutProfile";
 import MessageCard from "./MessageCard";
 import Img from "../Img";
 import { FaUserAlt } from "react-icons/fa";
+import { formatChats } from "@/utils/actualUtils/formatChats";
+import Menu from '@mui/joy/Menu';
+import { GiCancel } from "react-icons/gi";
+import { BsChevronUp, BsChevronDown } from "react-icons/bs"
+import { RxDividerVertical } from "react-icons/rx"
+import { CircularProgress } from "@mui/joy";
 
 const ContentContainer = () => {
   const {
@@ -29,6 +35,11 @@ const ContentContainer = () => {
   const [IsMobile, setIsMobile] = useState(false);
   const secondDivRef = useRef(null);
   const [invalidURL, setinvalidURL] = useState(true);
+  const [Searchanchor, setSearchanchor] = useState(null);
+  const isOpen = Boolean(Searchanchor)
+  const [searchedMessages, setsearchedMessages] = useState([])
+  const [currentSearchIndex, setcurrentSearchIndex] = useState(0)
+
 
   useEffect(() => {
     function widthResizer() {
@@ -46,11 +57,14 @@ const ContentContainer = () => {
     if (ChatObject.photoUrl && ChatObject.photoUrl.props) {
       setPhotoUrl(ChatObject.photoUrl.props.src);
     }
-    console.log(ChatObject.photoUrl);
   }, [ChatObject.photoUrl]);
   useEffect(() => {
     if (!IsMobile) setshowChats(true);
   }, [IsMobile]);
+
+  useEffect(() => {
+    console.log(currentSearchIndex)
+  }, [currentSearchIndex])
 
   useMemo(() => {
     if (Chats == []) return;
@@ -69,9 +83,19 @@ const ContentContainer = () => {
 
   const mainContentStyle = {
     overflowY: "auto",
-    height: `calc(100vh - 123px${
-      ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
-    })`,
+    height: `calc(100vh - 123px${ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
+      })`,
+  };
+
+  const handleSearch = (event) => {
+    const searchText = event.target.value.toLowerCase();
+    const filteredChats = sortedChats.filter((chat) =>
+      chat.text.toLowerCase().includes(searchText)
+    );
+    const reversedChats = filteredChats.reverse();
+    setsearchedMessages(reversedChats);
+    setcurrentSearchIndex(0);
+    console.log(reversedChats);
   };
   return (
     showChats && (
@@ -108,9 +132,8 @@ const ContentContainer = () => {
                 }}
               >
                 <div
-                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${
-                    ChatObject.photoUrl === null ? "pt-[3px]" : ""
-                  }`}
+                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${ChatObject.photoUrl === null ? "pt-[3px]" : ""
+                    }`}
                 >
                   <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500">
                     <div className="flex items-center justify-center rounded-full bg-inherit text-[30px]">
@@ -123,7 +146,6 @@ const ContentContainer = () => {
                         />
                       ) : ChatObject.activeChatType === "group" ? (
                         <i className="text-[30px]">
-                          {" "}
                           <MdGroup />
                         </i>
                       ) : (
@@ -138,24 +160,101 @@ const ContentContainer = () => {
               </div>
             </div>
 
-            <div className="px-[10px]">
+            <div className=" hover:bg-hover p-3 cursor-pointer  rounded-lg " onClick={(e) => { setSearchanchor(e.currentTarget) }} >
               <AiOutlineSearch />
             </div>
+            <Menu
+              anchorEl={Searchanchor}
+              variant="plain"
+              open={isOpen}
+              disableFocusRipple={true}
+              onClose={() => { }}
+              placement={"bottom-end"}
+              sx={{
+                backgroundColor: "transparent",
+                boxShadow: "none",
+                paddingTop: "15px",
+              }}>
+              <div className="flex rounded-lg dark:bg-dark-primary bg-light-primary p-2 [&>i]:p-3 [&>i]:rounded-lg
+               [&>i]: [&>i]:text-lg  [&>i]:text-muted
+               [&>i]:cursor-pointer">
+                <input type="text"
+                  className=" w-full rounded-lg dark:text-white text-black bg-light-secondary
+                   px-3 py-1 placeholder-muted-light
+                   outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+                  placeholder="Search"
+                  onChange={handleSearch}
+                />
+                <p className="text-red-500 flex text-center whitespace-nowrap">
+                   {currentSearchIndex + 1} of {searchedMessages.length}
+                </p>
+                <i
+                  className="hover:bg-hover "
+                  onClick={() => {
+                    if (currentSearchIndex === 0) return;
+
+                    const nextIndex = Math.min(currentSearchIndex + 1, searchedMessages.length - 1);
+                    const scrollToElement = searchedMessages[nextIndex];
+
+                    if (scrollToElement) {
+                      document
+                        .getElementById(scrollToElement.id)
+                        ?.scrollIntoView({ behavior: "smooth" });
+
+                      setcurrentSearchIndex(nextIndex);
+                    }
+                  }}
+                >
+                  <BsChevronUp />
+                </i> <i
+                  className="hover:bg-hover mr-1"
+                  onClick={() => {
+                    if (currentSearchIndex === searchedMessages.length - 1) return;
+
+                    const prevIndex = Math.max(currentSearchIndex - 1, 0);
+                    const scrollToElement = searchedMessages[prevIndex];
+
+
+                    if (scrollToElement) {
+                      document
+                        .getElementById(scrollToElement.id)
+                        ?.scrollIntoView({ behavior: "smooth" });
+
+                      setcurrentSearchIndex(prevIndex);
+                    }
+                  }}
+                >
+                  <BsChevronDown />
+                </i>
+
+
+                <div className="text-muted flex items-center justify-center">
+                  <i className="h-4">
+                    <RxDividerVertical /></i>
+                </div>
+                <i className="hover:bg-hover" onClick={() => setSearchanchor(null)}>
+                  <GiCancel />
+                </i>
+              </div>
+
+            </Menu>
+
           </div>
           <main
             style={mainContentStyle}
             className="flex h-[calc(100vh-123px)] flex-col justify-end"
           >
             {Chats == null ? (
-              <div className="text-center text-2xl">Loading</div>
+              <div className="text-center flex items-center mb-4 justify-center">
+                <CircularProgress size="sm" variant="plain" /> <p className="ml-2"> Loading...</p></div>
             ) : Chats.length == 0 ? (
-              <>you have nothing </>
+              <></>
             ) : (
               <div
                 className="scrollBar w-full overflow-y-auto "
               >
                 {sortedChats &&
-                  sortedChats.map((chat) => <MessageCard chat={chat} />)}
+                  formatChats(sortedChats).map((chat) => <MessageCard chat={chat} />)}
                 <div ref={secondDivRef} id="scrollToMe"></div>
               </div>
             )}
@@ -167,11 +266,10 @@ const ContentContainer = () => {
                 }}
                 className="absolute right-[20px] z-10 hidden cursor-pointer rounded-lg p-3 dark:bg-[#1d232a]"
                 style={{
-                  bottom: `${
-                    ReplyObject.ReplyTextId
-                      ? `${replyDivHeight + 120}px`
-                      : "120px"
-                  }`,
+                  bottom: `${ReplyObject.ReplyTextId
+                    ? `${replyDivHeight + 120}px`
+                    : "120px"
+                    }`,
                 }}
               >
                 <AiOutlineArrowDown size={23} />

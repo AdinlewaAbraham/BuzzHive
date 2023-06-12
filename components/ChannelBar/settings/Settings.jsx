@@ -100,7 +100,7 @@ const SelectMenu = ({ optionsArr, selectedMenuText, onClickFunc }) => {
             })
             .map((option, index) => (
               <div
-              key={index}
+                key={index}
                 onClick={() => {
                   setshowMenuOptions(false);
                   onClickFunc(option);
@@ -128,9 +128,9 @@ const Modal = ({ modalObject, setshowModal }) => {
     <div className="Poll-input fixed inset-0 z-50 flex  items-center justify-center bg-gray-900 bg-opacity-50">
       <div
         className="w-[35%]
-       max-w-[500px] rounded-lg dark:bg-dark-secondary bg-light-secondary"
+       max-w-[500px] rounded-lg bg-light-secondary dark:bg-dark-secondary"
       >
-        <div className="rounded-t-lg p-5 dark:bg-dark-primary bg-light-primary">
+        <div className="rounded-t-lg bg-light-primary p-5 dark:bg-dark-primary">
           <h1 className="text-xl font-medium">{modalObject.header}</h1>
           <p className="mt-1 text-sm">{modalObject.description}</p>
         </div>
@@ -185,7 +185,7 @@ const Settings = () => {
     if (!User) {
       return;
     }
-    console.log('stop')
+    console.log("stop");
     const q = doc(db, "users", User.id);
     const unsub = onSnapshot(q, async (doc) => {
       if (!doc.data()) return;
@@ -247,7 +247,13 @@ const Settings = () => {
         <Modal modalObject={modalObject} setshowModal={setshowModal} />
       )}
       <Goback text={"Settings"} />
-      <div className="scrollBar h-[calc(100vh-70px-66px)] overflow-scroll md:h-[calc(100vh-66px)]">
+      <motion.div
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -10, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="scrollBar h-[calc(100vh-70px-66px)] overflow-scroll md:h-[calc(100vh-66px)]"
+      >
         <div className="flex flex-col">
           <h2 className="mb-4 text-xl font-medium">Account</h2>
           <h3 className="mb-2">Privacy</h3>
@@ -295,7 +301,7 @@ const Settings = () => {
               setshowModal(true);
             }}
             className="my-1 flex max-w-[max-content] items-center justify-center
-      rounded-lg bg-light-secondary p-2
+            rounded-lg bg-light-secondary p-2
           dark:bg-dark-secondary"
           >
             <i className="mr-1 flex items-center">
@@ -390,7 +396,7 @@ const Settings = () => {
             },
           ].map((option) => (
             <DeleteOption
-            key={option.text}
+              key={option.text}
               option={option}
               onClickFunc={() => {
                 setmodalObject({
@@ -409,7 +415,7 @@ const Settings = () => {
             />
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

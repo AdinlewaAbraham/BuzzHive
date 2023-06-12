@@ -90,12 +90,12 @@ const App = () => {
       {!isAuthed ? (
         <div className="flex h-screen items-center justify-center">
           <button
-            className="rounded-lg bg-green-600 px-2 py-4"
+            className="rounded-lg bg-accent-blue px-2 py-4"
             onClick={() => {
               SigninWithGoogle();
             }}
           >
-            sign in with google{" "}
+            sign in with google
           </button>
         </div>
       ) : null}

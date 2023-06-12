@@ -24,6 +24,8 @@ import {
 } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import ModalComp from "@/components/ModalComp";
+import { AnimatePresence, motion } from "framer-motion";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const UserCard = (p) => {
   return (
@@ -51,6 +53,7 @@ const UserCard = (p) => {
 };
 
 const AddGroup = () => {
+  const [animationParent] = useAutoAnimate();
   const { User } = useContext(UserContext);
   const { setSelectedChannel, prevSelectedChannel, setprevSelectedChannel } =
     useContext(SelectedChannelContext);
@@ -128,6 +131,7 @@ const AddGroup = () => {
         ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
         : ""
     })`,
+    transition: "height ease-in-out 150ms",
   };
   const showAddGroupMenudivStyles = {
     maxHeight: `calc(100vh - 80px${
@@ -135,6 +139,7 @@ const AddGroup = () => {
         ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
         : ""
     })`,
+    transition: "max-height 0.5s ease",
   };
 
   const createGroupFunc = async () => {
@@ -163,7 +168,6 @@ const AddGroup = () => {
     console.log("running");
     setLoading(true);
     const usersRef = collection(db, "users");
-    console.log(lastUser);
     let q = query(usersRef, limit(10));
 
     if (lastUser) {
@@ -175,7 +179,6 @@ const AddGroup = () => {
     try {
       const querySnapshot = await getDocs(q);
       const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
-      console.log(fetchedUsers);
       setUsers((prevUsers) => [...prevUsers, ...fetchedUsers]);
       setLastUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
       if (querySnapshot.docs.length < 10) {
@@ -224,7 +227,6 @@ const AddGroup = () => {
     console.log(container.scrollHeight);
     if (triggerHeight >= container.scrollHeight - 20 && hasMore) {
       addUsers();
-      console.log("fetching users...");
     }
   };
 
@@ -259,278 +261,305 @@ const AddGroup = () => {
       />
       <Goback text="New group" clickFunc={goBack} />
       {selectedUsers.length > 0 && (
-        <div className={`${!showAddGroupMenu && "mb-3"} flex flex-col`}>
-          <div
-            ref={ref}
-            className="scrollBar flex max-h-[116px] flex-wrap
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className={`${!showAddGroupMenu && "mb-3"} flex flex-col`}
+        >
+          <div ref={ref}>
+            <ul
+              ref={animationParent}
+              className="scrollBar flex max-h-[116px] flex-wrap
            items-center overflow-y-auto rounded-lg bg-light-secondary py-1  dark:bg-dark-secondary  "
-          >
-            {[...selectedUsers].map((user) => (
-              <div
-                key={user.id}
-                id={user.id}
-                className="parent-div text-bold group relative m-1 flex items-center whitespace-nowrap
+            >
+              {[...selectedUsers].map((user) => (
+                <li
+                  key={user.id}
+                  id={user.id}
+                  className="parent-div text-bold group relative m-1 flex items-center whitespace-nowrap
                 rounded-lg bg-accent-blue px-2 py-1 text-center text-[12px] font-semibold"
-              >
-                <img
-                  className="mr-1 h-5 rounded-full"
-                  src={user.photoUrl}
-                  alt=""
-                />
-                {user.name}
-                <i
-                  className={`text-danger absolute right-1 cursor-pointer p-1
+                >
+                  <img
+                    className="mr-1 h-5 rounded-full"
+                    src={user.photoUrl}
+                    alt=""
+                  />
+                  {user.name}
+                  <i
+                    className={`text-danger absolute right-1 cursor-pointer p-1
                    opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${
                      !showAddGroupMenu && "group-hover:opacity-100  "
                    } `}
-                  onClick={() => handleRemoveUser(user.id)}
-                >
-                  <GiCancel />
-                </i>
-              </div>
-            ))}
+                    onClick={() => handleRemoveUser(user.id)}
+                  >
+                    <GiCancel />
+                  </i>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {showAddGroupMenu ? (
-        <div className={`flex  flex-col justify-between`}>
-          <div
-            style={showAddGroupMenudivStyles}
-            className={`scrollBar relative
+      <AnimatePresence>
+        {showAddGroupMenu ? (
+          <motion.div
+            initial={{ y: -70, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            exit={{ y: 10, opacity: 0 }}
+            className={`flex  flex-col justify-between`}
+          >
+            <div
+              style={showAddGroupMenudivStyles}
+              className={`scrollBar relative
            flex flex-col justify-between
             overflow-y-auto px-1 
           pb-5 `}
-          >
-            <div className="-center  my-7 flex items-center">
-              <label
-                for="dropzone-file"
-                className="cursor-pointier flex w-full cursor-pointer items-center justify-start rounded-lg "
+            >
+              <div className="-center  my-7 flex items-center">
+                <label
+                  for="dropzone-file"
+                  className="cursor-pointier flex w-full cursor-pointer items-center justify-start rounded-lg "
+                >
+                  {!profilePic ? (
+                    <div className="relative mr-3 flex h-[40px] w-[40px] items-center justify-center rounded-full bg-gray-500">
+                      <MdGroup size={35} />
+                    </div>
+                  ) : (
+                    <img
+                      className="relative mr-3 flex h-[40px] w-[40px] items-center justify-center rounded-full bg-gray-500"
+                      src={URL.createObjectURL(profilePic)}
+                    />
+                  )}
+                  <input
+                    disabled={creatingGroupLoading}
+                    onChange={(e) => setprofilePic(e.target.files[0])}
+                    id="dropzone-file"
+                    type="file"
+                    className="hidden"
+                  />
+
+                  <p className=" text-[15px]">
+                    Add group Icon{" "}
+                    <span className="text-muted-light dark:text-muted-dark">
+                      (optional)
+                    </span>
+                  </p>
+                </label>
+              </div>
+
+              <div>
+                <h3 className="mb-2 font-medium">Provide a group subject</h3>
+                <input
+                  type="text"
+                  className=" w-full rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+                  placeholder="Enter group name"
+                  onChange={(e) => {
+                    setgroupName(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="mt-4">
+                <h3 className="mb-2 font-medium">
+                  Provide a group bio{" "}
+                  <span className="text-muted-light dark:text-muted-dark">
+                    {"(optional)"}
+                  </span>
+                </h3>
+                <input
+                  type="text"
+                  className=" w-full rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+                  placeholder="Enter group bio"
+                  value={groupBio}
+                  onChange={(e) => {
+                    setgroupBio(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="  left-0 bottom-0 mt-auto flex w-full">
+              <button
+                className={`mr-1 flex w-1/2 items-center justify-center rounded-lg bg-accent-blue py-2 ${
+                  creatingGroupLoading && "cursor-wait"
+                } `}
+                onClick={createGroupFunc}
+                disabled={creatingGroupLoading}
               >
-                {!profilePic ? (
-                  <div className="relative mr-3 flex h-[40px] w-[40px] items-center justify-center rounded-full bg-gray-500">
-                    <MdGroup size={35} />
-                  </div>
-                ) : (
-                  <img
-                    className="relative mr-3 flex h-[40px] w-[40px] items-center justify-center rounded-full bg-gray-500"
-                    src={URL.createObjectURL(profilePic)}
+                {creatingGroupLoading && (
+                  <CircularProgress
+                    color="neutral"
+                    size="sm"
+                    value={23}
+                    variant="plain"
                   />
                 )}
-                <input
-                  disabled={creatingGroupLoading}
-                  onChange={(e) => setprofilePic(e.target.files[0])}
-                  id="dropzone-file"
-                  type="file"
-                  className="hidden"
-                />
-
-                <p className=" text-[15px]">
-                  Add group Icon{" "}
-                  <span className="text-muted-light dark:text-muted-dark">
-                    (optional)
-                  </span>
+                <p className="ml-2">
+                  {creatingGroupLoading ? "Creating" : "Create"}
                 </p>
-              </label>
-            </div>
-
-            <div>
-              <h3 className="mb-2 font-medium">Provide a group subject</h3>
-              <input
-                type="text"
-                className=" w-full rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
-                placeholder="Enter group name"
-                onChange={(e) => {
-                  setgroupName(e.target.value);
-                }}
-              />
-            </div>
-            <div className="mt-4">
-              <h3 className="mb-2 font-medium">
-                Provide a group bio{" "}
-                <span className="text-muted-light dark:text-muted-dark">
-                  {"(optional)"}
-                </span>
-              </h3>
-              <input
-                type="text"
-                className=" w-full rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
-                placeholder="Enter group bio"
-                value={groupBio}
-                onChange={(e) => {
-                  setgroupBio(e.target.value);
-                }}
-              />
-            </div>
-          </div>
-          <div className=" absolute left-0 bottom-0 mt-auto flex w-full">
-            <button
-              className={`mr-1 flex w-1/2 items-center justify-center rounded-lg bg-accent-blue py-2 ${
-                creatingGroupLoading && "cursor-wait"
-              } `}
-              onClick={createGroupFunc}
-              disabled={creatingGroupLoading}
-            >
-              {creatingGroupLoading && (
-                <CircularProgress
-                  color="neutral"
-                  size="sm"
-                  value={23}
-                  variant="plain"
-                />
-              )}
-              <p className="ml-2">
-                {creatingGroupLoading ? "Creating" : "Create"}
-              </p>
-            </button>
-            <button
-              onClick={cancelCreateGroup}
-              disabled={creatingGroupLoading}
-              className={`w-1/2 rounded-lg bg-gray-500 py-2 ${
-                creatingGroupLoading && "cursor-wait"
-              } `}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="mb-3 flex w-full items-center justify-center">
-            <input
-              type="text"
-              className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
-              placeholder="Search"
-            />
-          </div>
-          {selectedUsers.length > 0 && (
-            <div className="flex">
-              <button
-                className="mr-1 w-1/2 rounded-lg bg-accent-blue py-2"
-                onClick={() => {
-                  setshowAddGroupMenu(true);
-                }}
-              >
-                Next
               </button>
               <button
-                onClick={goBack}
-                className="w-1/2 rounded-lg  bg-gray-500 py-2"
+                onClick={cancelCreateGroup}
+                disabled={creatingGroupLoading}
+                className={`w-1/2 rounded-lg bg-gray-500 py-2 ${
+                  creatingGroupLoading && "cursor-wait"
+                } `}
               >
                 Cancel
               </button>
             </div>
-          )}
-
-          <div
-            style={divStyles}
-            ref={scrollContainerRef}
-            onScroll={handleOnScroll}
-            className={` scrollBar relative
-                mt-[10px] overflow-y-auto`}
-          >
-            {activeUsers.length > 0 && (
-              <>
-                {" "}
-                <h2
-                  className="sticky top-0 mb-1 rounded-lg bg-light-primary p-2 pt-0
-             text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark "
+          </motion.div>
+        ) : (
+          <>
+            <div className="mb-3 flex w-full items-center justify-center">
+              <input
+                type="text"
+                className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+                placeholder="Search"
+              />
+            </div>
+            {selectedUsers.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex"
+              >
+                <button
+                  className="mr-1 w-1/2 rounded-lg bg-accent-blue py-2"
+                  onClick={() => {
+                    setshowAddGroupMenu(true);
+                  }}
                 >
-                  Active chats
-                </h2>
-                <div>
-                  {activeUsers
-                    .slice()
-                    .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds)
+                  Next
+                </button>
+                <button
+                  onClick={goBack}
+                  className="w-1/2 rounded-lg  bg-gray-500 py-2"
+                >
+                  Cancel
+                </button>
+              </motion.div>
+            )}
+
+            <motion.div
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -10, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              style={divStyles}
+              ref={scrollContainerRef}
+              onScroll={handleOnScroll}
+              className={` scrollBar relative
+                mt-[10px] overflow-y-auto transition-all duration-200  `}
+            >
+              {activeUsers.length > 0 && (
+                <>
+                  <h2
+                    className="sticky top-0 mb-1 rounded-lg bg-light-primary p-2 pt-0
+             text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark "
+                  >
+                    Active chats
+                  </h2>
+                  <div>
+                    {activeUsers
+                      .slice()
+                      .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds)
+                      .map((user) => {
+                        const userObj = {
+                          id: user.otherParticipant,
+                          photoUrl: user.senderDisplayImg,
+                          name: user.senderDisplayName,
+                        };
+                        return (
+                          <div
+                            className={`${
+                              user.type == "group" ? "hidden" : ""
+                            }`}
+                            key={`active${user.id}`}
+                          >
+                            <UserCard
+                              id={user.id}
+                              photoUrl={user.senderDisplayImg}
+                              name={user.senderDisplayName}
+                              isSelected={selectedUsers.some(
+                                (u) =>
+                                  JSON.stringify(u) === JSON.stringify(userObj)
+                              )}
+                              onSelect={(isSelected) =>
+                                handleSelect(userObj, isSelected)
+                              }
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+                </>
+              )}
+              <h2
+                className="sticky top-0 mb-1 mt-1 rounded-lg bg-light-primary p-2
+             text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark"
+              >
+                All users
+              </h2>
+              {!loading ? (
+                <>
+                  {[...users]
+                    .filter((user) => user.id !== User.id)
                     .map((user) => {
                       const userObj = {
-                        id: user.otherParticipant,
-                        photoUrl: user.senderDisplayImg,
-                        name: user.senderDisplayName,
+                        id: user.id,
+                        photoUrl: user.photoUrl,
+                        name: user.name,
                       };
                       return (
-                        <div
-                          className={`${user.type == "group" ? "hidden" : ""}`}
-                          key={`active${user.id}`}
-                        >
-                          <UserCard
-                            id={user.id}
-                            photoUrl={user.senderDisplayImg}
-                            name={user.senderDisplayName}
-                            isSelected={selectedUsers.some(
-                              (u) =>
-                                JSON.stringify(u) === JSON.stringify(userObj)
-                            )}
-                            onSelect={(isSelected) =>
-                              handleSelect(userObj, isSelected)
-                            }
-                          />
-                        </div>
+                        <UserCard
+                          key={user.id}
+                          id={user.id}
+                          photoUrl={user.photoUrl}
+                          name={user.name}
+                          isSelected={selectedUsers.some(
+                            (u) => JSON.stringify(u) === JSON.stringify(userObj)
+                          )}
+                          onSelect={(isSelected) =>
+                            handleSelect(userObj, isSelected)
+                          }
+                        />
                       );
                     })}
-                </div>
-              </>
-            )}
-            <h2
-              className="sticky top-0 mb-1 mt-1 rounded-lg bg-light-primary p-2
-             text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark"
-            >
-              All users
-            </h2>
-            {!loading ? (
-              <>
-                {[...users]
-                  .filter((user) => user.id !== User.id)
-                  .map((user) => {
-                    const userObj = {
-                      id: user.id,
-                      photoUrl: user.photoUrl,
-                      name: user.name,
-                    };
-                    return (
-                      <UserCard
-                        key={user.id}
-                        id={user.id}
-                        photoUrl={user.photoUrl}
-                        name={user.name}
-                        isSelected={selectedUsers.some(
-                          (u) => JSON.stringify(u) === JSON.stringify(userObj)
-                        )}
-                        onSelect={(isSelected) =>
-                          handleSelect(userObj, isSelected)
-                        }
-                      />
-                    );
-                  })}
-              </>
-            ) : (
-              <>
-                {[1, 2, 3, 4, 5].map((key) => (
-                  <div
-                    className="flex cursor-pointer items-center px-4 py-4"
-                    key={key}
-                    style={{ width: "100%" }}
-                  >
-                    <i className="skeleton absolute h-[50px] w-[50px] rounded-full"></i>
-                    <div className="ml-[60px] w-full">
-                      <div className="skeleton mb-[10px] h-[10px] w-[30%] rounded-md"></div>
-                      <div className="skeleton h-[15px] w-[80%] rounded-md"></div>
+                </>
+              ) : (
+                <>
+                  {[1, 2, 3, 4, 5].map((key) => (
+                    <div
+                      className="flex cursor-pointer items-center px-4 py-4"
+                      key={key}
+                      style={{ width: "100%" }}
+                    >
+                      <i className="skeleton absolute h-[50px] w-[50px] rounded-full"></i>
+                      <div className="ml-[60px] w-full">
+                        <div className="skeleton mb-[10px] h-[10px] w-[30%] rounded-md"></div>
+                        <div className="skeleton h-[15px] w-[80%] rounded-md"></div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </>
-            )}
-            {addUsersLoading && (
-              <div className="mb-5 flex items-center justify-center">
-                <i className="mr-1">
-                  <CircularProgress variant="plain" size="sm" />
-                </i>{" "}
-                loading...
-              </div>
-            )}
-          </div>
-        </>
-      )}
+                  ))}
+                </>
+              )}
+              {addUsersLoading && (
+                <div className="mb-5 flex items-center justify-center">
+                  <i className="mr-1">
+                    <CircularProgress variant="plain" size="sm" />
+                  </i>{" "}
+                  loading...
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -2,7 +2,6 @@ import { useContext, useEffect, useState, useRef } from "react";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { UserContext } from "../App";
 import { Emoji } from "emoji-picker-react";
-import reactTomessage from "@/utils/messagesUtils/reactToMessage";
 import ImageComponent from "./imageComponent/ImageComponent";
 import VideoComponent from "./videoComponent/VideoComponent";
 import PollComponent from "./pollComponent/PollComponent";
@@ -20,15 +19,16 @@ import Menu from "@mui/joy/Menu";
 import MenuItem from "@mui/joy/MenuItem";
 import { useTheme } from "next-themes";
 import { HiReply } from "react-icons/hi";
-import data from "@emoji-mart/data";
-import Picker from "@emoji-mart/react";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
-
-import { topEmojiUnified } from "@/utils/emojis";
 import EmojiPicker from "./EmojiPicker";
-
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { motion } from "framer-motion";
+import { formatTimeForMessages } from "@/utils/actualUtils/formatTimeForMessages";
+import { formatCount } from "@/utils/actualUtils/formatCount";
 const MessageCard = ({ chat }) => {
+  const [animationParent] = useAutoAnimate();
+
   const { ChatObject, setReplyObject, ReplyObject, setChats } = useContext(
     SelectedChannelContext
   );
@@ -43,24 +43,62 @@ const MessageCard = ({ chat }) => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [emojiAnchor, setemojiAnchor] = useState(null);
-const Open = Boolean(anchorEl)
+  const Open = Boolean(anchorEl);
 
   const messageRef = useRef(null);
 
   const handleEmojiReaction = async (emoji) => {
-    await reactTomessage(
-      emoji,
-      chat.id,
-      ChatObject.activeChatId,
-      User,
-      ChatObject.activeChatType
+    const reactions = chat.reactions;
+    const existingReaction = reactions.find(
+      (reaction) => reaction.id === User.id
     );
+    const collectionName =
+      ChatObject.activeChatType === "group" ? "groups" : "conversations";
+    const docRef = doc(
+      db,
+      collectionName,
+      ChatObject.activeChatId,
+      "messages",
+      chat.id
+    );
+    if (existingReaction) {
+      const udatedReactionsArr = reactions.filter(
+        (reaction) => reaction.id !== User.id
+      );
+      if (existingReaction.emoji === emoji) {
+
+        await updateDoc(docRef, { ["reactions"]: udatedReactionsArr });
+      } else if (existingReaction.emoji !== emoji) {
+        const reactionObj = {
+          displayImg: User.photoUrl,
+          emoji,
+          name: User.name,
+          id: User.id,
+        };
+        await updateDoc(docRef, {
+          ["reactions"]: [...udatedReactionsArr, reactionObj],
+        });
+      }
+    } else {
+      const reactionObj = {
+        displayImg: User.photoUrl,
+        emoji,
+        name: User.name,
+        id: User.id,
+      };
+      await updateDoc(docRef, {
+        ["reactions"]: [...chat.reactions, reactionObj],
+      });
+    }
   };
   const addEmojiToLastUsedEmojiTray = async (emoji) => {
     const userRef = doc(db, "users", User.id);
     const newEmojiTray = [...User.lastUsedEmojiTray];
-    newEmojiTray.pop();
-    newEmojiTray.unshift(emoji);
+
+    if (!newEmojiTray.includes(emoji)) {
+      newEmojiTray.pop();
+      newEmojiTray.unshift(emoji);
+    }
 
     setUser({ ...User, ["lastUsedEmojiTray"]: newEmojiTray });
     await updateDoc(userRef, { ["lastUsedEmojiTray"]: newEmojiTray });
@@ -116,28 +154,35 @@ const Open = Boolean(anchorEl)
     );
   }
 
+  if (chat.type == "timeStamp") {
+    return (
+      <div className="sticky top-2 z-10 flex items-center justify-center pb-4">
+        <p className=" my-2 max-w-[50%] truncate rounded-md bg-white  p-3 text-center text-[13px] dark:bg-black">
+          {chat.day}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={messageRef}
-      className={`group my-2 flex items-center justify-start ${
-        chat.senderId === currentId ? " flex-row-reverse" : " "
-      } ${chat.reactions.length === 0 ? "" : "mb-[30px]"}  `}
+      className={`group my-2 flex items-center justify-start ${chat.senderId === currentId ? " flex-row-reverse" : " "
+        } ${chat.reactions.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
     >
       <div
-        className={`relative max-w-[80%] break-words rounded-lg p-2 text-left ${
-          chat.senderId === currentId
+        className={`relative max-w-[80%] break-words rounded-lg p-2 text-left ${chat.senderId === currentId
             ? " ml-2 mr-5 bg-accent-blue  text-right text-white"
             : "mr-2 ml-5 bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
-        }  ${
-          (chat.type === "pic/video" ||
+          }  ${(chat.type === "pic/video" ||
             chat.type === "image" ||
             chat.type === "video" ||
             chat.type === "file" ||
             chat.type === "poll") &&
           "w-[300px]"
-        }`}
+          }`}
       >
         {chat.type == "reply" && (
           <div
@@ -156,54 +201,50 @@ const Open = Boolean(anchorEl)
         {(chat.type === "pic/video" ||
           chat.type === "image" ||
           chat.type === "video") && (
-          <div>
-            <>
-              {chat.dataObject.type.startsWith("image") ? (
-                <ImageComponent
-                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                  downloadSRC={chat.dataObject.downloadURL}
-                  messageId={chat.id}
-                  chat={chat}
-                />
-              ) : (
-                <VideoComponent
-                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                  downloadSRC={chat.dataObject.downloadURL}
-                  messageId={chat.id}
-                  messageText={chat.text}
-                  dataObject={chat.dataObject}
-                />
-              )}
-            </>
-          </div>
-        )}
+            <div>
+              <>
+                {chat.dataObject.type.startsWith("image") ? (
+                  <ImageComponent
+                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                    downloadSRC={chat.dataObject.downloadURL}
+                    messageId={chat.id}
+                    chat={chat}
+                  />
+                ) : (
+                  <VideoComponent
+                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                    downloadSRC={chat.dataObject.downloadURL}
+                    messageId={chat.id}
+                    messageText={chat.text}
+                    dataObject={chat.dataObject}
+                  />
+                )}
+              </>
+            </div>
+          )}
         {chat.type === "poll" && <PollComponent PollObject={chat} />}
         <div
-          className={`items- flex w-full flex-col ${
-            chat.senderId !== User.id && "justify-end"
-          } ${
-            (chat.type === "pic/video" ||
+          className={`items- flex w-full flex-col ${chat.senderId !== User.id && "justify-end"
+            } ${(chat.type === "pic/video" ||
               chat.type === "image" ||
               chat.type === "video") &&
             !chat.text &&
             "absolute bottom-3 right-4 z-30"
-          }`}
+            }`}
         >
           <p
-            className={`max-w-[400px] break-words  text-start ${
-              chat.type === "poll" && "w-1 truncate opacity-0"
-            } `}
+            className={`max-w-[400px] break-words  text-start ${chat.type === "poll" && "w-1 truncate opacity-0"
+              } `}
           >
             {chat.text}
           </p>
           <div className="ml-3 flex w-full items-center justify-end text-end">
             <div className={`ml-auto flex items-center justify-end`}>
               <div
-                className={`text-muted mt-1 text-sm ${
-                  chat.senderId !== User.id && "mr-2"
-                } `}
+                className={`text-muted mt-1 text-[11px] ${chat.senderId !== User.id && "mr-2"
+                  } `}
               >
-                11:00 pm
+                {formatTimeForMessages(chat.timestamp)}
               </div>
               {chat.senderId === User.id && (
                 <i className="mx-1 mr-3">
@@ -219,27 +260,27 @@ const Open = Boolean(anchorEl)
 
         {chat.reactions.length > 0 && (
           <div
-            onClick={() => {}}
+            ref={animationParent}
+            onClick={() => { }}
             className={`absolute bottom-[-20px] right-0 flex cursor-pointer
             items-center  rounded-lg bg-light-primary p-[5px] dark:bg-dark-primary`}
           >
-            {chat.reactions
+            {[...new Set(chat.reactions.map(({ emoji }) => emoji))]
               .slice(-3)
               .reverse()
-              .map(({ emoji }) => (
+              .map((emoji) => (
                 <Emoji unified={emoji} size="15" key={emoji} />
               ))}
             <span className="text-muted ml-1 text-[10px] ">
-              {chat.reactions.length}
+              {formatCount(chat.reactions.length)}
             </span>
           </div>
         )}
       </div>
 
       <div
-        className={` flex ${
-          chat.senderId === currentId ? "left-0 " : "right-0 "
-        }`}
+        className={` flex ${chat.senderId === currentId ? "left-0 " : "right-0 "
+          }`}
       >
         <div className="relative">
           {showReactEmojiTray && (
@@ -263,12 +304,10 @@ const Open = Boolean(anchorEl)
             }}
           >
             <i
-              className={` transition-all duration-300 ${
-                chat.senderId === currentId &&
+              className={` transition-all duration-300 ${chat.senderId === currentId &&
                 " ml-2 flex-row-reverse md:group-hover:ml-2"
-              }  ${
-                chat.senderId !== currentId && " mr-2 md:group-hover:mr-2 "
-              } `}
+                }  ${chat.senderId !== currentId && " mr-2 md:group-hover:mr-2 "
+                } `}
             >
               <BsChevronDown size={10} />
             </i>
@@ -297,10 +336,9 @@ const Open = Boolean(anchorEl)
             <div
               key={emoji}
               className={`mr-1 cursor-pointer rounded-lg p-1 hover:dark:bg-hover-dark
-               hover:dark:text-white ${
-                 chat.reactions.find((reaction) => reaction.id === User.id)
-                   ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
-               } `}
+               hover:dark:text-white ${chat.reactions.find((reaction) => reaction.id === User.id)
+                  ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
+                } `}
               onClick={() => handleEmojiReaction(emoji)}
             >
               <Emoji unified={emoji} size="23" />

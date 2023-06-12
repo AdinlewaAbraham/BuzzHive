@@ -1,17 +1,19 @@
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { useContext } from "react";
 import { UserContext } from "../../App";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, getDoc, getDocs, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import Img from "@/components/Img";
 const UserCard = ({ name, id, image, user }) => {
-  const { setChats, setIsChatsLoading, ChatObject, setChatObject } = useContext(
-    SelectedChannelContext
-  );
+  const { setChats, setIsChatsLoading, ChatObject, setChatObject,
+    setshowChats } = useContext(
+      SelectedChannelContext
+    );
   const { User } = useContext(UserContext);
   const handleUserClick = async () => {
     setIsChatsLoading(true);
     const activeChatId = User.id > id ? User.id + id : id + User.id;
+    sessionStorage.setItem("activeChatId", new String(activeChatId));
     setChatObject({
       ...ChatObject,
       activeChatId: `${activeChatId}`,
@@ -20,6 +22,47 @@ const UserCard = ({ name, id, image, user }) => {
       photoUrl: image,
       displayName: `${name}`,
     });
+    const getStoredMessages = () => {
+      const str = localStorage.getItem(`${activeChatId}`);
+      return JSON.parse(str);
+    };
+    if (
+      localStorage.getItem(`${activeChatId}`) !== "[]" &&
+      localStorage.getItem(`${activeChatId}`) !== "{}" &&
+      localStorage.getItem(`${activeChatId}`) !== "undefined" &&
+      localStorage.getItem(`${activeChatId}`) !== "null" &&
+      localStorage.getItem(`${activeChatId}`)
+    ) {
+      const Chat = getStoredMessages();
+      Chat;
+      "this is for " + name + " " + unReadCount;
+      setChats(Chat);
+    } else {
+      const getMessage = async () => {
+        const query = collection(
+          db,
+          "conversations",
+          activeChatId,
+          "messages"
+        );
+
+        const snapshot = await getDocs(query);
+        const messages = await snapshot.docs.map((doc) => doc.data());
+        messages;
+        const sortedMessages = messages.sort((a, b) => {
+          a.timestamp - b.timestamp;
+        });
+        sortedMessages;
+        const filteredMessages = sortedMessages.filter((message) => message);
+        setChats(filteredMessages);
+        localStorage.setItem(
+          `${ChatObject.activeChatId}`,
+          JSON.stringify(filteredMessages)
+        );
+      };
+      getMessage();
+    }
+    setshowChats(true);
     setIsChatsLoading(false);
   };
 

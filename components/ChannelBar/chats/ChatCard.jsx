@@ -24,7 +24,9 @@ import {
   BsCheckLg,
   BiTimeFive,
 } from "react-icons/bs";
+import { formatCount } from "@/utils/actualUtils/formatCount";
 
+import { formatTime } from "@/utils/actualUtils/formatTime";
 const ChatCard = ({
   img,
   name,
@@ -52,9 +54,6 @@ const ChatCard = ({
   const [currentChatId, setcurrentChatId] = useState();
 
   const activeChatIdRef = useRef(ChatObject.activeChatId);
-  const LocalMessages = useMemo(() => {
-    return JSON.parse(localStorage.getItem(id));
-  }, [id]);
   useEffect(() => {
     sessionStorage.setItem(
       "activeChatId",
@@ -105,11 +104,9 @@ const ChatCard = ({
         localStorage.setItem(id, JSON.stringify(modifiedArr));
       }
     }
-    unReadCount;
     JSON.parse(localStorage.getItem("user"));
     setactiveId(id);
     sessionStorage.setItem("activeChatId", new String(id));
-    console.log(sessionStorage.getItem("activeChatId"));
     setChatObject({
       activeChatId: id,
       activeChatType: type,
@@ -121,7 +118,6 @@ const ChatCard = ({
     const userRef = doc(db, "users", User.id);
 
     const messages = JSON.parse(localStorage.getItem(id));
-    messages;
     if (!messages || JSON.stringify(message) == "[]") {
       return;
     }
@@ -153,7 +149,6 @@ const ChatCard = ({
     );
 
     if (lastMessage) {
-      ("trre");
       User.id;
       userRef;
       lastMessage;
@@ -188,8 +183,6 @@ const ChatCard = ({
             localstorageMessages.push(messageData);
             localStorage.setItem(id, JSON.stringify(localstorageMessages));
             if (id === ChatObject.activeChatId) {
-              console.log(id);
-              console.log(ChatObject.activeChatId);
 
               if (User.isReadReceiptsOn) {
                 changeMessagesStatus(id, type, "seen")
@@ -203,7 +196,6 @@ const ChatCard = ({
             } else if (id !== ChatObject.activeChatId) {
               changeMessagesStatus(id, type, "received")
                 .then(() => {
-                  console.log("changed to received in line 202");
                 })
                 .catch((error) => {
                   "Error updating message status:", error;
@@ -311,37 +303,40 @@ const ChatCard = ({
       getMessage();
     }
   }, [ChatObject.activeChatId]);
-
   return (
     <div
       className={`${
         ChatObject.activeChatId == id
           ? "bg-[#f0f2f5] hover:bg-[#f0f2f5] dark:bg-gray-600 dark:hover:bg-gray-600"
           : "hover:bg-hover-light dark:hover:bg-hover-dark"
-      } relative mb-1 flex w-[100%] cursor-pointer flex-row items-center justify-between rounded-xl
+      } relative mb-1 flex w-[100%] cursor-pointer items-center justify-between rounded-xl
         px-4 py-3 align-middle `}
       onClick={() => {
         handleChatClick();
       }}
     >
-      <div className="flex w-full  flex-row items-center ">
-        <div className="flex absolute h-[50px] w-[50px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500 ">
-          {img && invalidURL ? (
-            <img
-              src={img}
-              alt="profile pic"
-              className="h-full w-full rounded-full object-cover"
-              onError={() => setinvalidURL(false)}
-            />
-          ) : type === "group" ? (
-            <MdGroup size={35} />
-          ) : (
-            <FaUserAlt size={22} />
-          )}
+      <div className=" flex h-[50px] w-[50px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500 ">
+        {img && invalidURL ? (
+          <img
+            src={img}
+            alt="profile pic"
+            className="h-full w-full rounded-full object-cover"
+            onError={() => setinvalidURL(false)}
+          />
+        ) : type === "group" ? (
+          <MdGroup size={35} />
+        ) : (
+          <FaUserAlt size={22} />
+        )}
+      </div>
+      <div className="flex  w-[calc(100%-62px)] flex-col items-start  justify-between truncate">
+        <div className="flex w-full  items-center justify-between">
+          <h3 className=" font-normal ">{name}</h3>
+          <p className="text-muted  text-[11px]">{formatTime(timestamp)}</p>
         </div>
-        <div className=" ml-[62px]  w-[90%] truncate">
-          <h3 className=" text-[17px] font-normal ">{name}</h3>
-          <div className="flex flex-row text-sm text-muted-light dark:text-muted-dark">
+
+        <div className="flex w-full  items-center justify-between">
+          <div className=" flex w-[90%] flex-row truncate text-sm  text-muted-light dark:text-muted-dark">
             {isMessageSentByMe && (
               <i className="mr-1 flex items-center">
                 {message.status === "pending" && <BiTimeFive />}
@@ -371,16 +366,22 @@ const ChatCard = ({
               )}
             </i>
 
-            <p> {message.text}</p>
+            <p className="truncate">{message.text}</p>
+          </div>
+          <div className="ml-2 min-w-max">
+            {unReadCount !== 0 && (
+              <p
+                className="relative inline-block h-5 w-5 rounded-full bg-accent-blue 
+              p-2 text-center text-[12px] font-bold text-white "
+              >
+                <span className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] transform">
+                  {formatCount(unReadCount)}
+                </span>
+              </p>
+            )}
           </div>
         </div>
       </div>
-      <p className="">{timestamp}</p>
-      {unReadCount !== 0 && (
-        <p className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-blue text-white">
-          {unReadCount}
-        </p>
-      )}
     </div>
   );
 };

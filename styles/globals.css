@@ -29,6 +29,9 @@
 .text-muted {
   @apply text-muted-light dark:text-muted-dark
 }
+.bg-hover {
+  @apply bg-hover-light dark:bg-hover-dark
+}
 }
   /* target element with overflow */
   .scrollBar::-webkit-scrollbar-thumb {
