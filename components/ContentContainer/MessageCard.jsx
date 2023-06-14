@@ -168,7 +168,7 @@ const MessageCard = ({ chat }) => {
     <div
       ref={messageRef}
       className={`group my-2 flex items-center justify-start ${chat.senderId === currentId ? " flex-row-reverse" : " "
-        } ${chat.reactions.length === 0 ? "" : "mb-[30px]"}  `}
+        } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
     >
@@ -258,7 +258,7 @@ const MessageCard = ({ chat }) => {
           </div>
         </div>
 
-        {chat.reactions.length > 0 && (
+        {chat.reactions?.length > 0 && (
           <div
             ref={animationParent}
             onClick={() => { }}
@@ -272,7 +272,7 @@ const MessageCard = ({ chat }) => {
                 <Emoji unified={emoji} size="15" key={emoji} />
               ))}
             <span className="text-muted ml-1 text-[10px] ">
-              {formatCount(chat.reactions.length)}
+              {formatCount(chat.reactions?.length)}
             </span>
           </div>
         )}
@@ -336,7 +336,7 @@ const MessageCard = ({ chat }) => {
             <div
               key={emoji}
               className={`mr-1 cursor-pointer rounded-lg p-1 hover:dark:bg-hover-dark
-               hover:dark:text-white ${chat.reactions.find((reaction) => reaction.id === User.id)
+               hover:dark:text-white ${chat.reactions?.find((reaction) => reaction.id === User.id)
                   ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
                 } `}
               onClick={() => handleEmojiReaction(emoji)}

@@ -46,6 +46,10 @@ module.exports = {
           dark: "#666b7a",
           light: "#666b7a",
         },
+        imgCover: {
+          dark: "rgb(107 114 128)",
+          light: "#dfe5e7",
+        },
       },
     },
   },

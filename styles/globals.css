@@ -32,6 +32,9 @@
 .bg-hover {
   @apply bg-hover-light dark:bg-hover-dark
 }
+.bg-cover {
+  @apply bg-imgCover-light dark:bg-imgCover-dark
+}
 }
   /* target element with overflow */
   .scrollBar::-webkit-scrollbar-thumb {

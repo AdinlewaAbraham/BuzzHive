@@ -26,40 +26,48 @@ const AddContact = () => {
   const [lastUser, setLastUser] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [addUsersLoading, setaddUsersLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { setSelectedChannel, setprevSelectedChannel, prevSelectedChannel } =
     useContext(SelectedChannelContext);
-    const fetchUsers = async (searchQuery) => {
+  const fetchUsers = async () => {
+    try {
       setLoading(true);
+
       const usersRef = collection(db, "users");
-      let q;
-    
-      if (searchQuery) {
-        console.log(searchQuery)
-        q = query(usersRef, where("name", ">=", searchQuery), where("name", "<=", searchQuery + "\uf8ff"), orderBy("name"), limit(15));
-      } else if (lastUser) {
-        q = query(usersRef, orderBy("name"), startAfter(lastUser.data().name), limit(15));
-      } else {
-        q = query(usersRef, orderBy("name"), limit(15));
-      }
-    
-      try {
-        const querySnapshot = await getDocs(q);
-        const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
-        console.log(fetchedUsers)
-        setUsers((prevUsers) => [...prevUsers, ...fetchedUsers]);
-        setLastUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        if (querySnapshot.docs.length < 15) {
-          setHasMore(false);
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    
+      let q = query(usersRef, orderBy("name"), limit(15));
+
+      const querySnapshot = await getDocs(q);
+      const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
+
+      setUsers(fetchedUsers);
+      setLastUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setHasMore(querySnapshot.docs.length === 15);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
       setLoading(false);
-    };
-    
+    }
+  };
+
+  const fetchedUsersWithQuery = async (searchQuery) => {
+    setLoading(true);
+    const usersRef = collection(db, "users");
+    let q = query(
+      usersRef,
+      where("queryName", "!=", User.name.toLowerCase()), // using queryName because firebase query is case sensitive
+      where("queryName", ">=", searchQuery.toLowerCase()),
+      where("queryName", "<=", searchQuery.toLowerCase() + "\uf8ff")
+    );
+
+    const querySnapshot = await getDocs(q);
+    const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
+
+    setUsers(fetchedUsers);
+    setLoading(false);
+  }
+
+
 
   const addUsers = async () => {
     if (addUsersLoading) return;
@@ -126,7 +134,14 @@ const AddContact = () => {
           onChange={(e) => {
             const newSearchQuery = e.target.value;
             setSearchQuery(newSearchQuery);
-            fetchUsers(newSearchQuery); // Call fetchUsers with the updated search query
+            console.log(newSearchQuery)
+            if (newSearchQuery === "") {
+              console.log(newSearchQuery)
+              fetchUsers()
+            } else {
+              console.log(newSearchQuery)
+              fetchedUsersWithQuery(newSearchQuery);
+            }
           }}
         />
       </div>
@@ -159,6 +174,10 @@ const AddContact = () => {
             overflow-y-auto 
            `}
           >
+            {users.length === 0 &&
+              <div className="flex justify-center items-center h-full">
+                no contacts found
+              </div>}
             {users
               .filter((user) => user.id !== User.id)
               .map((user) => (

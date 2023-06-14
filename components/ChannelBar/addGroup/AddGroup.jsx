@@ -14,6 +14,7 @@ import Goback from "../Goback";
 import { GiCancel } from "react-icons/gi";
 import { CircularProgress } from "@mui/joy";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
+import { FaUserAlt } from "react-icons/fa";
 import {
   collection,
   query,
@@ -21,6 +22,7 @@ import {
   getDocs,
   startAfter,
   orderBy,
+  where,
 } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import ModalComp from "@/components/ModalComp";
@@ -28,17 +30,25 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const UserCard = (p) => {
+  const [invalidURL, setinvalidURL] = useState(true);
   return (
     <div
       key={p.id}
       className="mr-1 flex cursor-pointer items-center rounded-md px-2 py-2 hover:bg-hover-light dark:hover:bg-hover-dark"
       onClick={p.onSelect}
     >
-      <img
-        src={p.photoUrl}
-        alt=""
-        className="mr-2 h-[45px] w-[45px] rounded-full"
-      />
+      {p.photoUrl && invalidURL ? (
+        <img
+          src={p.photoUrl}
+          alt="profile pic"
+          className="mr-2 h-[45px] w-[45px] rounded-full"
+          onError={() => setinvalidURL(false)}
+        />
+      ) : (
+        <i className="mr-2 h-[45px] w-[45px] rounded-full bg-cover flex items-center justify-center ">
+          <FaUserAlt size={22} />
+        </i>
+      )}
       <div>
         <p className="">{p.name}</p>
       </div>
@@ -66,7 +76,6 @@ const AddGroup = () => {
 
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
-  const [lastUser, setLastUser] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [addUsersLoading, setaddUsersLoading] = useState(false);
   const [open, setOpen] = React.useState(false);
@@ -126,19 +135,17 @@ const AddGroup = () => {
     return () => window.removeEventListener("resize", widthResizer);
   }, []);
   const divStyles = {
-    maxHeight: `calc(100vh - 125px${
-      selectedUsers.length > 0
-        ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
-        : ""
-    })`,
+    maxHeight: `calc(100vh - 125px${selectedUsers.length > 0
+      ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
+      : ""
+      })`,
     transition: "height ease-in-out 150ms",
   };
   const showAddGroupMenudivStyles = {
-    maxHeight: `calc(100vh - 80px${
-      selectedUsers.length > 0
-        ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
-        : ""
-    })`,
+    maxHeight: `calc(100vh - 80px${selectedUsers.length > 0
+      ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
+      : ""
+      })`,
     transition: "max-height 0.5s ease",
   };
 
@@ -163,33 +170,36 @@ const AddGroup = () => {
       setSelectedChannel("chats");
     });
   };
+  const filterUsersWithQuery = (SearchQuery) => {
+    const filteredUsers = activeUsers.filter((user) => {
+      console.log(user);
+      const lowercaseName = user.senderDisplayName.toLowerCase();
+      const lowercaseSearchQuery = SearchQuery.toLowerCase();
+      return lowercaseName.includes(lowercaseSearchQuery);
+    });
+
+    setactiveUsers(filteredUsers);
+  };
 
   const fetchUsers = async () => {
-    console.log("running");
-    setLoading(true);
-    const usersRef = collection(db, "users");
-    let q = query(usersRef, limit(10));
-
-    if (lastUser) {
-      (q = query(usersRef, orderBy("name"), startAfter(lastUser.data().name))),
-        limit(10);
-    } else {
-      q = query(usersRef, orderBy("name"), limit(10));
-    }
     try {
+      setLoading(true);
+
+      const usersRef = collection(db, "users");
+      let q = query(usersRef, orderBy("name"), limit(15));
+
       const querySnapshot = await getDocs(q);
       const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
-      setUsers((prevUsers) => [...prevUsers, ...fetchedUsers]);
-      setLastUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      if (querySnapshot.docs.length < 10) {
-        setHasMore(false);
-      }
+
+      setUsers(fetchedUsers);
+      setHasMore(querySnapshot.docs.length === 15);
     } catch (error) {
       console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-    console.log(loading);
   };
+
   const addUsers = async () => {
     if (addUsersLoading) return;
     setaddUsersLoading(true);
@@ -206,7 +216,6 @@ const AddGroup = () => {
       const querySnapshot = await getDocs(q);
       const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
       setUsers((prevUsers) => [...prevUsers, ...fetchedUsers]);
-      setLastUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
       if (querySnapshot.docs.length < 10) {
         setHasMore(false);
       }
@@ -214,6 +223,23 @@ const AddGroup = () => {
       console.error("Error fetching users:", error);
     }
     setaddUsersLoading(false);
+  };
+
+  const fetchedUsersWithQuery = async (searchQuery) => {
+    setLoading(true);
+    const usersRef = collection(db, "users");
+    let q = query(
+      usersRef,
+      where("queryName", "!=", User.name.toLowerCase()), // using queryName because firebase query is case sensitive
+      where("queryName", ">=", searchQuery.toLowerCase()),
+      where("queryName", "<=", searchQuery.toLowerCase() + "\uf8ff")
+    );
+
+    const querySnapshot = await getDocs(q);
+    const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
+
+    setUsers(fetchedUsers);
+    setLoading(false);
   };
 
   const scrollContainerRef = useRef(null);
@@ -289,9 +315,8 @@ const AddGroup = () => {
                   {user.name}
                   <i
                     className={`text-danger absolute right-1 cursor-pointer p-1
-                   opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${
-                     !showAddGroupMenu && "group-hover:opacity-100  "
-                   } `}
+                   opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${!showAddGroupMenu && "group-hover:opacity-100  "
+                      } `}
                     onClick={() => handleRemoveUser(user.id)}
                   >
                     <GiCancel />
@@ -382,9 +407,8 @@ const AddGroup = () => {
             </div>
             <div className="  left-0 bottom-0 mt-auto flex w-full">
               <button
-                className={`mr-1 flex w-1/2 items-center justify-center rounded-lg bg-accent-blue py-2 ${
-                  creatingGroupLoading && "cursor-wait"
-                } `}
+                className={`mr-1 flex w-1/2 items-center justify-center rounded-lg bg-accent-blue py-2 ${creatingGroupLoading && "cursor-wait"
+                  } `}
                 onClick={createGroupFunc}
                 disabled={creatingGroupLoading}
               >
@@ -403,9 +427,8 @@ const AddGroup = () => {
               <button
                 onClick={cancelCreateGroup}
                 disabled={creatingGroupLoading}
-                className={`w-1/2 rounded-lg bg-gray-500 py-2 ${
-                  creatingGroupLoading && "cursor-wait"
-                } `}
+                className={`w-1/2 rounded-lg bg-gray-500 py-2 ${creatingGroupLoading && "cursor-wait"
+                  } `}
               >
                 Cancel
               </button>
@@ -418,6 +441,17 @@ const AddGroup = () => {
                 type="text"
                 className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
                 placeholder="Search"
+                onChange={(e) => {
+                  const newSearchQuery = e.target.value;
+                  if (newSearchQuery === "") {
+                    fetchUsers();
+                    let data = localStorage.getItem(`${User.id}_userChats`);
+                    data ? setactiveUsers(JSON.parse(data)) : 0;
+                  } else {
+                    fetchedUsersWithQuery(newSearchQuery);
+                    filterUsersWithQuery(newSearchQuery);
+                  }
+                }}
               />
             </div>
             {selectedUsers.length > 0 && (
@@ -456,11 +490,11 @@ const AddGroup = () => {
               className={` scrollBar relative
                 mt-[10px] overflow-y-auto transition-all duration-200  `}
             >
-              {activeUsers.length > 0 && (
-                <>
+              {activeUsers?.length > 0 && (
+                <div className="relative">
                   <h2
-                    className="sticky top-0 mb-1 rounded-lg bg-light-primary p-2 pt-0
-             text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark "
+                    className="sticky top-0 mb-1 bg-light-primary p-2 pt-0
+                 text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark "
                   >
                     Active chats
                   </h2>
@@ -476,9 +510,8 @@ const AddGroup = () => {
                         };
                         return (
                           <div
-                            className={`${
-                              user.type == "group" ? "hidden" : ""
-                            }`}
+                            className={`${user.type == "group" ? "hidden" : ""
+                              }`}
                             key={`active${user.id}`}
                           >
                             <UserCard
@@ -497,8 +530,9 @@ const AddGroup = () => {
                         );
                       })}
                   </div>
-                </>
+                </div>
               )}
+
               <h2
                 className="sticky top-0 mb-1 mt-1 rounded-lg bg-light-primary p-2
              text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark"
@@ -507,6 +541,11 @@ const AddGroup = () => {
               </h2>
               {!loading ? (
                 <>
+                  {users.length === 0 && (
+                    <div className="flex h-full items-center justify-center">
+                      no contacts found
+                    </div>
+                  )}
                   {[...users]
                     .filter((user) => user.id !== User.id)
                     .map((user) => {

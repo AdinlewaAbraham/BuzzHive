@@ -30,6 +30,7 @@ const Input = () => {
     ReplyObject,
     setReplyObject,
     setreplyDivHeight,
+    setallowScrollObject,
   } = useContext(SelectedChannelContext);
   const [message, setmessage] = useState("");
   const [showMediaPicker, setshowMediaPicker] = useState(false);
@@ -59,6 +60,11 @@ const Input = () => {
       status: "pending",
       id: "propId",
     };
+    setallowScrollObject({
+      scrollTo: "bottom",
+      scrollBehaviour: "smooth",
+      allowScroll: true,
+    });
     setChats((prevChats) => {
       [...prevChats, messageObj];
       return [...prevChats, messageObj];
@@ -88,9 +94,6 @@ const Input = () => {
         ReplyObject.ReplyTextId ? replyObject : {}
       );
     }
-    document
-      .getElementById("scrollToMe")
-      .scrollIntoView({ behavior: "smooth" });
     setmessage("");
   }
 

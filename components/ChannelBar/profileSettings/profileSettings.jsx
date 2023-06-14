@@ -43,6 +43,9 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
     const objectKey = title === "Bio" ? "bio" : "name";
     const userRef = doc(db, "users", User.id);
     updateDoc(userRef, { [objectKey]: toBeUpdated });
+    if (objectKey === "name"){
+      updateDoc(userRef, {["queryName"]: toBeUpdated.toLocaleLowerCase()})
+    }
     setshowInput(false);
   };
   return (
@@ -139,7 +142,7 @@ const ProfileSettings = () => {
               </label>
             )}
             {User.photoUrl && invalidURL ? (
-              <Image
+              <img
                 width={100}
                 height={100}
                 src={User.photoUrl}

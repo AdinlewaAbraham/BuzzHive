@@ -6,17 +6,17 @@ module.exports = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
           {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
+            key: "Access-Control-Allow-Origin",
+            value: "*",
           },
         ],
       },
     ];
   },
   images: {
-    domains: ['firebasestorage.googleapis.com'], 
+    domains: ["firebasestorage.googleapis.com", "lh3.googleusercontent.com"],
   },
 };

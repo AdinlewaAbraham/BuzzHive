@@ -1,0 +1,7 @@
+add logic when clicking user in add user
+search for messages 
+group users change 
+framer motion poll options              ------
+correct unread messages count 
+add positoner to emoji board
+fix pop up in mobile

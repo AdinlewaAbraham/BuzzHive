@@ -34,6 +34,12 @@ const SelectedChannelContext = createContext({
   setreplyDivHeight: () => {},
   prevSelectedChannel: "chats",
   setprevSelectedChannel: () => {},
+  allowScrollObject: {
+    scrollTo: "",
+    scrollBehaviour: "",
+    allowScroll: true,
+  },
+  setallowScrollObject: () => {},
 });
 
 export const SelectedChannelProvider = ({ children }) => {
@@ -46,11 +52,18 @@ export const SelectedChannelProvider = ({ children }) => {
   const [showChats, setshowChats] = useState(true);
   const [activeId, setactiveId] = useState("");
   const [replyDivHeight, setreplyDivHeight] = useState("");
+  const [allowScrollObject, setallowScrollObject] = useState({
+    scrollTo: "",
+    scrollBehaviour: "",
+    allowScroll: true,
+  });
   const [ChatObject, setChatObject] = useState({
     activeChatId: "",
     activeChatType: "",
     otherUserId: "",
     message: "",
+    photoUrl: "",
+    displayName: "",
   });
   const [ReplyObject, setReplyObject] = useState({
     ReplyText: "",
@@ -83,6 +96,8 @@ export const SelectedChannelProvider = ({ children }) => {
         setreplyDivHeight,
         prevSelectedChannel,
         setprevSelectedChannel,
+        allowScrollObject,
+        setallowScrollObject,
       }}
     >
       {children}

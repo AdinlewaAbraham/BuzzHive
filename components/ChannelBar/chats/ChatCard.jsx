@@ -9,6 +9,7 @@ import {
   updateDoc,
   getDoc,
   Timestamp,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
@@ -47,7 +48,7 @@ const ChatCard = ({
     setChatObject,
     setshowChats,
     setactiveId,
-    activeId,
+    setallowScrollObject,
   } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
   const [invalidURL, setinvalidURL] = useState(true);
@@ -75,7 +76,7 @@ const ChatCard = ({
       return;
     }
 
-    if (unReadCount == 0) {
+    if (unReadCount === 0) {
       const data = JSON.parse(localStorage.getItem(id));
       if (data) {
         const filteredData = data.filter((message) => {
@@ -88,7 +89,7 @@ const ChatCard = ({
       const data = JSON.parse(localStorage.getItem(id));
       const unreadObj = {
         type: "unread",
-        id: "propid",
+        id: "unreadId",
       };
       if (data) {
         const filteredData = data.filter((message) => {
@@ -107,6 +108,22 @@ const ChatCard = ({
     JSON.parse(localStorage.getItem("user"));
     setactiveId(id);
     sessionStorage.setItem("activeChatId", new String(id));
+    const data = getStoredChats();
+    const whatToScrollTo = unReadCount === 0 ? null : "propid";
+    console.log(whatToScrollTo);
+    if (unReadCount === 0) {
+      setallowScrollObject({
+        scrollTo: "bottom",
+        scrollBehaviour: "instant",
+        allowScroll: true,
+      });
+    } else {
+      setallowScrollObject({
+        scrollTo: "unreadId",
+        scrollBehaviour: "instant",
+        allowScroll: true,
+      });
+    }
     setChatObject({
       activeChatId: id,
       activeChatType: type,
@@ -124,8 +141,6 @@ const ChatCard = ({
     const lastMessage = messages[messages.length - 1];
     lastMessage;
     const Chats = getStoredChats();
-    Chats;
-    Chats;
     const updatedArr = Chats.map((obj) => {
       if (obj.id == id) {
         return { ...obj, unReadmessagesCount: 0 };
@@ -181,13 +196,15 @@ const ChatCard = ({
           if (!isMessageInLocalStorage(localstorageMessages, messageData)) {
             [...localstorageMessages];
             localstorageMessages.push(messageData);
-            localStorage.setItem(id, JSON.stringify(localstorageMessages));
+            const saveChats = localstorageMessages.sort(
+              (a, b) => a.timestamp?.seconds - b.timestamp?.seconds
+            );
+            localStorage.setItem(id, JSON.stringify(saveChats));
             if (id === ChatObject.activeChatId) {
-
               if (User.isReadReceiptsOn) {
                 changeMessagesStatus(id, type, "seen")
                   .then(() => {
-                    setChats((prevMessages) => [...localstorageMessages]);
+                    setChats((prevMessages) => [...saveChats]);
                   })
                   .catch((error) => {
                     "Error updating message status:", error;
@@ -195,8 +212,7 @@ const ChatCard = ({
               }
             } else if (id !== ChatObject.activeChatId) {
               changeMessagesStatus(id, type, "received")
-                .then(() => {
-                })
+                .then(() => {})
                 .catch((error) => {
                   "Error updating message status:", error;
                 });
@@ -250,11 +266,42 @@ const ChatCard = ({
     }
     return () => unsubscribe();
   }, [ChatObject.activeChatId]);
-
   const getStoredMessages = () => {
     const str = localStorage.getItem(`${ChatObject.activeChatId}`);
-    return JSON.parse(str);
+    const messages = JSON.parse(str).sort(
+      (a, b) => a.timestamp?.seconds - b.timestamp?.seconds
+    );
+
+    if (unReadCount !== 0 && User.unReadMessages[ChatObject.activeChatId]) {
+      const timestamp = User.unReadMessages[ChatObject.activeChatId];
+      const index = messages.findIndex((message) => {
+        return (
+          JSON.stringify({
+            seconds: message.timestamp?.seconds,
+            nanoseconds: message.timestamp?.nanoseconds,
+          }) ==
+          JSON.stringify({
+            seconds: timestamp?.seconds,
+            nanoseconds: timestamp?.nanoseconds,
+          })
+        );
+      });
+      console.log(index);
+      if (index !== -1) {
+        const startIndex = Math.max(index - 10, 0);
+        console.log(startIndex);
+        console.log(messages.slice(index).length);
+        if (messages.length - startIndex > 30) {
+          return messages.slice(startIndex, startIndex + 30);
+        } else {
+          return messages.slice(startIndex);
+        }
+      }
+    }
+
+    return messages.slice(-30);
   };
+
   useEffect(() => {
     if (ChatObject.activeChatId === "") return;
 
@@ -271,30 +318,25 @@ const ChatCard = ({
       localStorage.getItem(`${ChatObject.activeChatId}`)
     ) {
       const Chat = getStoredMessages();
-      Chat;
-      "this is for " + name + " " + unReadCount;
       setChats(Chat);
     } else {
       const getMessage = async () => {
         const CollectionName =
           ChatObject.activeChatType === "group" ? "groups" : "conversations";
         CollectionName;
-        const query = collection(
-          db,
-          CollectionName,
-          ChatObject.activeChatId,
-          "messages"
+
+        const q = query(
+          collection(db, CollectionName, ChatObject.activeChatId, "messages"),
+          orderBy("timestamp")
         );
 
-        const snapshot = await getDocs(query);
-        const messages = await snapshot.docs.map((doc) => doc.data());
-        messages;
-        const sortedMessages = messages.sort((a, b) => {
-          a.timestamp - b.timestamp;
-        });
-        sortedMessages;
+        const snapshot = await getDocs(q);
+        const messages = snapshot.docs.map((doc) => doc.data());
+        const sortedMessages = messages.sort(
+          (a, b) => a.timestamp?.seconds - b.timestamp?.seconds
+        );
         const filteredMessages = sortedMessages.filter((message) => message);
-        setChats(filteredMessages);
+        setChats(filteredMessages.splice(-30));
         localStorage.setItem(
           `${ChatObject.activeChatId}`,
           JSON.stringify(filteredMessages)
@@ -315,7 +357,7 @@ const ChatCard = ({
         handleChatClick();
       }}
     >
-      <div className=" flex h-[50px] w-[50px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500 ">
+      <div className=" flex h-[50px] w-[50px] items-center justify-center rounded-full bg-cover text-[#ffffff]">
         {img && invalidURL ? (
           <img
             src={img}

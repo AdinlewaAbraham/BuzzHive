@@ -6,6 +6,7 @@ export const createUser = async (uid, displayname, email, photoUrl, bio) => {
     await setDoc(docRef, {
       id: uid,
       name: displayname,
+      queryName: displayname.toLowerCase(),
       email: email,
       photoUrl: photoUrl,
       bio: bio,

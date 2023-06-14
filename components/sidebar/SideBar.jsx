@@ -123,7 +123,7 @@ const SideBar = () => {
           text="Add group"
         />
       </i>
-
+<button onClick={()=>localStorage.clear()}>clear</button>
       <div className="flex items-center justify-center md:flex-col ">
         <SideBarIcon
           icon={<AiOutlineSetting size={22} />}

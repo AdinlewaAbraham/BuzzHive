@@ -34,8 +34,6 @@ const UserCard = ({ name, id, image, user }) => {
       localStorage.getItem(`${activeChatId}`)
     ) {
       const Chat = getStoredMessages();
-      Chat;
-      "this is for " + name + " " + unReadCount;
       setChats(Chat);
     } else {
       const getMessage = async () => {

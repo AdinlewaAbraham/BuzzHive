@@ -164,7 +164,7 @@ const Chats = () => {
                       chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
                   )
                   .map((chat) => (
-                    <ChatCard //this is soo stupid of me too late to change this
+                    <ChatCard  
                       key={chat.id}
                       otherUserId={chat.otherParticipant}
                       type={chat.type}
