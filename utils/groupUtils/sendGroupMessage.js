@@ -11,8 +11,11 @@ export const sendGroupMessage = async (
   type,
   time,
   replyObj,
-  dataObj, createdId
+  dataObj,
+  createdId,
+  clearMessage
 ) => {
+  clearMessage();
   const groupRef = doc(db, "groups", groupID);
   const customId = uuidv4();
   const message = {
@@ -31,7 +34,7 @@ export const sendGroupMessage = async (
   const user = await getUser(senderId);
   const newMessage = {
     lastMessage: messageText,
-    type: type, 
+    type: type,
     status: "sent",
     timestamp: time,
     senderId: senderId,
@@ -40,9 +43,6 @@ export const sendGroupMessage = async (
   };
   try {
     await updateDoc(groupRef, { lastMessage: newMessage });
-
-
-
 
     const messagesColRef = collection(groupRef, "messages");
     const messageDocRef = doc(messagesColRef, customId);

@@ -44,7 +44,7 @@ const Input = () => {
 
   const senderid = User.id;
   const elementRef = useRef(null);
-  function handleSend() {
+  async function handleSend() {
     if (!message || message.trim().length === 0) return;
     const replyObject = {
       replyText: ReplyObject.ReplyText,
@@ -70,20 +70,20 @@ const Input = () => {
       return [...prevChats, messageObj];
     });
     if (ChatObject.activeChatType == "group") {
-      sendGroupMessage(
+      await sendGroupMessage(
         User.id,
         ChatObject.activeChatId,
         message,
         User.name,
         ReplyObject.ReplyTextId ? "reply" : "regular",
         time,
-        ReplyObject.ReplyTextId ? replyObject : {}
+        ReplyObject.ReplyTextId ? replyObject : {},
+        null,
+        null,
+        clearMessage
       );
     } else if (ChatObject.activeChatType == "personal") {
-      const time = new Date();
-      User;
-      ("ran");
-      sendMessage(
+      await sendMessage(
         senderid,
         ChatObject.otherUserId,
         message,
@@ -91,9 +91,14 @@ const Input = () => {
         User.name,
         ReplyObject.ReplyTextId ? "reply" : "regular",
         time,
-        ReplyObject.ReplyTextId ? replyObject : {}
+        ReplyObject.ReplyTextId ? replyObject : {},
+        null,
+        null,
+        clearMessage
       );
     }
+  }
+  function clearMessage() {
     setmessage("");
   }
 

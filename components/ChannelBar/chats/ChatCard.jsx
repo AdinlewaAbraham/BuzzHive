@@ -75,6 +75,7 @@ const ChatCard = ({
     if (ChatObject.activeChatId === id) {
       return;
     }
+    const userRef = doc(db, "users", User.id);
 
     if (unReadCount === 0) {
       const data = JSON.parse(localStorage.getItem(id));
@@ -86,7 +87,9 @@ const ChatCard = ({
         localStorage.setItem(id, JSON.stringify(filteredData));
       }
     } else {
-      const data = JSON.parse(localStorage.getItem(id));
+      const data = JSON.parse(localStorage.getItem(id)).sort((a, b) => {
+        a.timestamp?.seconds - b.timestamp?.seconds;
+      });
       const unreadObj = {
         type: "unread",
         id: "unreadId",
@@ -97,6 +100,7 @@ const ChatCard = ({
           return message.type !== "unread";
         });
         const index = filteredData.length - unReadCount;
+        console.log([...filteredData.slice(index)]);
         const modifiedArr = [
           ...filteredData.slice(0, index),
           unreadObj,
@@ -108,9 +112,6 @@ const ChatCard = ({
     JSON.parse(localStorage.getItem("user"));
     setactiveId(id);
     sessionStorage.setItem("activeChatId", new String(id));
-    const data = getStoredChats();
-    const whatToScrollTo = unReadCount === 0 ? null : "propid";
-    console.log(whatToScrollTo);
     if (unReadCount === 0) {
       setallowScrollObject({
         scrollTo: "bottom",
@@ -132,14 +133,15 @@ const ChatCard = ({
       displayName: name,
     });
     setshowChats(true);
-    const userRef = doc(db, "users", User.id);
 
-    const messages = JSON.parse(localStorage.getItem(id));
+    const messages = JSON.parse(localStorage.getItem(id)).sort(
+      (a, b) => a.timestamp?.seconds - b.timestamp?.seconds
+    );
     if (!messages || JSON.stringify(message) == "[]") {
       return;
     }
     const lastMessage = messages[messages.length - 1];
-    lastMessage;
+    console.log(lastMessage);
     const Chats = getStoredChats();
     const updatedArr = Chats.map((obj) => {
       if (obj.id == id) {
@@ -148,7 +150,6 @@ const ChatCard = ({
         return obj;
       }
     });
-    updatedArr;
     set_Chats(
       updatedArr.sort((a, b) => {
         a.timestamp - b.timestamp;
@@ -164,9 +165,6 @@ const ChatCard = ({
     );
 
     if (lastMessage) {
-      User.id;
-      userRef;
-      lastMessage;
       await updateDoc(userRef, {
         [`unReadMessages.${id}`]: lastMessage.timestamp,
       });
@@ -188,7 +186,6 @@ const ChatCard = ({
     const q = query(collection(db, CollectionName, id, "messages"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const localstorageMessages = JSON.parse(localStorage.getItem(id));
-      const updatedMessages = [];
       snapshot.docChanges().forEach((change) => {
         const messageData = change.doc.data();
         if (change.type === "added") {
@@ -201,6 +198,49 @@ const ChatCard = ({
             );
             localStorage.setItem(id, JSON.stringify(saveChats));
             if (id === ChatObject.activeChatId) {
+              const userRef = doc(db, "users", User.id);
+              const activeChats = JSON.parse(
+                localStorage.getItem(ChatObject.activeChatId)
+              )?.sort((a, b) => a.timestamp?.seconds - b.timestamp?.seconds);
+              if (activeChats || JSON.stringify(activeChats) !== "[]") {
+                const lastMessage = activeChats[activeChats.length - 1];
+                const Chats = getStoredChats();
+                const updatedArr = Chats.map((obj) => {
+                  if (obj.id == id) {
+                    return { ...obj, unReadmessagesCount: 0 };
+                  } else {
+                    return obj;
+                  }
+                });
+                set_Chats(
+                  updatedArr.sort((a, b) => {
+                    a.timestamp - b.timestamp;
+                  })
+                );
+                localStorage.setItem(
+                  `${User.id}_userChats`,
+                  JSON.stringify(
+                    updatedArr.sort((a, b) => {
+                      a.timestamp - b.timestamp;
+                    })
+                  )
+                );
+                if (lastMessage) {
+                  updateDoc(userRef, {
+                    [`unReadMessages.${id}`]: lastMessage.timestamp,
+                  });
+                  const prev = JSON.parse(localStorage.getItem("user"));
+                  const newObj = {
+                    ...prev,
+                    unReadMessages: {
+                      ...prev.unReadMessages,
+                      [id]: lastMessage.timestamp,
+                    },
+                  };
+                  localStorage.setItem("user", JSON.stringify(newObj));
+                }
+              }
+
               if (User.isReadReceiptsOn) {
                 changeMessagesStatus(id, type, "seen")
                   .then(() => {

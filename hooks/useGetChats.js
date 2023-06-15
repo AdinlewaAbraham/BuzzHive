@@ -23,8 +23,6 @@ export const useGetChats = (currentUserId) => {
 
   const { ChatObject, activeId } = useContext(SelectedChannelContext);
 
-  ////////////////////
-
   useEffect(() => {
     ("ran");
     const conversationRef = collection(db, "conversations");
@@ -45,11 +43,9 @@ export const useGetChats = (currentUserId) => {
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       activeId;
       const activeChatId = JSON.parse(sessionStorage.getItem("activeChatId")); // this is a retarded hack but it works
-      activeChatId;
       const lastMessagesObject = JSON.parse(
         localStorage.getItem("user")
       ).unReadMessages;
-      ("ran");
       const chats = [];
       for (const doc of querySnapshot.docs) {
         const conversation = doc.data();
@@ -80,16 +76,16 @@ export const useGetChats = (currentUserId) => {
             orderBy("timestamp", "desc")
           );
           const unReadMessagequerySnapshot = await getDocs(unReadMessagesQuery);
-
-          unReadmessagesCount =
-            activeChatId == doc.id ? 0 : unReadMessagequerySnapshot.size;
-          ChatObject.activeChatId;
-          doc.id;
-          activeChatId;
-          "this is for " + doc.id + " " + unReadmessagesCount;
+          const unreadCount = unReadMessagequerySnapshot.docs.filter(
+            (message) => message.data().senderId !== currentUserId
+          ).length;
+          const unreadCount2 = unReadMessagequerySnapshot.docs.filter(
+            (message) => message.data().senderId !== currentUserId
+          );
+          const shir = unreadCount2.map((i)=>i.data())
+          unReadmessagesCount = activeChatId == doc.id ? 0 : unreadCount;
         } else {
           unReadmessagesCount = 0;
-          "this is for " + doc.id + " " + unReadmessagesCount;
         }
         console.log(lastMessage);
         const chat = {
@@ -134,8 +130,10 @@ export const useGetChats = (currentUserId) => {
             orderBy("timestamp", "desc")
           );
           const unReadMessagequerySnapshot = await getDocs(unReadMessagesQuery);
-          unReadmessagesCount =
-            activeChatId == doc.id ? 0 : unReadMessagequerySnapshot.size;
+          const unreadCount = unReadMessagequerySnapshot.docs.filter(
+            (message) => message.data().senderId !== currentUserId
+          ).length;
+          unReadmessagesCount = activeChatId == doc.id ? 0 : unreadCount;
         } else {
           unReadmessagesCount = 0;
         }

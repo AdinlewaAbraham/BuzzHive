@@ -1,7 +1,16 @@
 add logic when clicking user in add user
-search for messages 
-group users change 
-framer motion poll options              ------
-correct unread messages count 
+search for messages --------
+when click on searcb comp focus -------
+group users change so to indicate user who sent message 
+framer motion poll options              
 add positoner to emoji board
 fix pop up in mobile
+fix mui select Menu
+find color for check mark
+fix bllue line when in mobole
+pagination not working fine with different heights (small heights) it adds keeps ading even if there are already there
+login page loading state
+make aboutprofile functional 
+add forward mesages 
+fix reply ui
+make emojis clickable

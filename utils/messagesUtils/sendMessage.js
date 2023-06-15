@@ -12,8 +12,11 @@ export async function sendMessage(
   type,
   time,
   replyObj,
-  fileObj, createdId
+  fileObj,
+  createdId,
+  clearMessage
 ) {
+  clearMessage();
   const customId = uuidv4();
 
   console.log(customId);

@@ -55,8 +55,10 @@ const ContentContainer = () => {
   const [hasMoreBottom, sethasMoreBottom] = useState(true);
   const [hasMoreTop, sethasMoreTop] = useState(true);
   const [showScrollTobottom, setshowScrollTobottom] = useState(false);
+  const [SearchText, setSearchText] = useState("");
 
   const [showSearchPara, setshowSearchPara] = useState(false);
+  const [activeIndexId, setactiveIndexId] = useState();
 
   const scrollContainerRef = useRef(null);
   useEffect(() => {
@@ -83,12 +85,12 @@ const ContentContainer = () => {
   useEffect(() => {
     if (secondDivRef.current && allowScrollObject.allowScroll) {
       if (allowScrollObject.scrollTo === "bottom") {
-        secondDivRef.current.scrollIntoView({
+        secondDivRef.current?.scrollIntoView({
           behavior: allowScrollObject.scrollBehaviour,
         });
       } else if (allowScrollObject.scrollTo === "unreadId") {
         const element = document.getElementById("unreadId");
-        element.scrollIntoView();
+        element?.scrollIntoView();
         console.log(element);
       }
       setallowScrollObject({
@@ -99,6 +101,13 @@ const ContentContainer = () => {
     }
   }, [sortedChats]);
 
+  useEffect(() => {
+    console.log(searchedMessages[currentSearchIndex]);
+
+    if (searchedMessages[currentSearchIndex]) {
+      setactiveIndexId(searchedMessages[currentSearchIndex].id);
+    }
+  }, [currentSearchIndex]);
   useMemo(() => {
     if (Chats == []) return;
     if (Chats) {
@@ -114,7 +123,6 @@ const ContentContainer = () => {
       </div>
     );
   }
-  ReplyObject.divHeight;
 
   const mainContentStyle = {
     overflowY: "auto",
@@ -122,17 +130,27 @@ const ContentContainer = () => {
       ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
     })`,
   };
-
   const handleSearch = (event) => {
+    setSearchText(event.target.value);
     const searchText = event.target.value.toLowerCase();
     if (searchText) {
       setshowSearchPara(true);
     } else {
+      sortedChats.forEach((message) => {
+        const id = message.id;
+        const messageElement = document.getElementById(id);
+        messageElement.style.color = "";
+        messageElement.style.backgroundColor = "";
+      });
       setshowSearchPara(false);
     }
-    const filteredChats = sortedChats.filter((chat) =>
-      chat.text.toLowerCase().includes(searchText)
-    );
+    const filteredChats = sortedChats.filter((chat) => {
+      const searchWords = searchText.toLowerCase().split(" ");
+      const chatWords = chat.text.toLowerCase().split(" ");
+
+      return searchWords.every((searchWord) => chatWords.includes(searchWord));
+    });
+
     const reversedChats = filteredChats.reverse();
     setsearchedMessages(reversedChats);
     setcurrentSearchIndex(0);
@@ -156,8 +174,6 @@ const ContentContainer = () => {
     );
     const first30 = sortedMessages.splice(0, 30);
     setChats((prevMessages) => [...prevMessages, ...first30]);
-    console.log(newMessages);
-    console.log(lastBottomMessage);
   };
 
   const addMessagesTop = () => {
@@ -313,13 +329,15 @@ const ContentContainer = () => {
                 <i
                   className="hover:bg-hover "
                   onClick={() => {
-                    if (currentSearchIndex === 0) return;
+                    if (currentSearchIndex === searchedMessages.length - 1)
+                      return;
 
                     const nextIndex = Math.min(
                       currentSearchIndex + 1,
                       searchedMessages.length - 1
                     );
                     const scrollToElement = searchedMessages[nextIndex];
+                    console.log(scrollToElement);
 
                     if (scrollToElement) {
                       document
@@ -331,12 +349,11 @@ const ContentContainer = () => {
                   }}
                 >
                   <BsChevronUp />
-                </i>{" "}
+                </i>
                 <i
                   className="hover:bg-hover mr-1"
                   onClick={() => {
-                    if (currentSearchIndex === searchedMessages.length - 1)
-                      return;
+                    if (currentSearchIndex === 0) return;
 
                     const prevIndex = Math.max(currentSearchIndex - 1, 0);
                     const scrollToElement = searchedMessages[prevIndex];
@@ -359,7 +376,12 @@ const ContentContainer = () => {
                 </div>
                 <i
                   className="hover:bg-hover"
-                  onClick={() => setSearchanchor(null)}
+                  onClick={() => {
+                    setSearchanchor(null);
+                    setSearchText("");
+                    setsearchedMessages([])
+                    setactiveIndexId("")
+                  }}
                 >
                   <GiCancel />
                 </i>
@@ -385,9 +407,11 @@ const ContentContainer = () => {
               >
                 {sortedChats &&
                   formatChats(sortedChats).map((chat) => (
-                    <div id={chat.id} key={chat.id}>
-                      <MessageCard chat={chat} />
-                    </div>
+                    <MessageCard
+                      chat={chat}
+                      searchText={SearchText}
+                      activeIndexId={activeIndexId}
+                    />
                   ))}
                 <div ref={secondDivRef} id="scrollToMe"></div>
               </div>
