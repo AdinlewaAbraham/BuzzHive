@@ -1,16 +1,24 @@
-add logic when clicking user in add user
-search for messages --------
-when click on searcb comp focus -------
-group users change so to indicate user who sent message 
+group users change so to indicate user who sent message --------
 framer motion poll options              
 add positoner to emoji board
-fix pop up in mobile
+fix pop up in mobile (just add min w) and also bg color for light mode
 fix mui select Menu
 find color for check mark
 fix bllue line when in mobole
-pagination not working fine with different heights (small heights) it adds keeps ading even if there are already there
 login page loading state
-make aboutprofile functional 
+make about profile functional 
 add forward mesages 
-fix reply ui
+fix reply message ui
 make emojis clickable
+fix pending messages without timeStamp
+remove hover for mobile
+add delete and edited
+change sidebar context comp styling (font)
+do something about add user ui
+fix box input and maybe add check animation
+
+
+
+
+clean up stuff 
+use <img/>

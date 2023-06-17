@@ -134,7 +134,7 @@ const ChatCard = ({
     });
     setshowChats(true);
 
-    const messages = JSON.parse(localStorage.getItem(id)).sort(
+    const messages = JSON.parse(localStorage.getItem(id))?.sort(
       (a, b) => a.timestamp?.seconds - b.timestamp?.seconds
     );
     if (!messages || JSON.stringify(message) == "[]") {

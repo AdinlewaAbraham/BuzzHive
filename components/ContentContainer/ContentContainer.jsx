@@ -24,7 +24,7 @@ import { GiCancel } from "react-icons/gi";
 import { BsChevronUp, BsChevronDown } from "react-icons/bs";
 import { RxDividerVertical } from "react-icons/rx";
 import { CircularProgress } from "@mui/joy";
-import { TbRuler3 } from "react-icons/tb";
+import InfiniteScroll from 'react-infinite-scroller';
 
 const ContentContainer = () => {
   const {
@@ -50,10 +50,10 @@ const ContentContainer = () => {
   const [Searchanchor, setSearchanchor] = useState(null);
   const isOpen = Boolean(Searchanchor);
   const [searchedMessages, setsearchedMessages] = useState([]);
-  const [currentSearchIndex, setcurrentSearchIndex] = useState(0);
+  const [currentSearchIndex, setcurrentSearchIndex] = useState(-1);
 
-  const [hasMoreBottom, sethasMoreBottom] = useState(true);
   const [hasMoreTop, sethasMoreTop] = useState(true);
+
   const [showScrollTobottom, setshowScrollTobottom] = useState(false);
   const [SearchText, setSearchText] = useState("");
 
@@ -73,6 +73,10 @@ const ContentContainer = () => {
 
     return () => window.removeEventListener("resize", widthResizer);
   }, []);
+  useEffect(() => {
+    setshowSearchPara(false);
+  }, [isOpen]);
+
   useEffect(() => {
     if (ChatObject.photoUrl && ChatObject.photoUrl.props) {
       setPhotoUrl(ChatObject.photoUrl.props.src);
@@ -108,6 +112,11 @@ const ContentContainer = () => {
       setactiveIndexId(searchedMessages[currentSearchIndex].id);
     }
   }, [currentSearchIndex]);
+
+  useEffect(() => {
+    sethasMoreTop(true)
+  }, [ChatObject.activeChatId])
+
   useMemo(() => {
     if (Chats == []) return;
     if (Chats) {
@@ -126,9 +135,8 @@ const ContentContainer = () => {
 
   const mainContentStyle = {
     overflowY: "auto",
-    height: `calc(100vh - 123px${
-      ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
-    })`,
+    height: `calc(100vh - 123px${ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
+      })`,
   };
   const handleSearch = (event) => {
     setSearchText(event.target.value);
@@ -136,12 +144,6 @@ const ContentContainer = () => {
     if (searchText) {
       setshowSearchPara(true);
     } else {
-      sortedChats.forEach((message) => {
-        const id = message.id;
-        const messageElement = document.getElementById(id);
-        messageElement.style.color = "";
-        messageElement.style.backgroundColor = "";
-      });
       setshowSearchPara(false);
     }
     const filteredChats = sortedChats.filter((chat) => {
@@ -153,73 +155,8 @@ const ContentContainer = () => {
 
     const reversedChats = filteredChats.reverse();
     setsearchedMessages(reversedChats);
-    setcurrentSearchIndex(0);
-    console.log(reversedChats);
+    setcurrentSearchIndex(-1);
   };
-  const addMessagesBottom = () => {
-    const lastBottomMessage = Chats[Chats.length - 1];
-    const messages = JSON.parse(
-      localStorage.getItem(`${ChatObject.activeChatId}`)
-    );
-
-    const newMessages = messages.filter(
-      (message) =>
-        message.timestamp?.seconds > lastBottomMessage.timestamp?.seconds
-    );
-    if (newMessages.length === 0) {
-      sethasMoreBottom(false);
-    }
-    const sortedMessages = newMessages.sort(
-      (a, b) => a.timestamp.seconds - b.timestamp.seconds
-    );
-    const first30 = sortedMessages.splice(0, 30);
-    setChats((prevMessages) => [...prevMessages, ...first30]);
-  };
-
-  const addMessagesTop = () => {
-    const firstBottomMessage = Chats[0];
-    const messages = JSON.parse(
-      localStorage.getItem(`${ChatObject.activeChatId}`)
-    );
-
-    const newMessages = messages.filter(
-      (message) =>
-        message.timestamp?.seconds < firstBottomMessage.timestamp?.seconds
-    );
-    if (newMessages.length === 0) {
-      sethasMoreTop(false);
-    }
-    const sortedMessages = newMessages.sort(
-      (a, b) => a.timestamp.seconds - b.timestamp.seconds
-    );
-    const first30 = sortedMessages.splice(-30);
-
-    setChats((prevMessages) => [...first30, ...prevMessages]);
-    console.log(newMessages);
-  };
-
-  const handleScroll = () => {
-    const container = scrollContainerRef.current;
-
-    if (!container) return;
-
-    let triggerHeight = container.scrollTop + container.offsetHeight;
-    console.log(triggerHeight);
-    console.log(container.scrollHeight);
-    if (triggerHeight >= container.scrollHeight - 50) {
-      addMessagesBottom();
-    }
-    console.log(container.scrollTop);
-    if (container.scrollTop < 300) {
-      addMessagesTop();
-    }
-    if (triggerHeight <= container.scrollHeight - 300) {
-      setshowScrollTobottom(true);
-    } else {
-      setshowScrollTobottom(false);
-    }
-  };
-
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
@@ -232,9 +169,7 @@ const ContentContainer = () => {
           )}
           <div
             className="z-20 flex max-h-[66px] cursor-pointer  items-center justify-between bg-[#fcfcfc] px-[13px] dark:bg-[#1d232a] md:ml-[1px]"
-            onClick={() => {
-              //setshowProfile(true);
-            }}
+
           >
             <div className="flex h-full items-center p-[13px]">
               {IsMobile && (
@@ -255,9 +190,8 @@ const ContentContainer = () => {
                 }}
               >
                 <div
-                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${
-                    ChatObject.photoUrl === null ? "pt-[3px]" : ""
-                  }`}
+                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${ChatObject.photoUrl === null ? "pt-[3px]" : ""
+                    }`}
                 >
                   <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500">
                     <div className="flex items-center justify-center rounded-full bg-inherit text-[30px]">
@@ -297,7 +231,7 @@ const ContentContainer = () => {
               variant="plain"
               open={isOpen}
               disableFocusRipple={true}
-              onClose={() => {}}
+              onClose={() => { }}
               placement={"bottom-end"}
               sx={{
                 backgroundColor: "transparent",
@@ -313,6 +247,7 @@ const ContentContainer = () => {
               >
                 <div className="relative flex w-full items-center justify-center">
                   <input
+                    autoFocus
                     type="text"
                     className=" mr-1 flex w-full items-center justify-center rounded-lg bg-light-secondary py-1 px-3
                    pr-[50px]  text-black placeholder-muted-light outline-none
@@ -322,7 +257,10 @@ const ContentContainer = () => {
                   />
                   {showSearchPara && (
                     <p className="text-muted absolute right-3 flex whitespace-nowrap text-center  text-[12px] ">
-                      {currentSearchIndex + 1} of {searchedMessages.length}
+                      {searchedMessages.length === 0
+                        ? 0
+                        : currentSearchIndex + 1}{" "}
+                      of {searchedMessages.length}
                     </p>
                   )}
                 </div>
@@ -337,12 +275,14 @@ const ContentContainer = () => {
                       searchedMessages.length - 1
                     );
                     const scrollToElement = searchedMessages[nextIndex];
-                    console.log(scrollToElement);
 
                     if (scrollToElement) {
                       document
                         .getElementById(scrollToElement.id)
-                        ?.scrollIntoView({ behavior: "smooth" });
+                        ?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
 
                       setcurrentSearchIndex(nextIndex);
                     }
@@ -361,7 +301,10 @@ const ContentContainer = () => {
                     if (scrollToElement) {
                       document
                         .getElementById(scrollToElement.id)
-                        ?.scrollIntoView({ behavior: "smooth" });
+                        ?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
 
                       setcurrentSearchIndex(prevIndex);
                     }
@@ -379,8 +322,8 @@ const ContentContainer = () => {
                   onClick={() => {
                     setSearchanchor(null);
                     setSearchText("");
-                    setsearchedMessages([])
-                    setactiveIndexId("")
+                    setsearchedMessages([]);
+                    setactiveIndexId("");
                   }}
                 >
                   <GiCancel />
@@ -398,21 +341,58 @@ const ContentContainer = () => {
                 <p className="ml-2"> Loading...</p>
               </div>
             ) : Chats.length == 0 ? (
-              <></>
+              <>{/* empty state comp */}</>
             ) : (
               <div
-                className="scrollBar w-full overflow-y-auto "
-                onScroll={handleScroll}
+                className="scrollBar w-full overflow-y-auto"
+                //  onScroll={handleScroll}
                 ref={scrollContainerRef}
               >
-                {sortedChats &&
-                  formatChats(sortedChats).map((chat) => (
-                    <MessageCard
-                      chat={chat}
-                      searchText={SearchText}
-                      activeIndexId={activeIndexId}
-                    />
-                  ))}
+                <InfiniteScroll
+                  pageStart={0}
+                  loadMore={() => {
+                    const firstBottomMessage = Chats[0];
+                    const messages = JSON.parse(
+                      localStorage.getItem(`${ChatObject.activeChatId}`)
+                    );
+
+                    const newMessages = messages.filter(
+                      (message) =>
+                        message.timestamp?.seconds < firstBottomMessage.timestamp?.seconds
+                    );
+                    if (newMessages.length === 0 && hasMoreTop) {
+                      sethasMoreTop(false);
+                    }
+                    const sortedMessages = newMessages.sort(
+                      (a, b) => a.timestamp.seconds - b.timestamp.seconds
+                    );
+                    const first30 = sortedMessages.splice(-30);
+                    const newChats = [...first30, ...sortedChats]
+                    setChats(newChats);
+                  }}
+                  hasMore={hasMoreTop}
+                  loader={
+                    <div className="mb-5 mt-3 flex items-center justify-center">
+                      <i className="mr-2">
+                        <CircularProgress variant="plain" size="sm" />
+                      </i>{" "}
+                      loading more chats...
+                    </div>}
+                  useWindow={false}
+                  isReverse
+                >
+                  {sortedChats &&
+                    formatChats(sortedChats).map((chat) => (
+                      <MessageCard
+                        chat={chat}
+                        searchText={SearchText}
+                        activeIndexId={activeIndexId}
+                        searchedMessages={searchedMessages.map(
+                          (message) => message.id
+                        )}
+                      />
+                    ))}
+                </InfiniteScroll>
                 <div ref={secondDivRef} id="scrollToMe"></div>
               </div>
             )}
@@ -423,11 +403,10 @@ const ContentContainer = () => {
                 }}
                 className="absolute right-[20px] z-10 cursor-pointer rounded-lg p-3 dark:bg-[#1d232a]"
                 style={{
-                  bottom: `${
-                    ReplyObject.ReplyTextId
-                      ? `${replyDivHeight + 120}px`
-                      : "120px"
-                  }`,
+                  bottom: `${ReplyObject.ReplyTextId
+                    ? `${replyDivHeight + 120}px`
+                    : "120px"
+                    }`,
                 }}
               >
                 <AiOutlineArrowDown size={23} />

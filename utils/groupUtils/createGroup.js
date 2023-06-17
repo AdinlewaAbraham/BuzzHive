@@ -39,11 +39,10 @@ export const createGroup = async (
       isPublic: isPublic,
       admins: [creator],
     };
-
     await setDoc(newGroupRef, newGroup);
 
-    const messageText = `${username} created ${groupName}!`;
     const time = new Date();
+    const messageText = `${username} created ${groupName}!`;
     await sendGroupMessage(
       creator,
       newGroupRef.id,
@@ -53,7 +52,8 @@ export const createGroup = async (
       time,
       null,
       null,
-      null
+      null,
+      () => {}
     );
   } catch (error) {
     console.error("Error adding user to Firebase: ", error);

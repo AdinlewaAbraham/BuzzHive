@@ -26,12 +26,13 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { motion } from "framer-motion";
 import { formatTimeForMessages } from "@/utils/actualUtils/formatTimeForMessages";
 import { formatCount } from "@/utils/actualUtils/formatCount";
-const MessageCard = ({ chat, searchText, activeIndexId }) => {
+const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
   const [animationParent] = useAutoAnimate();
 
   const { ChatObject, setReplyObject, ReplyObject, setChats } = useContext(
     SelectedChannelContext
   );
+
   const { User, setUser } = useContext(UserContext);
   const { theme } = useTheme();
 
@@ -46,6 +47,9 @@ const MessageCard = ({ chat, searchText, activeIndexId }) => {
   const Open = Boolean(anchorEl);
 
   const messageRef = useRef(null);
+  useEffect(() => {
+    console.log(theme);
+  }, []);
 
   const handleEmojiReaction = async (emoji) => {
     const reactions = chat.reactions;
@@ -145,7 +149,7 @@ const MessageCard = ({ chat, searchText, activeIndexId }) => {
 
   if (chat.type === "announcement") {
     return (
-      <div className="flex items-center justify-center truncate">
+      <div className="flex items-center justify-center truncate pb-4">
         <p className="my-2 max-w-[50%] truncate rounded-md bg-white  p-3 text-center text-[13px] dark:bg-black">
           {chat.text}
         </p>
@@ -173,13 +177,22 @@ const MessageCard = ({ chat, searchText, activeIndexId }) => {
       id={chat.id}
     >
       <div
-        className={`relative max-w-[80%] break-words rounded-lg box-border p-2 text-left ${
-          activeIndexId === chat.id ? " border-accent-blue border ": "border-inherit"
-        } ${
-          chat.senderId === currentId
-            ? " ml-2 mr-5 bg-accent-blue  text-right text-white"
-            : "mr-2 ml-5 bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
+        className={`relative box-border max-w-[80%] break-words rounded-lg p-2 text-left ${
+          activeIndexId === chat.id &&
+          `${
+            chat.senderId === User.id
+              ? "pulse-bg-user"
+              : ` ${
+                  theme === "dark" || theme === "system"
+                    ? "pulse-bg-notUser-dark"
+                    : "pulse-bg-notUser-light"
+                }  `
+          }`
         }  ${
+          chat.senderId === User.id
+            ? "ml-2 mr-5 bg-accent-blue text-right text-white"
+            : "mr-2 ml-5 bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
+        } ${
           (chat.type === "pic/video" ||
             chat.type === "image" ||
             chat.type === "video" ||
@@ -247,8 +260,8 @@ const MessageCard = ({ chat, searchText, activeIndexId }) => {
                     .toLowerCase()
                     .split(" ")
                     .includes(word.toLowerCase()) &&
-                  searchText !== "" &&
-                  "text-red-500"
+                  searchText !== "" && searchedMessages.includes(chat.id) &&
+                  "bg-red-500 max-h-min max-w-min p-0 m-0"
                 }
               >
                 {word}{" "}
@@ -345,7 +358,8 @@ const MessageCard = ({ chat, searchText, activeIndexId }) => {
         onClose={() => setAnchorEl(null)}
         placement={chat.senderId === currentId ? "bottom-end" : "bottom-start"}
         sx={{
-          backgroundColor: theme === "dark" ? "#1d232a" : "#fcfcfc",
+          backgroundColor:
+            theme === "dark" || theme === "system" ? "#1d232a" : "#fcfcfc",
           boxShadow: "none",
           padding: "7px",
         }}

@@ -4,6 +4,7 @@ import { AiOutlineSend } from "react-icons/ai";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
+import { Reorder, useDragControls } from "framer-motion"
 
 const PollInput = () => {
   const { ChatObject, setChats } = useContext(SelectedChannelContext);
@@ -17,6 +18,7 @@ const PollInput = () => {
   const [pollQuestion, setpollQuestion] = useState("");
   const [allowMultipleAnswers, setallowMultipleAnswers] = useState(false);
 
+  const controls = useDragControls()
   const handleChange = (id, value) => {
     const newInputs = [...inputs];
     const index = newInputs.findIndex((input) => input.id === id);
@@ -107,7 +109,7 @@ const PollInput = () => {
       status: "pending",
     };
 
-    setChats((prevChats)=>[...prevChats, pollObject])
+    setChats((prevChats) => [...prevChats, pollObject])
     if (ChatObject.activeChatType === "group") {
       sendGroupMessage(
         User.id,
@@ -148,13 +150,12 @@ const PollInput = () => {
         {inputs.map((input, index) => (
           <div
             key={input.id}
-            className={`flex w-full items-center border-b p-2 ${
-              currentDraggedOptionId === input.id
-                ? dragIndex < index
-                  ? "pb-10"
-                  : "pt-10"
-                : ""
-            } ${index !== inputs.length - 1 ? "cursor-grab" : ""}`}
+            className={`flex w-full items-center border-b p-2 ${currentDraggedOptionId === input.id
+              ? dragIndex < index
+                ? "pb-10"
+                : "pt-10"
+              : ""
+              } ${index !== inputs.length - 1 ? "cursor-grab" : ""}`}
             draggable={index !== inputs.length - 1}
             onDragStart={(e) => {
               if (index === inputs.length - 1) return;
@@ -186,9 +187,26 @@ const PollInput = () => {
             </div>
           </div>
         ))}
+        <Reorder.Group
+          axis="y"
+          onReorder={setInputs}
+          value={inputs}
+          layoutScroll
+          style={{ overflowY: "scroll" }}
+        >
+          <Reorder.Item
+            value={inputs}
+            dragListener={false}
+            dragControls={controls}
+          >
+            <div
+              className="reorder-handle"
+              onPointerDown={(e) => controls.start(e)}
+            />
+          </Reorder.Item>
+        </Reorder.Group>
       </div>
       <div className="mt-5 flex items-center justify-between">
-        {" "}
         <div onClick={() => setallowMultipleAnswers(!allowMultipleAnswers)}>
           <input
             type="checkbox"

@@ -18,42 +18,42 @@
 
   .sidebar-tooltip {
     @apply absolute bottom-[55px] z-50 m-2 w-auto min-w-max origin-left scale-0
-    rounded-md bg-gray-900  p-2 text-xs opacity-0 md:opacity-100
-    font-bold text-white 
-    shadow-md transition-all delay-300 duration-100 dark:bg-black md:bottom-auto md:left-14;
+    rounded-md bg-gray-900  p-2 text-xs font-bold text-white
+    opacity-0 shadow-md 
+    transition-all delay-300 duration-100 dark:bg-black md:bottom-auto md:left-14 md:opacity-100;
   }
-.scrollBar {
-  @apply scrollbar-thin
+  .scrollBar {
+    @apply scrollbar-thin
   scrollbar-track-[transparent] scrollbar-thumb-scrollbar-light dark:scrollbar-thumb-scrollbar-dark;
-}
-.text-muted {
-  @apply text-muted-light dark:text-muted-dark
-}
-.bg-hover {
-  @apply bg-hover-light dark:bg-hover-dark
-}
-.bg-cover {
-  @apply bg-imgCover-light dark:bg-imgCover-dark
-}
-}
-  /* target element with overflow */
-  .scrollBar::-webkit-scrollbar-thumb {
-    border-radius: 999px;
   }
+  .text-muted {
+    @apply text-muted-light dark:text-muted-dark;
+  }
+  .bg-hover {
+    @apply bg-hover-light dark:bg-hover-dark;
+  }
+  .bg-cover {
+    @apply bg-imgCover-light dark:bg-imgCover-dark;
+  }
+}
+/* target element with overflow */
+.scrollBar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+}
 
-  /* Firefox */
-  .scrollBar::-moz-scrollbar-thumb {
-    border-radius: 999px;
-  }
+/* Firefox */
+.scrollBar::-moz-scrollbar-thumb {
+  border-radius: 999px;
+}
 
-  /* IE 10+ */
-  .scrollBar::-ms-scrollbar-thumb {
-    border-radius: 999px;
-  }
-  /* standard */
-  .scrollBar::scrollbar-thumb {
-    border-radius: 999px;
-  }
+/* IE 10+ */
+.scrollBar::-ms-scrollbar-thumb {
+  border-radius: 999px;
+}
+/* standard */
+.scrollBar::scrollbar-thumb {
+  border-radius: 999px;
+}
 
 .skeleton {
   background-color: #ccc;
@@ -77,22 +77,40 @@
   opacity: 1;
 }
 
-.custom-menu-paper {
-  box-shadow: none;
+.pulse-bg-notUser-dark {
+  animation: pulse-bg-notUser-dark 1s ease-in-out 0ms;
 }
 
+@keyframes pulse-bg-notUser-dark {
+  0% {
+    background-color: #101419;
+  }
+  100% {
+    background-color: #252d35;
+  }
+}
 
+.pulse-bg-notUser-light {
+  animation: pulse-bg-notUser-light 1s ease-in-out 0ms;
+}
 
+@keyframes pulse-bg-notUser-light {
+  0% {
+    background-color: #CCCCCC;
+  }
+  100% {
+    background-color: #ffffff;
+  }
+}
+.pulse-bg-user {
+  animation: pulse-bg-user 1s ease-in-out 0ms;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
+@keyframes pulse-bg-user {
+  0% {
+    background-color: #143b89;
+  }
+  100% {
+    background-color: #3B82F6;
+  }
+}
