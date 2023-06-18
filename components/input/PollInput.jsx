@@ -1,10 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { AiOutlineSend } from "react-icons/ai";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
-import { Reorder, useDragControls } from "framer-motion"
+import { useAutoAnimate } from '@formkit/auto-animate/react'
+
 
 const PollInput = () => {
   const { ChatObject, setChats } = useContext(SelectedChannelContext);
@@ -18,7 +19,29 @@ const PollInput = () => {
   const [pollQuestion, setpollQuestion] = useState("");
   const [allowMultipleAnswers, setallowMultipleAnswers] = useState(false);
 
-  const controls = useDragControls()
+  const [animationParent] = useAutoAnimate({ duration: 300 })
+
+  const [height, setHeight] = useState(window.innerHeight - 362);
+  const targetDivRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (targetDivRef.current) {
+        const { height } = targetDivRef.current.getBoundingClientRect();
+        setHeight(height - 365);
+      }
+    };
+
+    handleResize(); // Calculate initial height
+
+    window.addEventListener('resize', handleResize);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const handleChange = (id, value) => {
     const newInputs = [...inputs];
     const index = newInputs.findIndex((input) => input.id === id);
@@ -26,7 +49,7 @@ const PollInput = () => {
     if (value && index === newInputs.length - 1 && newInputs.length < 10) {
       newInputs.push({ id: String(Number(id) + 1), value: "" });
     }
-    setInputs(newInputs);
+    setInputs([...newInputs]);
   };
 
   const handleBlur = (id, i) => {
@@ -112,7 +135,7 @@ const PollInput = () => {
     setChats((prevChats) => [...prevChats, pollObject])
     if (ChatObject.activeChatType === "group") {
       sendGroupMessage(
-        User.id,
+        User.id,User.photoUrl,
         ChatObject.activeChatId,
         pollQuestion,
         User.name,
@@ -136,96 +159,95 @@ const PollInput = () => {
     }
   }
   (ChatObject);
-  return (
-    <div className="detectMe absolute bottom-2 left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg p-4  dark:bg-black">
-      <input
-        type="text"
-        placeholder="Type poll question"
-        className=" mb-4 rounded-md px-2 py-1 focus:outline-none"
-        onChange={(e) => setpollQuestion(e.target.value)}
-        value={pollQuestion}
-      />
 
-      <div className="rounded-lg bg-gray-700 px-1 pb-[6px]">
-        {inputs.map((input, index) => (
-          <div
-            key={input.id}
-            className={`flex w-full items-center border-b p-2 ${currentDraggedOptionId === input.id
-              ? dragIndex < index
-                ? "pb-10"
-                : "pt-10"
-              : ""
-              } ${index !== inputs.length - 1 ? "cursor-grab" : ""}`}
-            draggable={index !== inputs.length - 1}
-            onDragStart={(e) => {
-              if (index === inputs.length - 1) return;
-              setDragIndex(index);
-              handleDragStart(e, input.id);
-            }}
-            onDrop={(e) => {
-              if (index === inputs.length - 1) return;
-              handleDrop(e, input.id);
-            }}
-            onDragOver={(e) => {
-              if (index !== inputs.length - 1) {
-                setOverIndex(index);
-              }
-              handleDragOver(e, input.id);
-            }}
-          >
+
+  return (
+    <>
+      <div className="inset-0 fixed" ref={targetDivRef}></div>
+      <div className="detectMe  absolute bottom-[65px] left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg p-4 shadow-lg bg-primary">
+
+        <h1 className="mb-2 text-lg font-semibold">Create a poll</h1>
+        <p className="mb-1">Question</p>
+        <input
+          autoFocus
+          type="text"
+          placeholder="Type poll question"
+          className=" bg-secondary mb-2 rounded-md px-2 py-2 focus:outline-none"
+          onChange={(e) => setpollQuestion(e.target.value)}
+          value={pollQuestion}
+        />
+        <p className="mb-1">Options</p>
+        <div className={`rounded-lg bg-secondary px-1 max-h-[calc(100vh-365px)] scrollBar
+         ${height < (32 * inputs.length) + 32 && "overflow-y-scroll"} `}>
+          <ul ref={animationParent} className="">
+            {inputs.map((input, index) => (
+
+              <div
+                key={input.id}
+                className={`flex w-full items-center  
+                           ${index !== inputs.length - 1 && "border-b border-[#2c2b2b] "} 
+               p-2 transition-all duration-150 
+               ${currentDraggedOptionId === input.id && index !== inputs.length - 1
+                    ? dragIndex < index
+                      ? "pb-10"
+                      : "pt-10"
+                    : ""
+                  } ${index !== inputs.length - 1 ? "cursor-grab" : ""}`}
+                draggable={index !== inputs.length - 1}
+                onDragStart={(e) => {
+                  if (index === inputs.length - 1) return;
+                  setDragIndex(index);
+                  handleDragStart(e, input.id);
+                }}
+                onDrop={(e) => {
+                  if (index === inputs.length - 1) return;
+                  handleDrop(e, input.id);
+                }}
+                onDragOver={(e) => {
+                  if (index !== inputs.length - 1) {
+                    setOverIndex(index);
+                  }
+                  handleDragOver(e, input.id);
+                }}
+              >
+
+                <input
+                  className=" z-50 w-full bg-inherit outline-none"
+                  key={input.id}
+                  value={input.value}
+                  onChange={(e) => handleChange(input.id, e.target.value)}
+                  onBlur={() => handleBlur(input.id, index)}
+                  placeholder="+  Add Option"
+                  draggable={false}
+                />
+                <div className={`flex items-center p-1`}>
+                  <RxHamburgerMenu />
+                </div>
+              </div>
+            ))}
+          </ul>
+        </div>
+        <div className="mt-5 flex items-center justify-between">
+          <div onClick={() => setallowMultipleAnswers(!allowMultipleAnswers)}>
             <input
-              className=" z-50 w-full bg-inherit outline-none"
-              key={input.id}
-              value={input.value}
-              onChange={(e) => handleChange(input.id, e.target.value)}
-              onBlur={() => handleBlur(input.id, index)}
-              placeholder="+  Add Option"
-              draggable={false}
+              type="checkbox"
+              onChange={(e) => {
+                (e.target.checked);
+                setallowMultipleAnswers(e.target.checked);
+              }}
+              checked={allowMultipleAnswers}
             />
-            <div className={`flex items-center p-1`}>
-              <RxHamburgerMenu />
-            </div>
+            Allow multiple answers
           </div>
-        ))}
-        <Reorder.Group
-          axis="y"
-          onReorder={setInputs}
-          value={inputs}
-          layoutScroll
-          style={{ overflowY: "scroll" }}
-        >
-          <Reorder.Item
-            value={inputs}
-            dragListener={false}
-            dragControls={controls}
+          <div
+            className="flex items-center rounded-md bg-blue-600 px-2 py-2"
+            onClick={() => handlePollSend()}
           >
-            <div
-              className="reorder-handle"
-              onPointerDown={(e) => controls.start(e)}
-            />
-          </Reorder.Item>
-        </Reorder.Group>
-      </div>
-      <div className="mt-5 flex items-center justify-between">
-        <div onClick={() => setallowMultipleAnswers(!allowMultipleAnswers)}>
-          <input
-            type="checkbox"
-            onChange={(e) => {
-              (e.target.checked);
-              setallowMultipleAnswers(e.target.checked);
-            }}
-            checked={allowMultipleAnswers}
-          />{" "}
-          Allow multiple answers{" "}
-        </div>
-        <div
-          className="flex items-center rounded-md bg-blue-600 px-2 py-2"
-          onClick={() => handlePollSend()}
-        >
-          <AiOutlineSend />
+            <AiOutlineSend />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 export default PollInput;

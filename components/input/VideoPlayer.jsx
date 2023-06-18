@@ -28,12 +28,12 @@ function VideoPlayer({ src, setvideoLengthFunc }) {
   };
 
   return (
-    <div className="media-container relative">
+    <div className="media-container relative  rounded-t-lg ">
       <video
         onClick={handlePlayPause}
         ref={videoRef}
         onDurationChange={handleDurationChange}
-        className="fff mx-auto block w-full bg-red-800"
+        className="fff mx-auto block w-full bg-red-800  rounded-t-lg "
       >
         <source src={src} type="video/mp4" />
       </video>

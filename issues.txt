@@ -1,10 +1,8 @@
-group users change so to indicate user who sent message --------
-framer motion poll options              
-add positoner to emoji board
+add positoner to emoji board --------
 fix pop up in mobile (just add min w) and also bg color for light mode
 fix mui select Menu
 find color for check mark
-fix bllue line when in mobole
+fix blue line when in mobole
 login page loading state
 make about profile functional 
 add forward mesages 
@@ -16,7 +14,13 @@ add delete and edited
 change sidebar context comp styling (font)
 do something about add user ui
 fix box input and maybe add check animation
-
+fix play/pause button triggering popup
+limit file size
+fix muliple send messages
+unread messages mark ui update 
+gotoBottom button in contentCointainer not available 
+when click outside the adduser modal dont render it 
+limit lenght of username and bio
 
 
 

@@ -10,12 +10,9 @@ import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 import { UserContext } from "../App";
-import { BsEmojiSmile } from "react-icons/bs";
 import { ImAttachment } from "react-icons/im";
 import { RiGalleryLine } from "react-icons/ri";
 import { TiChartBarOutline } from "react-icons/ti";
-import { CiUser } from "react-icons/ci";
-import EmojiPicker from "emoji-picker-react";
 import { AiOutlineSend, AiOutlineFile } from "react-icons/ai";
 import { ImCross } from "react-icons/im";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
@@ -71,7 +68,7 @@ const Input = () => {
     });
     if (ChatObject.activeChatType == "group") {
       await sendGroupMessage(
-        User.id,
+        User.id,User.photoUrl,
         ChatObject.activeChatId,
         message,
         User.name,
@@ -222,6 +219,8 @@ const Input = () => {
           </div>
         </div>
       )}
+      {(file || picVidmedia || showPollInput || showSendContact) &&
+        <div className="inset-0 fixed " ></div>}
       <div className="flex items-center justify-between bg-[#fcfcfc] px-[4px] py-[8px] dark:bg-[#1d232a] md:ml-[1px]">
         <div className="detectMe">
           {picVidmedia && (
@@ -231,7 +230,6 @@ const Input = () => {
               setblurredPicVidmedia={setblurredPicVidmedia}
               setpicVidmediaToNull={() => {
                 setpicVidmedia(null);
-                //setblurredPicVidmedia(null);
               }}
             />
           )}
@@ -239,36 +237,24 @@ const Input = () => {
         </div>
         {showPollInput && <PollInput />}
         <div className="relative flex">
-          {[
-            {
-              id: "showMediaPicker",
-              icon: <ImAttachment />,
-              onclick: () => {
-                setshowMediaPicker(!showMediaPicker);
-              },
-            },
-          ].map(({ icon, onclick, id }) => {
-            return (
-              <div
-                key={id}
-                className={` detectme MediaPicker
-                ${
-                  id === "showMediaPicker" &&
-                  showMediaPicker &&
-                  "bg-hover-light dark:bg-hover-dark"
-                } 
-               
-                cursor-pointer rounded-lg bg-transparent p-[10px] px-[15px]
+          <div
+            key={"showMediaPicker"}
+            className={` detectme MediaPicker
+                ${(showMediaPicker || file || picVidmedia || showPollInput || showSendContact) &&
+              "bg-hover-light dark:bg-hover-dark"
+              } 
+                 cursor-pointer rounded-lg bg-transparent p-[10px] px-[15px]
                  text-muted-light hover:bg-hover-light dark:text-muted-dark dark:hover:bg-hover-dark`}
-                onClick={onclick}
-              >
-                {icon}
-              </div>
-            );
-          })}
+            onClick={() => {
+              if (file || picVidmedia || showPollInput || showSendContact) return
+              setshowMediaPicker(!showMediaPicker);
+            }}
+          >
+            <ImAttachment />
+          </div>
           {showMediaPicker && (
             <div
-              className="detectMe MediaPicker absolute bottom-[65px]  w-[160px] rounded-lg bg-light-primary px-1 py-2
+              className="detectMe MediaPicker absolute bottom-[65px] z-[99]  w-[160px] rounded-lg bg-light-primary px-1 py-2
                 text-[15px] dark:bg-dark-primary  [&>div>div>svg]:mr-2 [&>div>div]:flex
             [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 
             [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-hover-light dark:hover:[&>div]:bg-hover-dark"
@@ -347,6 +333,7 @@ const Input = () => {
           )}
         </div>
         <input
+        autoFocus
           type="text"
           className="w-full  bg-transparent px-4 py-2 placeholder-muted-light outline-none dark:placeholder-muted-dark"
           placeholder="Type a message"

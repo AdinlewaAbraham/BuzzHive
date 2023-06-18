@@ -80,15 +80,16 @@ const FileInput = ({ file, setfile }) => {
   }
 
   return (
-    <div className="file-input absolute bottom-2 left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg bg-white  p-4 shadow-md dark:bg-black">
+    <div className="file-input absolute bottom-[65px] left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg bg-primary p-4 shadow-md ">
       <div className="flex flex-col items-center justify-center">
         <RenderFileType type={file.type} size={100} />
         {file.name}
       </div>
 
-      <div className="flex items-center justify-between p-2">
+      <div className="flex items-center justify-between mt-2 ">
         <BsEmojiSmile />
         <input
+          autoFocus
           type="text"
           className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
           placeholder="Caption (optional)"

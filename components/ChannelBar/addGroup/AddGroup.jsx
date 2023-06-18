@@ -63,7 +63,7 @@ const UserCard = (p) => {
 };
 
 const AddGroup = () => {
-  const [animationParent] = useAutoAnimate();
+  const [animationParent] = useAutoAnimate({ duration: 150 });
   const { User } = useContext(UserContext);
   const { setSelectedChannel, prevSelectedChannel, setprevSelectedChannel } =
     useContext(SelectedChannelContext);

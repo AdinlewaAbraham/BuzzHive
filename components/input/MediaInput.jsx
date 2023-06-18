@@ -56,12 +56,13 @@ const MediaInput = ({
     setvideoLength(state);
   }
   return (
-    <div className="media-container absolute bottom-2 left-2 z-10 w-[80%]">
+    <div className="media-container absolute bottom-[65px] left-2 z-10 w-[80%] ">
       {picVidmedia.type.startsWith("image/") ? (
-        <img src={URL.createObjectURL(picVidmedia)} alt="Downscaled media" />
+        <div className="">
+        <img src={URL.createObjectURL(picVidmedia)} alt="Downscaled media " className=" rounded-t-lg " /></div>
       ) : (
         <>
-          {/* dont want to render this comp below because i only need the thumbnail */}
+          {/* dont want to render  this component (<VideoThumbnail/>) below because i only need the thumbnail */}
           <VideoThumbnail
             videoUrl={URL.createObjectURL(picVidmedia)}
             thumbnailHandler={(thumbnail) => setImageBase64(thumbnail)}
@@ -77,9 +78,10 @@ const MediaInput = ({
         </>
       )}
 
-      <div className="flex items-center justify-between bg-black p-2">
+      <div className="flex items-center justify-between bg-primary p-2 rounded-b-lg ">
         <BsEmojiSmile />
         <input
+          autoFocus
           type="text"
           className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
           placeholder="Caption (optional)"

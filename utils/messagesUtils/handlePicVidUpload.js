@@ -183,7 +183,7 @@ export const handlePicVidUpload = async (
           };
           ChatObject.activeChatType == "group"
             ? sendGroupMessage(
-                User.id,
+                User.id,User.photoUrl,
                 ChatObject.activeChatId,
                 mediaCaption,
                 User.name,

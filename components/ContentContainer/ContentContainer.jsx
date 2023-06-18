@@ -341,7 +341,7 @@ const ContentContainer = () => {
                 <p className="ml-2"> Loading...</p>
               </div>
             ) : Chats.length == 0 ? (
-              <>{/* empty state comp */}</>
+              <>{/* empty state component */}</>
             ) : (
               <div
                 className="scrollBar w-full overflow-y-auto"

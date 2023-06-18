@@ -44,7 +44,7 @@ export const createGroup = async (
     const time = new Date();
     const messageText = `${username} created ${groupName}!`;
     await sendGroupMessage(
-      creator,
+      creator,null,
       newGroupRef.id,
       messageText,
       username,

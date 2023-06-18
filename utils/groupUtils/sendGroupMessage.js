@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export const sendGroupMessage = async (
   senderId,
+  senderDisplayImg,
   groupID,
   messageText,
   senderDisplayName,
@@ -25,6 +26,7 @@ export const sendGroupMessage = async (
     timestamp: time,
     senderId: senderId,
     senderDisplayName: senderDisplayName,
+    senderDisplayImg,
     groupID: groupID,
     reactions: [],
     replyObject: replyObj || {},

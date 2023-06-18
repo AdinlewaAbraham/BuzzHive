@@ -113,7 +113,7 @@ export const handleFileUpload = async (
 
     if (ChatObject.activeChatType == "group") {
       await sendGroupMessage(
-        User.id,
+        User.id,User.photoUrl,
         ChatObject.activeChatId,
         fileCaption || "",
         User.name,

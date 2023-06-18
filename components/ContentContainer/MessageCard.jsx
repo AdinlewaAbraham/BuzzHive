@@ -26,10 +26,11 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { motion } from "framer-motion";
 import { formatTimeForMessages } from "@/utils/actualUtils/formatTimeForMessages";
 import { formatCount } from "@/utils/actualUtils/formatCount";
+import Img from "../Img";
 const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
   const [animationParent] = useAutoAnimate();
 
-  const { ChatObject, setReplyObject, ReplyObject, setChats } = useContext(
+  const { ChatObject, setReplyObject, setChats, Chats } = useContext(
     SelectedChannelContext
   );
 
@@ -44,12 +45,25 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [emojiAnchor, setemojiAnchor] = useState(null);
+  const [SamePrevSender, setSamePrevSender] = useState(false)
   const Open = Boolean(anchorEl);
 
   const messageRef = useRef(null);
+
   useEffect(() => {
-    console.log(theme);
-  }, []);
+    const currentIndex = Chats.findIndex((chatItem) => chatItem === chat);
+    if (currentIndex > 0) {
+      const prevChat = Chats[currentIndex - 1];
+  
+      if (prevChat.senderId === chat.senderId) {
+        setSamePrevSender(true);
+      } else {
+        setSamePrevSender(false);
+      }
+    } else {
+      setSamePrevSender(false);
+    }
+  }, [Chats, chat, setSamePrevSender]);  
 
   const handleEmojiReaction = async (emoji) => {
     const reactions = chat.reactions;
@@ -167,40 +181,58 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
     );
   }
 
+
   return (
     <div
       ref={messageRef}
-      className={`group my-2 flex items-center justify-start  ${
-        chat.senderId === currentId ? " flex-row-reverse" : " "
-      } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
+      className={`group my-2 flex  justify-start px-5  ${chat.senderId === currentId ? " flex-row-reverse" : " "
+        } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
     >
+      {(ChatObject.activeChatType === "group" && chat.senderId !== User.id && !SamePrevSender) &&
+        <Img src={chat.senderDisplayImg}
+          styles=" w-[30px] h-[30px] rounded-full mr-2 bg-[#dfe5e7] dark:bg-gray-500"
+          type="personnal"
+          personalSize="40"
+          imgStyles=" rounded-full "
+        />}
       <div
-        className={`relative box-border max-w-[80%] break-words rounded-lg p-2 text-left ${
-          activeIndexId === chat.id &&
-          `${
-            chat.senderId === User.id
-              ? "pulse-bg-user"
-              : ` ${
-                  theme === "dark" || theme === "system"
-                    ? "pulse-bg-notUser-dark"
-                    : "pulse-bg-notUser-light"
-                }  `
+        className={`relative messageDiv box-border max-w-[80%] break-words rounded-lg p-2 text-left 
+        ${(SamePrevSender && chat.senderId !== User.id && ChatObject.activeChatType === "group") && "ml-[38px]"}
+        ${(!SamePrevSender && ` ${chat.senderId !== User.id ? "rounded-tl-none" : "rounded-tr-none"} `)}
+        ${activeIndexId === chat.id &&
+          `${chat.senderId === User.id
+            ? "pulse-bg-user"
+            : ` ${theme === "dark" || theme === "system"
+              ? "pulse-bg-notUser-dark"
+              : "pulse-bg-notUser-light"
+            }  `
           }`
-        }  ${
-          chat.senderId === User.id
-            ? "ml-2 mr-5 bg-accent-blue text-right text-white"
-            : "mr-2 ml-5 bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
-        } ${
-          (chat.type === "pic/video" ||
+          }  ${chat.senderId === User.id
+            ? "ml-2   bg-accent-blue text-right text-white"
+            : "mr-2  bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
+          } ${(chat.type === "pic/video" ||
             chat.type === "image" ||
             chat.type === "video" ||
             chat.type === "file" ||
             chat.type === "poll") &&
           "w-[300px]"
-        }`}
+          }
+          `}
       >
+        {(chat.senderId !== User.id && ChatObject.activeChatType === "group" && !SamePrevSender) &&
+          <p className="text-[11px] font-medium text-muted">{chat.senderDisplayName}</p>}
+        {!SamePrevSender &&
+          <span className={`absolute top-0 
+          ${chat.senderId !== User.id ? "left-[-7px] text-[#ffffff] dark:text-[#252d35]" : "right-[-7px] scale-x-[-1] text-accent-blue"} 
+           `}>
+            <svg width="7" height="10"
+              viewBox="0 0 7 10" className="">
+              <polygon points="0 0, 200 0, 200 200" mydatadeg="0" fill="currentColor" />
+
+            </svg>
+          </span>}
         {chat.type == "reply" && (
           <div
             className="max-h-[80px] truncate rounded-lg  p-2 dark:bg-gray-500"
@@ -218,38 +250,36 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
         {(chat.type === "pic/video" ||
           chat.type === "image" ||
           chat.type === "video") && (
-          <div>
-            <>
-              {chat.dataObject.type.startsWith("image") ? (
-                <ImageComponent
-                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                  downloadSRC={chat.dataObject.downloadURL}
-                  messageId={chat.id}
-                  chat={chat}
-                />
-              ) : (
-                <VideoComponent
-                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                  downloadSRC={chat.dataObject.downloadURL}
-                  messageId={chat.id}
-                  messageText={chat.text}
-                  dataObject={chat.dataObject}
-                />
-              )}
-            </>
-          </div>
-        )}
+            <div>
+              <>
+                {chat.dataObject.type.startsWith("image") ? (
+                  <ImageComponent
+                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                    downloadSRC={chat.dataObject.downloadURL}
+                    messageId={chat.id}
+                    chat={chat}
+                  />
+                ) : (
+                  <VideoComponent
+                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                    downloadSRC={chat.dataObject.downloadURL}
+                    messageId={chat.id}
+                    messageText={chat.text}
+                    dataObject={chat.dataObject}
+                  />
+                )}
+              </>
+            </div>
+          )}
         {chat.type === "poll" && <PollComponent PollObject={chat} />}
         <div
-          className={`items- flex w-full flex-col ${
-            chat.senderId !== User.id && "justify-end"
-          } ${
-            (chat.type === "pic/video" ||
+          className={`items- flex w-full flex-col ${chat.senderId !== User.id && "justify-end"
+            } ${(chat.type === "pic/video" ||
               chat.type === "image" ||
               chat.type === "video") &&
             !chat.text &&
             "absolute bottom-3 right-4 z-30"
-          }`}
+            }`}
         >
           <p className="max-w-[400px] break-words text-start">
             {chat.text.split(" ").map((word, index) => (
@@ -272,9 +302,8 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
           <div className="ml-3 flex w-full items-center justify-end text-end">
             <div className={`ml-auto flex items-center justify-end`}>
               <div
-                className={`text-muted mt-1 text-[11px] ${
-                  chat.senderId !== User.id && "mr-2"
-                } `}
+                className={`text-muted mt-1 text-[11px] ${chat.senderId !== User.id && "mr-3"
+                  } `}
               >
                 {formatTimeForMessages(chat.timestamp)}
               </div>
@@ -293,7 +322,7 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
         {chat.reactions?.length > 0 && (
           <div
             ref={animationParent}
-            onClick={() => {}}
+            onClick={() => { }}
             className={`absolute bottom-[-20px] right-0 flex cursor-pointer
             items-center  rounded-lg bg-light-primary p-[5px] dark:bg-dark-primary`}
           >
@@ -311,9 +340,8 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
       </div>
 
       <div
-        className={` flex ${
-          chat.senderId === currentId ? "left-0 " : "right-0 "
-        }`}
+        className={` flex items-center ${chat.senderId === currentId ? "left-0 " : "right-0 "
+          }`}
       >
         <div className="relative">
           {showReactEmojiTray && (
@@ -337,12 +365,10 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
             }}
           >
             <i
-              className={` transition-all duration-300 ${
-                chat.senderId === currentId &&
+              className={` transition-all duration-300 ${chat.senderId === currentId &&
                 " ml-2 flex-row-reverse md:group-hover:ml-2"
-              }  ${
-                chat.senderId !== currentId && " mr-2 md:group-hover:mr-2 "
-              } `}
+                }  ${chat.senderId !== currentId && " mr-2 md:group-hover:mr-2 "
+                } `}
             >
               <BsChevronDown size={10} />
             </i>
@@ -372,10 +398,9 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
             <div
               key={emoji}
               className={`mr-1 cursor-pointer rounded-lg p-1 hover:dark:bg-hover-dark
-               hover:dark:text-white ${
-                 chat.reactions?.find((reaction) => reaction.id === User.id)
-                   ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
-               } `}
+               hover:dark:text-white ${chat.reactions?.find((reaction) => reaction.id === User.id)
+                  ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
+                } `}
               onClick={() => handleEmojiReaction(emoji)}
             >
               <Emoji unified={emoji} size="23" />

@@ -35,6 +35,12 @@
   .bg-cover {
     @apply bg-imgCover-light dark:bg-imgCover-dark;
   }
+  .bg-primary {
+    @apply bg-light-primary dark:bg-dark-primary;
+  }
+  .bg-secondary {
+    @apply bg-light-secondary dark:bg-dark-secondary;
+  }
 }
 /* target element with overflow */
 .scrollBar::-webkit-scrollbar-thumb {
@@ -96,7 +102,7 @@
 
 @keyframes pulse-bg-notUser-light {
   0% {
-    background-color: #CCCCCC;
+    background-color: #cccccc;
   }
   100% {
     background-color: #ffffff;
@@ -111,6 +117,10 @@
     background-color: #143b89;
   }
   100% {
-    background-color: #3B82F6;
+    background-color: #3b82f6;
   }
+}
+
+.messageDiv:after {
+  border-top-left-radius: 0px;
 }
