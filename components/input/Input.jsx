@@ -19,6 +19,7 @@ import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import MediaInput from "./MediaInput";
 import PollInput from "./PollInput";
 import FileInput from "./FileInput";
+import { Timestamp } from "firebase/firestore";
 const Input = () => {
   const { User } = useContext(UserContext);
   const {
@@ -47,12 +48,22 @@ const Input = () => {
       replyText: ReplyObject.ReplyText,
       replyTextId: ReplyObject.ReplyTextId,
       replyDisplayName: ReplyObject.displayName,
+      replyUserId: ReplyObject.ReplyUserId,
     };
     const time = new Date();
+
+
+
+    let currentTime = new Date().getTime();
+
+    let seconds = Math.floor(currentTime / 1000);
+    let nanoseconds = (currentTime % 1000) * 10 ** 6;
+
+    let timestamp = { seconds: seconds, nanoseconds: nanoseconds };
     const messageObj = {
       text: message,
       senderId: senderid,
-      timeStamp: time,
+      timestamp,
       reactions: [],
       status: "pending",
       id: "propId",
@@ -68,7 +79,7 @@ const Input = () => {
     });
     if (ChatObject.activeChatType == "group") {
       await sendGroupMessage(
-        User.id,User.photoUrl,
+        User.id, User.photoUrl,
         ChatObject.activeChatId,
         message,
         User.name,
@@ -235,7 +246,7 @@ const Input = () => {
           )}
           {file && <FileInput file={file} setfile={setfile} />}
         </div>
-        {showPollInput && <PollInput />}
+        {showPollInput && <PollInput setshowPollInputFunc={()=>setshowPollInput(false)} />}
         <div className="relative flex">
           <div
             key={"showMediaPicker"}
@@ -333,7 +344,6 @@ const Input = () => {
           )}
         </div>
         <input
-        autoFocus
           type="text"
           className="w-full  bg-transparent px-4 py-2 placeholder-muted-light outline-none dark:placeholder-muted-dark"
           placeholder="Type a message"

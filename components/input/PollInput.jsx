@@ -7,7 +7,7 @@ import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 
 
-const PollInput = () => {
+const PollInput = ({setshowPollInputFunc}) => {
   const { ChatObject, setChats } = useContext(SelectedChannelContext);
   const [inputs, setInputs] = useState([
     { id: "1", value: "" },
@@ -98,9 +98,9 @@ const PollInput = () => {
     return mappedArray;
   };
   function handlePollSend() {
+    setshowPollInputFunc()
     if (!ChatObject.activeChatId) return;
     const newarr = [...inputs].filter((option) => option.value !== "");
-    (newarr);
     const options = mapInputs(newarr);
     if (options.length < 2) {
       alert("Please add value ");
@@ -118,16 +118,22 @@ const PollInput = () => {
       allowMultipleAnswers: allowMultipleAnswers,
     };
     const User = JSON.parse(localStorage.getItem("user"));
-    (User);
+
     const time = new Date();
 
+    let currentTime = new Date().getTime();
+
+    let seconds = Math.floor(currentTime / 1000);
+    let nanoseconds = (currentTime % 1000) * 10 ** 6;
+
+    let timestamp = { seconds: seconds, nanoseconds: nanoseconds };
     const pollObject = {
       type: "poll",
       id: "propId",
       reactions: [],
       senderId: User.id,
       text: null,
-      timestamp: time,
+      timestamp,
       dataObject: dataOBJ || {},
       status: "pending",
     };
@@ -142,7 +148,7 @@ const PollInput = () => {
         "poll",
         time,
         {},
-        dataOBJ
+        dataOBJ, null,()=>{},false
       );
     } else {
       sendMessage(
@@ -154,7 +160,7 @@ const PollInput = () => {
         "poll",
         time,
         {},
-        dataOBJ
+        dataOBJ,null, ()=>{}, false
       );
     }
   }

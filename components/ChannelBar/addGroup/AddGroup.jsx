@@ -96,7 +96,6 @@ const AddGroup = () => {
   useLayoutEffect(() => {
     if (!ref.current) return;
     setHeight(ref.current.clientHeight);
-    console.log(ref.current.clientHeight);
   }, [selectedUsers]);
 
   function handleSelect(user, checked) {

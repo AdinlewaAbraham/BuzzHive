@@ -92,7 +92,12 @@ const MediaInput = ({
         <div
           className="flex items-center rounded-md bg-blue-600 px-2 py-2"
           onClick={async () => {
-            const time = new Date();
+            let currentTime = new Date().getTime();
+        
+            let seconds = Math.floor(currentTime / 1000);
+            let nanoseconds = (currentTime % 1000) * 10 ** 6;
+        
+            let time = { seconds: seconds, nanoseconds: nanoseconds };
             await handlePicVidUpload(
               picVidmedia,
               blurredPicVidmedia,

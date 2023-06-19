@@ -14,7 +14,8 @@ export async function sendMessage(
   replyObj,
   fileObj,
   createdId,
-  clearMessage
+  clearMessage,
+  isForwarded,
 ) {
   clearMessage();
   const customId = uuidv4();
@@ -31,6 +32,7 @@ export async function sendMessage(
     replyObject: replyObj || {},
     dataObject: fileObj || {},
     status: "sent",
+    isForwarded:isForwarded || false,
   };
 
   try {

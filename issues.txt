@@ -1,8 +1,4 @@
 make about profile functional 
-add forward mesages -------
-fix reply message ui
-fix pending messages without timeStamp
-remove hover for mobile
 add delete and edited
 change sidebar tooltip comp styling (font)
 do something about add user ui
@@ -17,6 +13,9 @@ limit lenght of username and bio
 add animations to popups 
 if new user send welcome message 
 look into verifying yourself
+make a img have alt using <Img />
+fix announcement blocking emoji popup 
+fix poll bugs
 
 
 clean up stuff 

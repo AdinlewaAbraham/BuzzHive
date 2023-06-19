@@ -84,7 +84,7 @@
 }
 
 .pulse-bg-notUser-dark {
-  animation: pulse-bg-notUser-dark 1s ease-in-out 0ms;
+  animation: pulse-bg-notUser-dark 2s ease-in-out 0ms;
 }
 
 @keyframes pulse-bg-notUser-dark {
@@ -97,7 +97,7 @@
 }
 
 .pulse-bg-notUser-light {
-  animation: pulse-bg-notUser-light 1s ease-in-out 0ms;
+  animation: pulse-bg-notUser-light 2s ease-in-out 0ms;
 }
 
 @keyframes pulse-bg-notUser-light {
@@ -109,7 +109,7 @@
   }
 }
 .pulse-bg-user {
-  animation: pulse-bg-user 1s ease-in-out 0ms;
+  animation: pulse-bg-user 2s ease-in-out 0ms;
 }
 
 @keyframes pulse-bg-user {

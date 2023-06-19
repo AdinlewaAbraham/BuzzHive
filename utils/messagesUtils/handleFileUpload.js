@@ -15,7 +15,12 @@ export const handleFileUpload = async (
   Chats,
   sendingFromChatRoomId
 ) => {
-  const time = new Date();
+  const currentTime = new Date().getTime();
+
+  const seconds = Math.floor(currentTime / 1000);
+  const nanoseconds = (currentTime % 1000) * 10 ** 6;
+
+  const time = { seconds: seconds, nanoseconds: nanoseconds };
   try {
     if (!file) {
       return;
@@ -121,7 +126,7 @@ export const handleFileUpload = async (
         time,
         null,
         fileObj,
-        id
+        id,()=>{},false
       );
     } else {
       await sendMessage(
@@ -134,7 +139,7 @@ export const handleFileUpload = async (
         time,
         null,
         fileObj,
-        id
+        id,()=>{},false
       );
     }
     console.log("File available at", downloadURL);

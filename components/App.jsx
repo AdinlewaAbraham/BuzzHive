@@ -12,6 +12,7 @@ import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import { FcGoogle } from "react-icons/fc";
 import { CircularProgress } from "@mui/joy";
+import { useTheme } from "next-themes";
 
 export const UserContext = createContext();
 
@@ -21,6 +22,8 @@ const App = () => {
 
   const [isAuthed, setIsAuthed] = useState(false);
   const [isSigningIn, setisSigningIn] = useState(false);
+
+  const { setTheme } = useTheme()
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       if (u) {
@@ -32,10 +35,16 @@ const App = () => {
           const userSnapshot = await getDoc(doc(db, "users", u.uid));
           const userData = userSnapshot.data();
           setUser(userData);
-          localStorage.setItem("user", JSON.stringify(userData)); // Save user data to local storage
+          localStorage.setItem("user", JSON.stringify(userData));
+          if (userData.darkMode) {
+            setTheme(userData.darkMode ? "dark" : "light");
+          }
         } else {
           setUser(userData);
-          localStorage.setItem("user", JSON.stringify(userData)); // Save user data to local storage
+          localStorage.setItem("user", JSON.stringify(userData));
+          if (userData.darkMode) {
+            setTheme(userData.darkMode ? "dark" : "light");
+          }
         }
       } else {
         setUser(null);
@@ -56,7 +65,9 @@ const App = () => {
       if (!doc.data()) return;
       setUser(doc.data());
       localStorage.setItem("user", JSON.stringify(doc.data()));
-      localStorage.getItem("user");
+      if (doc.data().darkMode) {
+        setTheme(doc.data().darkMode ? "dark" : "light");
+      }
     });
     return () => {
       unsub();
@@ -67,6 +78,9 @@ const App = () => {
     const userData = localStorage.getItem("user");
     if (userData !== "undefined" && JSON.parse(userData)) {
       setUser(JSON.parse(userData));
+      if (userData.darkMode) {
+        setTheme(userData.darkMode ? "dark" : "light");
+      }
       setIsAuthed(true);
     }
   }, []);
@@ -130,7 +144,7 @@ const App = () => {
       )}
     </>
   );
-  
+
 };
 
 export default App;

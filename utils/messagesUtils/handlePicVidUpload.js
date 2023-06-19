@@ -11,7 +11,8 @@ export const handlePicVidUpload = async (
   mediaCaption,
   User,
   time,
-  setChatsFunc, videoLength
+  setChatsFunc,
+  videoLength
 ) => {
   if (!downscaledBlob) return;
   console.log(downscaledBlob);
@@ -183,7 +184,8 @@ export const handlePicVidUpload = async (
           };
           ChatObject.activeChatType == "group"
             ? sendGroupMessage(
-                User.id,User.photoUrl,
+                User.id,
+                User.photoUrl,
                 ChatObject.activeChatId,
                 mediaCaption,
                 User.name,
@@ -191,7 +193,9 @@ export const handlePicVidUpload = async (
                 time,
                 null,
                 picORvideoObj,
-                id
+                id,
+                () => {},
+                null
               )
             : sendMessage(
                 User.id,
@@ -203,7 +207,9 @@ export const handlePicVidUpload = async (
                 time,
                 null,
                 picORvideoObj,
-                id
+                id,
+                () => {},
+                null
               );
           console.log("File available at", downloadURL);
         });

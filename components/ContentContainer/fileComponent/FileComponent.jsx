@@ -150,7 +150,7 @@ const FileComponent = ({ chat }) => {
   const { baseName, extName } = getFileExtension(chat.dataObject.name);
   return (
     <div
-      className={`truncate rounded-sm bg-blue-400 p-2 ${
+      className={`truncate ${chat.senderId === User.id ? "bg-blue-400":"dark:bg-gray-500 bg-light-secondary" } rounded-lg p-2 ${
         chat.text !== "" && "mb-2"
       }`}
     >
@@ -191,8 +191,8 @@ const FileComponent = ({ chat }) => {
         </div>
       </div>
       <div
-        className={`[&>div>button]:w [&>div>button]:w-full [&>div>button]:rounded-sm
-       [&>div>button]:bg-blue-300 ${
+        className={`[&>div>button]:py-1 [&>div>button]:w-full [&>div>button]:rounded-lg 
+          ${chat.senderId === User.id ? "[&>div>button]:bg-blue-300":"dark:[&>div>button]:bg-[#252d35] [&>div>button]:bg-light-primary" } ${
          (isDownloading || chat.dataObject.status === "uploading") &&
          "[&>div>button]:hover:cursor-not-allowed"
        }`}

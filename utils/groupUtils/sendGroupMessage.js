@@ -14,7 +14,8 @@ export const sendGroupMessage = async (
   replyObj,
   dataObj,
   createdId,
-  clearMessage
+  clearMessage,
+  isForwarded,
 ) => {
   clearMessage();
   const groupRef = doc(db, "groups", groupID);
@@ -32,6 +33,7 @@ export const sendGroupMessage = async (
     replyObject: replyObj || {},
     dataObject: dataObj || {},
     status: "sent",
+    isForwarded:isForwarded || false,
   };
   const user = await getUser(senderId);
   const newMessage = {
