@@ -158,17 +158,17 @@ const Input = () => {
           ref={popupRef}
         >
           <div
-            className="w-[35%]
-           max-w-[500px] rounded-lg dark:bg-dark-secondary"
+            className=" min-w-[200px] w-[35%]
+           max-w-[500px] rounded-lg  dark:bg-dark-secondary bg-light-secondary"
           >
-            <div className="rounded-t-lg p-5 dark:bg-dark-primary">
-              <h1 className="text-xl font-medium">Discard unsent message</h1>
+            <div className="rounded-t-lg p-5 bg-primary">
+              <h1 className="md:text-xl text-lg font-medium">Discard unsent message</h1>
               <p className="mt-1 text-sm">
                 Your message, including attached media, will not be sent if you
                 leave this screen
               </p>
             </div>
-            <div className="z-[99] flex rounded-lg p-5 [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
+            <div className="z-[99] flex flex-col md:flex-row rounded-lg p-5 [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
               <button
                 className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
                 onClick={() => {
@@ -178,7 +178,7 @@ const Input = () => {
                 return to media
               </button>
               <button
-                className="bg-blue-500 p-4"
+                className="bg-blue-500 p-4 md:mt-0 mt-2"
                 onClick={() => {
                   setfile(null);
                   setpicVidmedia(null);

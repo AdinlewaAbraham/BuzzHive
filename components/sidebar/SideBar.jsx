@@ -15,6 +15,7 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
     selectedChannel,
     prevSelectedChannel,
     setprevSelectedChannel,
+    ChatObject
   } = useContext(SelectedChannelContext);
 
   const [IsMobile, setIsMobile] = useState(false);
@@ -47,7 +48,7 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
   return (
     <div className="relative flex items-center justify-center md:mb-1 md:w-[5%] md:min-w-[70px] md:max-w-[70px]">
       <span
-        className={`duration-150 ease-out rounded-sm  ${
+        className={`duration-150 ease-out rounded-sm ${(IsMobile && ChatObject.activeChatId !== "") && "hidden"} ${
           selectedChannel === clickevent
             ? ` opacity-1  right-[25%] md:bottom-[25%] ${
                 channels[prevSelectedChannel] > channels[clickevent] &&

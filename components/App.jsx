@@ -10,6 +10,8 @@ import { SigninWithGoogle } from "@/utils/userAuthentication/SigninWithGoogle";
 import { createUser } from "@/utils/userUtils/createUser";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
+import { FcGoogle } from "react-icons/fc";
+import { CircularProgress } from "@mui/joy";
 
 export const UserContext = createContext();
 
@@ -18,7 +20,7 @@ const App = () => {
   const auth = getAuth();
 
   const [isAuthed, setIsAuthed] = useState(false);
-
+  const [isSigningIn, setisSigningIn] = useState(false);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       if (u) {
@@ -51,7 +53,7 @@ const App = () => {
     const q = doc(db, "users", User.id);
     const unsub = onSnapshot(q, async (doc) => {
       console.log(doc.data());
-      if (!doc.data()) return
+      if (!doc.data()) return;
       setUser(doc.data());
       localStorage.setItem("user", JSON.stringify(doc.data()));
       localStorage.getItem("user");
@@ -70,37 +72,65 @@ const App = () => {
   }, []);
 
   const memoizedUser = useMemo(() => User, [User]);
-  if (!memoizedUser && isAuthed) {
-    return <p>Loading user...</p>;
-  }
 
+  function setisSigningInFunc(state) {
+    setisSigningIn(state);
+  }
   return (
     <>
       {isAuthed ? (
-        <UserContext.Provider value={{ User, setUser }}>
-          <SelectedChannelProvider>
-            <div className="flex h-full w-full flex-col-reverse overflow-y-hidden md:flex-row">
-              <SideBar />
-              <ChannelBar />
-              <ContentContainer />
+        memoizedUser ? (
+          <UserContext.Provider value={{ User, setUser }}>
+            <SelectedChannelProvider>
+              <div className="flex h-full w-full flex-col-reverse overflow-y-hidden md:flex-row">
+                <SideBar />
+                <ChannelBar />
+                <ContentContainer />
+              </div>
+            </SelectedChannelProvider>
+          </UserContext.Provider>
+        ) : (
+          <div className="flex h-screen items-center justify-center">
+            <div className="rounded-lg bg-accent-blue px-2 py-4">
+              <div className="flex items-center justify-center">
+                <i className="mr-1 flex items-center">
+                  <CircularProgress size="sm" variant="plain" />
+                </i>
+                loading user...
+              </div>
             </div>
-          </SelectedChannelProvider>
-        </UserContext.Provider>
-      ) : null}
-      {!isAuthed ? (
+          </div>
+        )
+      ) : (
         <div className="flex h-screen items-center justify-center">
-          <button
-            className="rounded-lg bg-accent-blue px-2 py-4"
-            onClick={() => {
-              SigninWithGoogle();
-            }}
-          >
-            sign in with google
-          </button>
+          <div className="rounded-lg bg-accent-blue px-2 py-4">
+            {!isSigningIn ? (
+              <button
+                className="flex items-center justify-center"
+                onClick={() => {
+                  setisSigningIn(true);
+                  SigninWithGoogle(setisSigningInFunc);
+                }}
+              >
+                <i className="mr-1 flex items-center">
+                  <FcGoogle size={25} />
+                </i>
+                Sign in with Google
+              </button>
+            ) : (
+              <div className="flex items-center justify-center">
+                <i className="mr-1 flex items-center">
+                  <CircularProgress size="sm" variant="plain" />
+                </i>
+                logging in...
+              </div>
+            )}
+          </div>
         </div>
-      ) : null}
+      )}
     </>
   );
+  
 };
 
 export default App;

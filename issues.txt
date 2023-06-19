@@ -1,17 +1,10 @@
-add positoner to emoji board --------
-fix pop up in mobile (just add min w) and also bg color for light mode
-fix mui select Menu
-find color for check mark
-fix blue line when in mobole
-login page loading state
 make about profile functional 
-add forward mesages 
+add forward mesages -------
 fix reply message ui
-make emojis clickable
 fix pending messages without timeStamp
 remove hover for mobile
 add delete and edited
-change sidebar context comp styling (font)
+change sidebar tooltip comp styling (font)
 do something about add user ui
 fix box input and maybe add check animation
 fix play/pause button triggering popup
@@ -21,7 +14,9 @@ unread messages mark ui update
 gotoBottom button in contentCointainer not available 
 when click outside the adduser modal dont render it 
 limit lenght of username and bio
-
+add animations to popups 
+if new user send welcome message 
+look into verifying yourself
 
 
 clean up stuff 

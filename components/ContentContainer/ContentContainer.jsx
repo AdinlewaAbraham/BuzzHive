@@ -347,6 +347,8 @@ const ContentContainer = () => {
                 className="scrollBar w-full overflow-y-auto"
                 //  onScroll={handleScroll}
                 ref={scrollContainerRef}
+                id="scrollContainer"
+                
               >
                 <InfiniteScroll
                   pageStart={0}
@@ -390,6 +392,7 @@ const ContentContainer = () => {
                         searchedMessages={searchedMessages.map(
                           (message) => message.id
                         )}
+                        ref={scrollContainerRef}
                       />
                     ))}
                 </InfiniteScroll>

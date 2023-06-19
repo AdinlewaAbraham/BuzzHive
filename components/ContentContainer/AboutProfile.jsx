@@ -131,8 +131,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
           setshowProfile(false);
         }}
       >
-       <Goback />
-        <h3>contact info</h3>
+       <Goback text={"Contact info"} />
       </div>
       <div className="">
         <div className="flex flex-col items-center justify-center mb-5 py-10 dark:bg-[#1d232a] relative">

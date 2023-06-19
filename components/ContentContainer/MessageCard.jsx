@@ -27,7 +27,15 @@ import { motion } from "framer-motion";
 import { formatTimeForMessages } from "@/utils/actualUtils/formatTimeForMessages";
 import { formatCount } from "@/utils/actualUtils/formatCount";
 import Img from "../Img";
-const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
+import { usePopper } from "react-popper";
+import { placements } from "@popperjs/core";
+const MessageCard = ({
+  chat,
+  searchText,
+  activeIndexId,
+  searchedMessages,
+  ref,
+}) => {
   const [animationParent] = useAutoAnimate();
 
   const { ChatObject, setReplyObject, setChats, Chats } = useContext(
@@ -38,23 +46,53 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
   const { theme } = useTheme();
 
   const [showReactEmojiTray, setshowReactEmojiTray] = useState(false);
-  const [showMessageMenu, setshowMessageMenu] = useState(false);
 
   const currentId = User.id;
   const timestamp = chat.timestamp;
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [emojiAnchor, setemojiAnchor] = useState(null);
-  const [SamePrevSender, setSamePrevSender] = useState(false)
+  const [SamePrevSender, setSamePrevSender] = useState(false);
+  const [referenceElement, setReferenceElement] = useState(null);
+  const [popperElement, setPopperElement] = useState(null);
+  const [arrowElement, setArrowElement] = useState(null);
+  const [forwardMessageModal, setforwardMessageModal] = useState(false);
+  const [contacts, setcontacts] = useState([]);
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    modifiers: [
+      {
+        name: "offset",
+        options: {
+          offset: [0, 10],
+        },
+      },
+      {
+        name: "arrow",
+        options: {
+          element: arrowElement,
+        },
+      },
+    ],
+    placement: "auto",
+  });
+
   const Open = Boolean(anchorEl);
 
   const messageRef = useRef(null);
-
+  useEffect(() => {
+    const getContacts = () => {
+      const contacts = JSON?.parse(
+        localStorage.getItem(`${User.id}_userChats`)
+      );
+      setcontacts(contacts);
+    };
+    return () => getContacts();
+  }, []);
   useEffect(() => {
     const currentIndex = Chats.findIndex((chatItem) => chatItem === chat);
     if (currentIndex > 0) {
       const prevChat = Chats[currentIndex - 1];
-  
+
       if (prevChat.senderId === chat.senderId) {
         setSamePrevSender(true);
       } else {
@@ -63,7 +101,35 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
     } else {
       setSamePrevSender(false);
     }
-  }, [Chats, chat, setSamePrevSender]);  
+  }, [Chats, chat, setSamePrevSender]);
+  useEffect(() => {
+    const mainElement = document.getElementById("scrollContainer");
+
+    const handleWheel = (event) => {
+      if (
+        (Open || showReactEmojiTray || forwardMessageModal) &&
+        !event.target.closest("#emojiBoard")
+      ) {
+        event.preventDefault();
+      }
+    };
+
+    mainElement.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      mainElement.removeEventListener("wheel", handleWheel);
+    };
+  }, [Open, showReactEmojiTray, setPopperElement, forwardMessageModal]);
+
+  useEffect(() => {
+    const event = window.addEventListener("click", (e) => {
+      if (!e.target.closest(".clickEvent")) {
+        setforwardMessageModal(false);
+      }
+    });
+
+    return () => event;
+  }, []);
 
   const handleEmojiReaction = async (emoji) => {
     const reactions = chat.reactions;
@@ -145,7 +211,9 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
         </i>
       ),
       label: "Forward",
-      action: () => "Forward clicked",
+      action: () => {
+        setforwardMessageModal(true);
+      },
     },
 
     {
@@ -158,7 +226,7 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
 
   const handleMenuItemClick = (item) => {
     item.action();
-    setshowMessageMenu(false);
+    setAnchorEl(null);
   };
 
   if (chat.type === "announcement") {
@@ -181,7 +249,6 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
     );
   }
 
-
   return (
     <div
       ref={messageRef}
@@ -190,17 +257,29 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
       key={chat.id}
       id={chat.id}
     >
-      {(ChatObject.activeChatType === "group" && chat.senderId !== User.id && !SamePrevSender) &&
-        <Img src={chat.senderDisplayImg}
-          styles=" w-[30px] h-[30px] rounded-full mr-2 bg-[#dfe5e7] dark:bg-gray-500"
-          type="personnal"
-          personalSize="40"
-          imgStyles=" rounded-full "
-        />}
+      {ChatObject.activeChatType === "group" &&
+        chat.senderId !== User.id &&
+        !SamePrevSender && (
+          <Img
+            src={chat.senderDisplayImg}
+            styles=" w-[30px] h-[30px] rounded-full mr-2 bg-[#dfe5e7] dark:bg-gray-500"
+            type="personnal"
+            personalSize="40"
+            imgStyles=" rounded-full "
+          />
+        )}
       <div
-        className={`relative messageDiv box-border max-w-[80%] break-words rounded-lg p-2 text-left 
-        ${(SamePrevSender && chat.senderId !== User.id && ChatObject.activeChatType === "group") && "ml-[38px]"}
-        ${(!SamePrevSender && ` ${chat.senderId !== User.id ? "rounded-tl-none" : "rounded-tr-none"} `)}
+        ref={setReferenceElement}
+        className={`messageDiv relative box-border max-w-[80%] break-words rounded-lg p-2 text-left 
+        ${SamePrevSender &&
+          chat.senderId !== User.id &&
+          ChatObject.activeChatType === "group" &&
+          "ml-[38px]"
+          }
+        ${!SamePrevSender &&
+          ` ${chat.senderId !== User.id ? "rounded-tl-none" : "rounded-tr-none"
+          } `
+          }
         ${activeIndexId === chat.id &&
           `${chat.senderId === User.id
             ? "pulse-bg-user"
@@ -221,18 +300,31 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
           }
           `}
       >
-        {(chat.senderId !== User.id && ChatObject.activeChatType === "group" && !SamePrevSender) &&
-          <p className="text-[11px] font-medium text-muted">{chat.senderDisplayName}</p>}
-        {!SamePrevSender &&
-          <span className={`absolute top-0 
-          ${chat.senderId !== User.id ? "left-[-7px] text-[#ffffff] dark:text-[#252d35]" : "right-[-7px] scale-x-[-1] text-accent-blue"} 
-           `}>
-            <svg width="7" height="10"
-              viewBox="0 0 7 10" className="">
-              <polygon points="0 0, 200 0, 200 200" mydatadeg="0" fill="currentColor" />
-
+        {chat.senderId !== User.id &&
+          ChatObject.activeChatType === "group" &&
+          !SamePrevSender && (
+            <p className="text-muted text-[11px] font-medium">
+              {chat.senderDisplayName}
+            </p>
+          )}
+        {!SamePrevSender && (
+          <span
+            className={`absolute top-0 
+          ${chat.senderId !== User.id
+                ? "left-[-7px] text-[#ffffff] dark:text-[#252d35]"
+                : "right-[-7px] scale-x-[-1] text-accent-blue"
+              } 
+           `}
+          >
+            <svg width="7" height="10" viewBox="0 0 7 10" className="">
+              <polygon
+                points="0 0, 200 0, 200 200"
+                mydatadeg="0"
+                fill="currentColor"
+              />
             </svg>
-          </span>}
+          </span>
+        )}
         {chat.type == "reply" && (
           <div
             className="max-h-[80px] truncate rounded-lg  p-2 dark:bg-gray-500"
@@ -290,8 +382,9 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
                     .toLowerCase()
                     .split(" ")
                     .includes(word.toLowerCase()) &&
-                  searchText !== "" && searchedMessages.includes(chat.id) &&
-                  "bg-red-500 max-h-min max-w-min p-0 m-0"
+                  searchText !== "" &&
+                  searchedMessages.includes(chat.id) &&
+                  "m-0 max-h-min max-w-min bg-red-500 p-0"
                 }
               >
                 {word}{" "}
@@ -312,7 +405,7 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
                   {chat.status === "pending" && <BiTimeFive />}
                   {chat.status === "sent" && <BsCheckLg />}
                   {chat.status === "received" && <BsCheckAll />}
-                  {chat.status === "seen" && <BsCheckAll color="hotpink" />}
+                  {chat.status === "seen" && <BsCheckAll color="#000001 " />}
                 </i>
               )}
             </div>
@@ -345,7 +438,13 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
       >
         <div className="relative">
           {showReactEmojiTray && (
-            <div className="absolute bottom-0 right-0 h-[300px] w-[280px]">
+            <div
+              id="emojiBoard"
+              className="absolute bottom-0 right-0 z-[100] h-[300px] w-[280px]"
+              ref={setPopperElement}
+              style={styles.popper}
+              {...attributes.popper}
+            >
               <EmojiPicker
                 setshowReactEmojiTray={setshowReactEmojiTray}
                 message={chat}
@@ -353,6 +452,40 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
                 handleEmojiReaction={handleEmojiReaction}
                 anchor={emojiAnchor}
               />
+            </div>
+          )}
+          {forwardMessageModal && (
+            <div
+              className="clickEvent z-50 bg-primary rounded-lg w-[200px] p-2"
+              ref={setPopperElement}
+              style={styles.popper}
+              {...attributes.popper}
+            >
+              <h1>Forward message</h1>
+              <input
+                type="text"
+                className=" w-full rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light 
+            outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+                placeholder="Search"
+              />
+              <div>
+                {console.log(contacts)}
+                {contacts.map((contact) => (
+                  <div className="flex items-center cursor-pointer justify-between">
+                    <div className="flex">
+                      <Img
+                        src={contact.senderDisplayImg}
+                        styles="w-[40px] h-[40px] rounded-full"
+                        imgStyles="rounded-full "
+                        type={contact.type}
+                        groupSize="70"
+                        personalSize="50"
+                      />
+                      {contact.senderDisplayName}</div>
+                    <input type="checkbox" name="" id="" />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           <div
@@ -380,19 +513,20 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
         anchorEl={anchorEl}
         variant="plain"
         open={Open}
-        disableFocusRipple={true}
         onClose={() => setAnchorEl(null)}
         placement={chat.senderId === currentId ? "bottom-end" : "bottom-start"}
         sx={{
           backgroundColor:
             theme === "dark" || theme === "system" ? "#1d232a" : "#fcfcfc",
           boxShadow: "none",
+          ".MuiOutlinedInput-notchedOutline": { border: 0 },
           padding: "7px",
         }}
       >
         <MenuItem
-          className="hover:dark:light-primary cursor-default px-4 py-2 text-black
-                 hover:bg-hover-light dark:text-white hover:dark:bg-dark-primary"
+          className="hover:dark:light-primary flex cursor-default border-none py-2 text-black
+                 hover:bg-hover-light dark:text-white hover:dark:bg-dark-primary  "
+          sx={{ borderRadius: "8px" }}
         >
           {User.lastUsedEmojiTray?.map((emoji) => (
             <div
@@ -425,7 +559,7 @@ const MessageCard = ({ chat, searchText, activeIndexId, searchedMessages }) => {
               handleMenuItemClick(item);
             }}
             sx={{ borderRadius: "8px" }}
-            className="cursor-pointer rounded-lg px-4 py-2  text-black hover:bg-hover-light
+            className="clickEvent cursor-pointer rounded-lg px-4 py-2  text-black hover:bg-hover-light
                  dark:text-white hover:dark:bg-hover-dark hover:dark:text-white"
           >
             {item.icon} <p className="ml-2">{item.label}</p>
