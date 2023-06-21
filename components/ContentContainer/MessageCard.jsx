@@ -19,15 +19,15 @@ import {
 } from "react-icons/bs";
 import { AiOutlinePlus } from "react-icons/ai";
 import { MdOutlineContentCopy } from "react-icons/md";
-import { GiCancel } from "react-icons/gi";
+import { RiDeleteBinLine } from "react-icons/ri";
 import { BiTimeFive } from "react-icons/bi";
 import FileComponent from "./fileComponent/FileComponent";
 import Menu from "@mui/joy/Menu";
 import MenuItem from "@mui/joy/MenuItem";
 import { useTheme } from "next-themes";
 import { HiReply } from "react-icons/hi";
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
-import { db } from "@/utils/firebaseUtils/firebase";
+import { deleteDoc, doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { db, storage } from "@/utils/firebaseUtils/firebase";
 import EmojiPicker from "./EmojiPicker";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { formatTimeForMessages } from "@/utils/actualUtils/formatTimeForMessages";
@@ -37,12 +37,14 @@ import { usePopper } from "react-popper";
 import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 import { CircularProgress } from "@mui/joy";
+import { ref, deleteObject } from "firebase/storage";
+
 const MessageCard = ({
   chat,
   searchText,
   activeIndexId,
   searchedMessages,
-  ref,
+  scrollContainerRef,
 }) => {
   const [animationParent] = useAutoAnimate();
 
@@ -267,6 +269,33 @@ const MessageCard = ({
       </div>
     );
   }
+  const handleMessageDelete = async () => {
+    setAnchorEl(null);
+    if (User.id !== chat.senderId) return
+    const docRef = doc(
+      db,
+      ChatObject.activeChatType === 'group' ? "groups" : "conversations",
+      ChatObject.activeChatId,
+      "messages",
+      chat.id
+    );
+
+    if (
+      chat.type === "image" ||
+      chat.type === "file" ||
+      chat.type === "video"
+    ) {
+      const storageFileRef = ref(storage, chat.dataObject.filePath);
+      const deleteFilePromise = deleteObject(storageFileRef)
+      const deleteDocPromise = deleteDoc(docRef)
+
+      await Promise.all([deleteDocPromise, deleteFilePromise])
+        .then(() => console.log("done"))
+        .catch((err) => console.error(err));
+    } else {
+      await deleteDoc(docRef)
+    }
+  };
 
   const divStyles = {
     maxHeight: `calc(100vh - 285px - ${Height}px
@@ -291,7 +320,7 @@ const MessageCard = ({
               chat.replyObject,
               chat.dataObject,
               null,
-              () => {},
+              () => { },
               true
             );
           } else {
@@ -306,7 +335,7 @@ const MessageCard = ({
               chat.replyObject,
               chat.dataObject,
               null,
-              () => {},
+              () => { },
               true
             );
           }
@@ -322,9 +351,8 @@ const MessageCard = ({
   return (
     <div
       ref={messageRef}
-      className={`group my-2 flex  justify-start px-5  ${
-        chat.senderId === currentId ? " flex-row-reverse" : " "
-      } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
+      className={`group my-2 flex  justify-start px-5  ${chat.senderId === currentId ? " flex-row-reverse" : " "
+        } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
     >
@@ -343,41 +371,33 @@ const MessageCard = ({
         id={`${chat.id}_mainCard`}
         ref={setReferenceElement}
         className={`messageDiv relative box-border max-w-[80%] break-words rounded-lg p-2 text-left 
-        ${
-          SamePrevSender &&
+        ${SamePrevSender &&
           chat.senderId !== User.id &&
           ChatObject.activeChatType === "group" &&
           "ml-[38px]"
-        }
-        ${
-          !SamePrevSender &&
-          ` ${
-            chat.senderId !== User.id ? "rounded-tl-none" : "rounded-tr-none"
+          }
+        ${!SamePrevSender &&
+          ` ${chat.senderId !== User.id ? "rounded-tl-none" : "rounded-tr-none"
           } `
-        }
-        ${
-          activeIndexId === chat.id &&
-          `${
-            chat.senderId === User.id
-              ? "pulse-bg-user"
-              : ` ${
-                  theme === "dark" || theme === "system"
-                    ? "pulse-bg-notUser-dark"
-                    : "pulse-bg-notUser-light"
-                }  `
+          }
+        ${activeIndexId === chat.id &&
+          `${chat.senderId === User.id
+            ? "pulse-bg-user"
+            : ` ${theme === "dark" || theme === "system"
+              ? "pulse-bg-notUser-dark"
+              : "pulse-bg-notUser-light"
+            }  `
           }`
-        }  ${
-          chat.senderId === User.id
+          }  ${chat.senderId === User.id
             ? "ml-2   bg-accent-blue text-right text-white"
             : "mr-2  bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
-        } ${
-          (chat.type === "pic/video" ||
+          } ${(chat.type === "pic/video" ||
             chat.type === "image" ||
             chat.type === "video" ||
             chat.type === "file" ||
             chat.type === "poll") &&
           "w-[300px]"
-        }
+          }
           `}
       >
         {chat.senderId !== User.id &&
@@ -398,11 +418,10 @@ const MessageCard = ({
         {!SamePrevSender && (
           <span
             className={`absolute top-0 
-          ${
-            chat.senderId !== User.id
-              ? "left-[-7px] text-[#ffffff] dark:text-[#252d35]"
-              : "right-[-7px] scale-x-[-1] text-accent-blue"
-          } 
+          ${chat.senderId !== User.id
+                ? "left-[-7px] text-[#ffffff] dark:text-[#252d35]"
+                : "right-[-7px] scale-x-[-1] text-accent-blue"
+              } 
            `}
           >
             <svg width="7" height="10" viewBox="0 0 7 10" className="">
@@ -417,11 +436,10 @@ const MessageCard = ({
         {chat.type == "reply" && (
           <div
             className={`max-h-[80px] truncate rounded-lg p-2 text-start 
-             ${
-               chat.senderId === User.id
-                 ? "bg-blue-400"
-                 : "bg-light-secondary dark:bg-gray-500"
-             } `}
+             ${chat.senderId === User.id
+                ? "bg-blue-400"
+                : "bg-light-secondary dark:bg-gray-500"
+              } `}
             onClick={() => {
               const scrollToElement = document.getElementById(
                 `${chat.replyObject.replyTextId}_mainCard`
@@ -430,8 +448,8 @@ const MessageCard = ({
                 chat.replyObject.replyUserId === User.id
                   ? "pulse-bg-user"
                   : theme === "light"
-                  ? "pulse-bg-notUser-light"
-                  : "pulse-bg-notUser-dark";
+                    ? "pulse-bg-notUser-light"
+                    : "pulse-bg-notUser-dark";
               if (scrollToElement) {
                 scrollToElement.scrollIntoView({
                   behavior: "smooth",
@@ -452,43 +470,40 @@ const MessageCard = ({
         {(chat.type === "pic/video" ||
           chat.type === "image" ||
           chat.type === "video") && (
-          <div>
-            <>
-              {chat.dataObject.type.startsWith("image") ? (
-                <ImageComponent
-                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                  downloadSRC={chat.dataObject.downloadURL}
-                  messageId={chat.id}
-                  chat={chat}
-                />
-              ) : (
-                <VideoComponent
-                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                  downloadSRC={chat.dataObject.downloadURL}
-                  messageId={chat.id}
-                  messageText={chat.text}
-                  dataObject={chat.dataObject}
-                />
-              )}
-            </>
-          </div>
-        )}
+            <div>
+              <>
+                {chat.dataObject.type.startsWith("image") ? (
+                  <ImageComponent
+                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                    downloadSRC={chat.dataObject.downloadURL}
+                    messageId={chat.id}
+                    chat={chat}
+                  />
+                ) : (
+                  <VideoComponent
+                    blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
+                    downloadSRC={chat.dataObject.downloadURL}
+                    messageId={chat.id}
+                    messageText={chat.text}
+                    dataObject={chat.dataObject}
+                  />
+                )}
+              </>
+            </div>
+          )}
         {chat.type === "poll" && <PollComponent PollObject={chat} />}
         <div
-          className={`items- flex w-full flex-col ${
-            chat.senderId !== User.id && "justify-end"
-          } ${
-            (chat.type === "pic/video" ||
+          className={`items- flex w-full flex-col ${chat.senderId !== User.id && "justify-end"
+            } ${(chat.type === "pic/video" ||
               chat.type === "image" ||
               chat.type === "video") &&
             !chat.text &&
             "absolute bottom-3 right-4 z-30"
-          }`}
+            }`}
         >
           <p
-            className={`max-w-[400px] break-words text-start ${
-              chat.type === "poll" && "hidden"
-            }`}
+            className={`max-w-[400px] break-words text-start ${chat.type === "poll" && "hidden"
+              }`}
           >
             {chat.text?.split(" ").map((word, index) => (
               <span
@@ -511,9 +526,8 @@ const MessageCard = ({
           <div className="ml-3 flex w-full items-center justify-end text-end">
             <div className={`ml-auto flex items-center justify-end`}>
               <div
-                className={`text-muted mt-1 text-[11px] ${
-                  chat.senderId !== User.id && "mr-3"
-                } `}
+                className={`text-muted mt-1 text-[11px] ${chat.senderId !== User.id && "mr-3"
+                  } `}
               >
                 {formatTimeForMessages(chat.timestamp)}
               </div>
@@ -522,7 +536,7 @@ const MessageCard = ({
                   {chat.status === "pending" && <BiTimeFive />}
                   {chat.status === "sent" && <BsCheckLg />}
                   {chat.status === "received" && <BsCheckAll />}
-                  {chat.status === "seen" && <BsCheckAll color="#000001 " />}
+                  {chat.status === "seen" && <BsCheckAll color="#000001" />}
                 </i>
               )}
             </div>
@@ -532,7 +546,7 @@ const MessageCard = ({
         {chat.reactions?.length > 0 && (
           <div
             ref={animationParent}
-            onClick={() => {}}
+            onClick={() => { }}
             className={`absolute bottom-[-20px] right-0 flex cursor-pointer
             items-center  rounded-lg bg-light-primary p-[5px] dark:bg-dark-primary`}
           >
@@ -550,9 +564,8 @@ const MessageCard = ({
       </div>
 
       <div
-        className={` flex items-center ${
-          chat.senderId === currentId ? "left-0 " : "right-0 "
-        }`}
+        className={` flex items-center ${chat.senderId === currentId ? "left-0 " : "right-0 "
+          }`}
       >
         <div className="relative">
           {showReactEmojiTray && (
@@ -589,9 +602,8 @@ const MessageCard = ({
               <div ref={selectedUserHeight}>
                 <ul
                   ref={animationParent}
-                  className={`${
-                    selectedUsers.length === 0 && "hidden h-0"
-                  }  scrollBar mb-2 flex max-h-[116px]
+                  className={`${selectedUsers.length === 0 && "hidden h-0"
+                    }  scrollBar mb-2 flex max-h-[116px]
                    flex-wrap items-center overflow-y-auto rounded-lg bg-light-secondary 
                     py-1 dark:bg-dark-secondary `}
                 >
@@ -622,9 +634,8 @@ const MessageCard = ({
               />
               {selectedUsers.length > 0 && (
                 <button
-                  className={` ${
-                    isforwarding && "cursor-wait"
-                  } mb-4 w-full rounded-lg bg-accent-blue py-2`}
+                  className={` ${isforwarding && "cursor-wait"
+                    } mb-4 w-full rounded-lg bg-accent-blue py-2`}
                   onClick={() => {
                     if (isforwarding) return;
                     handleMessageForward();
@@ -711,12 +722,10 @@ const MessageCard = ({
             }}
           >
             <i
-              className={` transition-all duration-300 ${
-                chat.senderId === currentId &&
+              className={` transition-all duration-300 ${chat.senderId === currentId &&
                 " ml-2 flex-row-reverse md:group-hover:ml-2"
-              }  ${
-                chat.senderId !== currentId && " mr-2 md:group-hover:mr-2 "
-              } `}
+                }  ${chat.senderId !== currentId && " mr-2 md:group-hover:mr-2 "
+                } `}
             >
               <BsChevronDown size={10} />
             </i>
@@ -747,10 +756,9 @@ const MessageCard = ({
             <div
               key={emoji}
               className={`mr-1 cursor-pointer rounded-lg p-1 hover:dark:bg-hover-dark
-               hover:dark:text-white ${
-                 chat.reactions?.find((reaction) => reaction.id === User.id)
-                   ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
-               } `}
+               hover:dark:text-white ${chat.reactions?.find((reaction) => reaction.id === User.id)
+                  ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
+                } `}
               onClick={() => handleEmojiReaction(emoji)}
             >
               <Emoji unified={emoji} size="23" />
@@ -786,7 +794,11 @@ const MessageCard = ({
             sx={{ borderRadius: "8px" }}
             className="clickEvent cursor-pointer rounded-lg px-4 py-2  text-black hover:bg-hover-light
                  dark:text-white hover:dark:bg-hover-dark hover:dark:text-white"
-          ></MenuItem>
+            onClick={handleMessageDelete}
+          >
+            <RiDeleteBinLine />
+            <p className="ml-2"> Delete</p>{" "}
+          </MenuItem>
         )}
       </Menu>
     </div>

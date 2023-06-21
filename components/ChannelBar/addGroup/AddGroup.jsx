@@ -28,6 +28,7 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import ModalComp from "@/components/ModalComp";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import Checkbox from "@/components/Checkbox";
 
 const UserCard = (p) => {
   const [invalidURL, setinvalidURL] = useState(true);
@@ -52,12 +53,10 @@ const UserCard = (p) => {
       <div>
         <p className="">{p.name}</p>
       </div>
-      <input
-        type="checkbox"
-        className="outlined-none ml-auto h-5 w-5 rounded-lg"
-        checked={p.isSelected}
-        readOnly
-      />
+      <div
+        className="outlined-none ml-auto h-5 w-5 rounded-lg">
+        <Checkbox isChecked={p.isSelected} /></div>
+
     </div>
   );
 };

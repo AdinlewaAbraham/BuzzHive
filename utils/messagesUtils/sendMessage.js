@@ -51,7 +51,7 @@ export async function sendMessage(
     await setDoc(newConversationRef, newConversationData);
 
     const messagesColRef = collection(newConversationRef, "messages");
-    const messageDocRef = doc(messagesColRef, customId);
+    const messageDocRef = doc(messagesColRef, createdId || customId);
     await setDoc(messageDocRef, message);
   } catch (error) {
     console.error("Failed to send message:", error);

@@ -50,7 +50,7 @@ export const handlePicVidUpload = async (
     console.log(blurredPixelatedBlob);
     const blurredPixelatedRef = ref(
       storage,
-      `${ChatObject.activeChatType}/${ChatObject.activeChatId}${
+      `${ChatObject.activeChatType}/${ChatObject.activeChatId}/${
         isImage ? "images" : "videos"
       }/${id}_blurred`
     );
@@ -171,7 +171,7 @@ export const handlePicVidUpload = async (
       (error) => {},
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log(blurredPixelatedBlobDownloadURL);
+
           const picORvideoObj = {
             downloadURL: downloadURL,
             blurredPixelatedBlobDownloadURL: blurredPixelatedBlobDownloadURL
@@ -181,6 +181,7 @@ export const handlePicVidUpload = async (
             size: downscaledBlob.size,
             type: downscaledBlob.type,
             length: isImage ? null : videoLength,
+            filePath: uploadTask.snapshot.ref.fullPath
           };
           ChatObject.activeChatType == "group"
             ? sendGroupMessage(

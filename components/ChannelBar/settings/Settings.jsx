@@ -17,6 +17,7 @@ import { TbFileShredder } from "react-icons/tb";
 import { TbVideoOff } from "react-icons/tb";
 import Image from "next/image";
 import { MdOutlineImageNotSupported } from "react-icons/md";
+import Checkbox from "@/components/Checkbox";
 
 const DeleteOption = ({ option, onClickFunc, loading, complete }) => {
   return (
@@ -356,26 +357,9 @@ const Settings = () => {
                 className="group flex cursor-pointer items-center py-1"
                 onClick={() => handleOptionClick(option)}
               >
-                <div className="mr-2 flex h-5 w-5 items-center justify-center rounded-[3px] border-gray-300 bg-accent-blue pb-[4px]  pl-[2px] group-hover:bg-blue-600">
-                  {User.autoDownloadSettings[option.toLowerCase()] && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      width="15"
-                      height="15"
-                    >
-                      <motion.path
-                        fill="none"
-                        strokeWidth="3"
-                        stroke="#fff"
-                        d="M1 14.5l6.857 6.857L23.5 4"
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 0.8 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                      />
-                    </svg>
-                  )}
-                </div>
+                <Checkbox
+                  isChecked={User.autoDownloadSettings[option.toLowerCase()]}
+                />
                 <label for="myCheckbox">{option}</label>
               </div>
             ))}

@@ -1,21 +1,23 @@
 make about profile functional 
-add delete and edited
-change sidebar tooltip comp styling (font)
-do something about add user ui
-fix box input and maybe add check animation
-fix play/pause button triggering popup
-limit file size
-fix muliple send messages
-unread messages mark ui update 
-gotoBottom button in contentCointainer not available 
-when click outside the adduser modal dont render it 
-limit lenght of username and bio
+limit lenght of username and bio --------
 add animations to popups 
 if new user send welcome message 
 look into verifying yourself
 make a img have alt using <Img />
 fix announcement blocking emoji popup 
 fix poll bugs
+opening pic and video with animations 
+dosnt auto scroll when i send vid or pic or poll
+hide menu for pending messages 
+deleting photos or files in storage setting causes downloading bug 
+add error indicators for errors
+fix not scrolling to the unread message when clicking on chat room(i think i am not filtering the message well)
+fix random scrolls 
+disable ablity to vote on poll when it is still sending 
+fix the scroll to bottom button 
+fix poll component, video comp ui 
+
+
 
 
 clean up stuff 

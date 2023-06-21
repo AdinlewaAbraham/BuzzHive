@@ -3,21 +3,17 @@ import { FaUserAlt } from "react-icons/fa";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { UserContext } from "../../App";
 import { modifyPollVote } from "@/utils/messagesUtils/modifyPollVote";
+import { motion } from "framer-motion";
 
 const PollComponent = ({ PollObject }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
-  PollObject;
-  PollObject.dataObject;
   const { options, question, allowMultipleAnswers } = PollObject.dataObject;
-  allowMultipleAnswers;
   const caclTotalVotes = useMemo(() => {
     return options.reduce((total, option) => total + option.voteCount, 0);
   }, [options]);
-  caclTotalVotes;
 
   async function handleVote(optionId) {
-    // logic for updating chats locally
     const messages = JSON.parse(localStorage.getItem(ChatObject.activeChatId));
     messages;
     const messageIndex = messages.findIndex(
@@ -25,9 +21,7 @@ const PollComponent = ({ PollObject }) => {
     );
     const message = messages[messageIndex];
     const messageOptions = message["dataObject"]["options"];
-    message.dataObject.allowMultipleAnswers;
     if (!allowMultipleAnswers) {
-      allowMultipleAnswers;
       for (let i = 0; i < messageOptions.length; i++) {
         if (messageOptions[i]["id"] === optionId) {
           true;
@@ -63,32 +57,54 @@ const PollComponent = ({ PollObject }) => {
     messageOptions;
     const votes = messageOptions[optionIndex]["votes"];
     if (!votes) return;
-    votes;
     const containsId = votes.some((vote) => vote.id === User.id);
-    containsId;
     modifyPollVote(
       ChatObject.activeChatType,
       PollObject.id,
       ChatObject.activeChatId,
       optionId,
       User.id,
-      containsId ? "remove" : "add" // this handles vote toggle
+      containsId ? "remove" : "add"
     );
   }
   return (
     <div className="text-left ">
-      <h3 className="max-w-[300px]  whitespace-normal break-words ">{question}</h3>
+      <h3 className="max-w-[300px]  whitespace-normal break-words ">
+        {question}
+      </h3>
 
       <p>{allowMultipleAnswers ? "select one or more" : "select one"}</p>
       {options.map((option) => (
         <div
           key={option.id}
-          className="flex items-center justify-center"
-          onClick={(e) => {
-            handleVote(option.id);
-          }}
+          className="group flex cursor-pointer items-center justify-center"
+          onClick={() => { handleVote(option.id) }}
         >
-          <input type="checkbox" name="" id="" className="mr-1" />
+          <div
+            className={`  mr-2 flex h-6 w-6 border border-black
+             items-center justify-center rounded-full
+           bg-accent-blue ${option.votes.some(vote => vote.id === User.id) && "bg-blue-800"} p-1`}
+          >
+            {option.votes.some(vote => vote.id === User.id) && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="15"
+                height="15"
+                className=" mb-[3px] ml-[2px] flex items-end"
+              >
+                <motion.path
+                  fill="none"
+                  strokeWidth="3"
+                  stroke="#fff"
+                  d="M1 14.5l6.857 6.857L23.5 4"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 0.8 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                />
+              </svg>
+            )}
+          </div>
           <div>
             <div className="flex justify-between">
               <p>{option.text}</p>

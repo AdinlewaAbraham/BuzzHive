@@ -133,7 +133,7 @@ const App = () => {
               </button>
             ) : (
               <div className="flex items-center justify-center">
-                <i className="mr-1 flex items-center">
+                <i className="mr-2 flex items-center">
                   <CircularProgress size="sm" variant="plain" />
                 </i>
                 logging in...

@@ -15,12 +15,13 @@ function VideoPlayer({ src, setvideoLengthFunc }) {
   }, [duration]);
 
   const handlePlayPause = () => {
-    if (isPlaying) {
+    if (!videoRef.current.paused) {
       videoRef.current.pause();
+      setIsPlaying(false);
     } else {
       videoRef.current.play();
+      setIsPlaying(true);
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleDurationChange = () => {
@@ -33,7 +34,7 @@ function VideoPlayer({ src, setvideoLengthFunc }) {
         onClick={handlePlayPause}
         ref={videoRef}
         onDurationChange={handleDurationChange}
-        className="fff mx-auto block w-full bg-red-800  rounded-t-lg "
+        className="fff mx-auto block w-full rounded-t-lg bg-primary "
       >
         <source src={src} type="video/mp4" />
       </video>
@@ -41,10 +42,12 @@ function VideoPlayer({ src, setvideoLengthFunc }) {
         <p className="absolute mr-2 text-[50px] ">{formatDuration(duration)}</p>
         <div className="flex w-full items-center justify-center">
           <button
-            onClick={handlePlayPause}
-            className="media-container transition-all"
+            onClick={() => handlePlayPause()}
+            className="media-container relative transition-all"
           >
+
             {isPlaying ? <CiPause1 size={30} /> : <VscPlay size={30} />}
+            <div className="absolute inset-0 "></div>
           </button>
         </div>
       </div>

@@ -49,7 +49,7 @@ export const sendGroupMessage = async (
     await updateDoc(groupRef, { lastMessage: newMessage });
 
     const messagesColRef = collection(groupRef, "messages");
-    const messageDocRef = doc(messagesColRef, customId);
+    const messageDocRef = doc(messagesColRef, createdId || customId);
     await setDoc(messageDocRef, message);
   } catch (error) {
     console.error(

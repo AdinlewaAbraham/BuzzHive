@@ -52,8 +52,6 @@ const Input = () => {
     };
     const time = new Date();
 
-
-
     let currentTime = new Date().getTime();
 
     let seconds = Math.floor(currentTime / 1000);
@@ -79,7 +77,8 @@ const Input = () => {
     });
     if (ChatObject.activeChatType == "group") {
       await sendGroupMessage(
-        User.id, User.photoUrl,
+        User.id,
+        User.photoUrl,
         ChatObject.activeChatId,
         message,
         User.name,
@@ -169,17 +168,19 @@ const Input = () => {
           ref={popupRef}
         >
           <div
-            className=" min-w-[200px] w-[35%]
-           max-w-[500px] rounded-lg  dark:bg-dark-secondary bg-light-secondary"
+            className=" w-[35%] min-w-[200px]
+           max-w-[500px] rounded-lg  bg-light-secondary dark:bg-dark-secondary"
           >
-            <div className="rounded-t-lg p-5 bg-primary">
-              <h1 className="md:text-xl text-lg font-medium">Discard unsent message</h1>
+            <div className="bg-primary rounded-t-lg p-5">
+              <h1 className="text-lg font-medium md:text-xl">
+                Discard unsent message
+              </h1>
               <p className="mt-1 text-sm">
                 Your message, including attached media, will not be sent if you
                 leave this screen
               </p>
             </div>
-            <div className="z-[99] flex flex-col md:flex-row rounded-lg p-5 [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
+            <div className="z-[99] flex flex-col rounded-lg p-5 md:flex-row [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
               <button
                 className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
                 onClick={() => {
@@ -189,7 +190,7 @@ const Input = () => {
                 return to media
               </button>
               <button
-                className="bg-blue-500 p-4 md:mt-0 mt-2"
+                className="mt-2 bg-blue-500 p-4 md:mt-0"
                 onClick={() => {
                   setfile(null);
                   setpicVidmedia(null);
@@ -230,8 +231,9 @@ const Input = () => {
           </div>
         </div>
       )}
-      {(file || picVidmedia || showPollInput || showSendContact) &&
-        <div className="inset-0 fixed " ></div>}
+      {(file || picVidmedia || showPollInput || showSendContact) && (
+        <div className="fixed inset-0 "></div>
+      )}
       <div className="flex items-center justify-between bg-[#fcfcfc] px-[4px] py-[8px] dark:bg-[#1d232a] md:ml-[1px]">
         <div className="detectMe">
           {picVidmedia && (
@@ -246,18 +248,26 @@ const Input = () => {
           )}
           {file && <FileInput file={file} setfile={setfile} />}
         </div>
-        {showPollInput && <PollInput setshowPollInputFunc={()=>setshowPollInput(false)} />}
+        {showPollInput && (
+          <PollInput setshowPollInputFunc={() => setshowPollInput(false)} />
+        )}
         <div className="relative flex">
           <div
             key={"showMediaPicker"}
             className={` detectme MediaPicker
-                ${(showMediaPicker || file || picVidmedia || showPollInput || showSendContact) &&
-              "bg-hover-light dark:bg-hover-dark"
-              } 
+                ${
+                  (showMediaPicker ||
+                    file ||
+                    picVidmedia ||
+                    showPollInput ||
+                    showSendContact) &&
+                  "bg-hover-light dark:bg-hover-dark"
+                } 
                  cursor-pointer rounded-lg bg-transparent p-[10px] px-[15px]
                  text-muted-light hover:bg-hover-light dark:text-muted-dark dark:hover:bg-hover-dark`}
             onClick={() => {
-              if (file || picVidmedia || showPollInput || showSendContact) return
+              if (file || picVidmedia || showPollInput || showSendContact)
+                return;
               setshowMediaPicker(!showMediaPicker);
             }}
           >
@@ -265,10 +275,12 @@ const Input = () => {
           </div>
           {showMediaPicker && (
             <div
-              className="detectMe MediaPicker absolute bottom-[65px] z-[99]  w-[160px] rounded-lg bg-light-primary px-1 py-2
+              className="detectMe MediaPicker absolute bottom-[52px] z-[99]  w-[160px] rounded-lg
+               bg-light-primary px-1 py-2
                 text-[15px] dark:bg-dark-primary  [&>div>div>svg]:mr-2 [&>div>div]:flex
             [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 
-            [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-hover-light dark:hover:[&>div]:bg-hover-dark"
+            [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-hover-light
+             dark:hover:[&>div]:bg-hover-dark"
             >
               <div className="file-input px-0 py-0">
                 <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
@@ -280,6 +292,11 @@ const Input = () => {
                     type="file"
                     className="hidden h-full w-full cursor-pointer"
                     onChange={(e) => {
+                      if (e.target.files[0].size > 20971520) {
+                        alert("Selected file exceeds the 20MB limit.");
+                        e.target.value = null; 
+                        return;
+                      }
                       e.target.files[0];
                       setfile(e.target.files[0]);
                       e.target.files[0];
@@ -291,7 +308,6 @@ const Input = () => {
               <div>
                 <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
                   <i className="mr-2 text-muted-light dark:text-muted-dark">
-                    {" "}
                     <RiGalleryLine />
                   </i>
                   Photo or video
@@ -299,6 +315,11 @@ const Input = () => {
                     type="file"
                     className="hidden h-full w-full cursor-pointer"
                     onChange={async (e) => {
+                      if (e.target.files[0].size > 20971520) {
+                        alert("Selected file exceeds the 20MB limit.");
+                        e.target.value = null;
+                        return;
+                      }
                       if (e.target.files[0].type.startsWith("image")) {
                         const blob = await downScalePicVid(
                           e.target.files[0],

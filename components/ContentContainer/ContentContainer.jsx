@@ -392,7 +392,7 @@ const ContentContainer = () => {
                         searchedMessages={searchedMessages.map(
                           (message) => message.id
                         )}
-                        ref={scrollContainerRef}
+                        scrollContainerRef={scrollContainerRef}
                       />
                     ))}
                 </InfiniteScroll>

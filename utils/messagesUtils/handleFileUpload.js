@@ -41,6 +41,7 @@ export const handleFileUpload = async (
       type: file.type,
       status: "uploading",
       progress: 0,
+      id: id,
     };
     const message = {
       type: "file",
@@ -53,17 +54,16 @@ export const handleFileUpload = async (
       status: "pending",
     };
 
-    
-  async function initializeFileDB() {
-    const db = await openDB("myFilesDatabase", 1, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains("files")) {
-          db.createObjectStore("files");
-        }
-      },
-    });
-    return db;
-  }
+    async function initializeFileDB() {
+      const db = await openDB("myFilesDatabase", 1, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains("files")) {
+            db.createObjectStore("files");
+          }
+        },
+      });
+      return db;
+    }
     const db = await initializeFileDB();
     const tx = db.transaction("files", "readwrite");
     const store = tx.objectStore("files");
@@ -114,11 +114,13 @@ export const handleFileUpload = async (
       name: file.name,
       size: file.size,
       type: file.type,
+      filePath: snapshot.ref.fullPath
     };
 
     if (ChatObject.activeChatType == "group") {
       await sendGroupMessage(
-        User.id,User.photoUrl,
+        User.id,
+        User.photoUrl,
         ChatObject.activeChatId,
         fileCaption || "",
         User.name,
@@ -126,7 +128,9 @@ export const handleFileUpload = async (
         time,
         null,
         fileObj,
-        id,()=>{},false
+        id,
+        () => {},
+        false
       );
     } else {
       await sendMessage(
@@ -139,7 +143,9 @@ export const handleFileUpload = async (
         time,
         null,
         fileObj,
-        id,()=>{},false
+        id,
+        () => {},
+        false
       );
     }
     console.log("File available at", downloadURL);
