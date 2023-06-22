@@ -13,6 +13,7 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import { FcGoogle } from "react-icons/fc";
 import { CircularProgress } from "@mui/joy";
 import { useTheme } from "next-themes";
+import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 
 export const UserContext = createContext();
 
@@ -23,15 +24,62 @@ const App = () => {
   const [isAuthed, setIsAuthed] = useState(false);
   const [isSigningIn, setisSigningIn] = useState(false);
 
-  const { setTheme } = useTheme()
+  const { setTheme } = useTheme();
+  let isFunctionRunning = false;
+
+  const sendWelcomeMessage = (userId) => {
+    let isFunctionRunning = false;
+
+    return async function () {
+      if (!isFunctionRunning) {
+        isFunctionRunning = true;
+        try {
+          const firstText =
+            "Hey there! 👋 It's Abraham, and I'm excited to introduce you to my chat app, BuzzHive! I've been working on this project as part of my portfolio, and I'm thrilled to share it with you. So, buckle up and get ready for a buzzing experience! 🐝";
+          const secondText =
+            "Welcome to BuzzHive! This is a chat app I've built from scratch, and it's all about connecting people and facilitating conversations. With BuzzHive, you can chat with friends, share messages and media, and explore different features. It's a fun and interactive platform designed to keep you engaged and entertained. ✨";
+          const thirdText =
+            "Feel free to test run the app using my account. Go ahead and dive into the world of BuzzHive! Chat with others, try out different functionalities, and let me know what you think. Enjoy exploring BuzzHive! 😄";
+          const lastText =
+            "I hope you have a great time using BuzzHive and discovering its features. Happy chatting! 🎉";
+          const messages = [firstText, secondText, thirdText, lastText];
+          const senderId = "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2";
+          messages.forEach(async (message) => {
+            await sendMessage(
+              senderId,
+              userId,
+              message,
+              senderId,
+              "Abraham",
+              "regular",
+              new Date(),
+              null,
+              null,
+              null,
+              () => {},
+              false
+            );
+          });
+        } catch (error) {
+          console.error("Error sending messages:", error);
+        } finally {
+          isFunctionRunning = false;
+        }
+      }
+    };
+  };
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       if (u) {
+        isFunctionRunning = true;
         setIsAuthed(true);
         const userSnapshot = await getDoc(doc(db, "users", u.uid));
         const userData = userSnapshot.data();
         if (!userData) {
+          console.log("creating");
           await createUser(u.uid, u.displayName, u.email, u.photoURL, "hello");
+          const runWelcomeMessage = sendWelcomeMessage(u.uid);
+          await runWelcomeMessage();
           const userSnapshot = await getDoc(doc(db, "users", u.uid));
           const userData = userSnapshot.data();
           setUser(userData);
@@ -144,7 +192,6 @@ const App = () => {
       )}
     </>
   );
-
 };
 
 export default App;

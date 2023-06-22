@@ -29,6 +29,7 @@ import ModalComp from "@/components/ModalComp";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Checkbox from "@/components/Checkbox";
+import { MdVerified } from "react-icons/md";
 
 const UserCard = (p) => {
   const [invalidURL, setinvalidURL] = useState(true);
@@ -46,17 +47,22 @@ const UserCard = (p) => {
           onError={() => setinvalidURL(false)}
         />
       ) : (
-        <i className="mr-2 h-[45px] w-[45px] rounded-full bg-cover flex items-center justify-center ">
+        <i className="mr-2 flex h-[45px] w-[45px] items-center justify-center rounded-full bg-cover ">
           <FaUserAlt size={22} />
         </i>
       )}
-      <div>
+      <div className="flex items-center">
         <p className="">{p.name}</p>
+        {console.log(p.id)}
+        {p.id === "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && (
+          <i className="ml-2 flex items-center border text-accent-blue">
+            <MdVerified />
+          </i>
+        )}
       </div>
-      <div
-        className="outlined-none ml-auto h-5 w-5 rounded-lg">
-        <Checkbox isChecked={p.isSelected} /></div>
-
+      <div className="outlined-none ml-auto h-5 w-5 rounded-lg">
+        <Checkbox isChecked={p.isSelected} />
+      </div>
     </div>
   );
 };
@@ -133,17 +139,19 @@ const AddGroup = () => {
     return () => window.removeEventListener("resize", widthResizer);
   }, []);
   const divStyles = {
-    maxHeight: `calc(100vh - 125px${selectedUsers.length > 0
-      ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
-      : ""
-      })`,
+    maxHeight: `calc(100vh - 125px${
+      selectedUsers.length > 0
+        ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
+        : ""
+    })`,
     transition: "height ease-in-out 150ms",
   };
   const showAddGroupMenudivStyles = {
-    maxHeight: `calc(100vh - 80px${selectedUsers.length > 0
-      ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
-      : ""
-      })`,
+    maxHeight: `calc(100vh - 80px${
+      selectedUsers.length > 0
+        ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
+        : ""
+    })`,
     transition: "max-height 0.5s ease",
   };
 
@@ -313,8 +321,9 @@ const AddGroup = () => {
                   {user.name}
                   <i
                     className={`text-danger absolute right-1 cursor-pointer p-1
-                   opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${!showAddGroupMenu && "group-hover:opacity-100  "
-                      } `}
+                   opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${
+                     !showAddGroupMenu && "group-hover:opacity-100  "
+                   } `}
                     onClick={() => handleRemoveUser(user.id)}
                   >
                     <GiCancel />
@@ -331,8 +340,11 @@ const AddGroup = () => {
           <motion.div
             initial={{ y: -70, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.15 }}
-            exit={{ y: 10, opacity: 0 }}
+            exit={{ x: 70, opacity: 0 }}
+            transition={{
+              ease: "linear",
+              duration: 0.15,
+            }}
             className={`flex  flex-col justify-between`}
           >
             <div
@@ -340,7 +352,7 @@ const AddGroup = () => {
               className={`scrollBar relative
            flex flex-col justify-between
             overflow-y-auto px-1 
-          pb-5 `}
+           pb-5 `}
             >
               <div className="-center  my-7 flex items-center">
                 <label
@@ -405,8 +417,9 @@ const AddGroup = () => {
             </div>
             <div className="  left-0 bottom-0 mt-auto flex w-full">
               <button
-                className={`mr-1 flex w-1/2 items-center justify-center rounded-lg bg-accent-blue py-2 ${creatingGroupLoading && "cursor-wait"
-                  } `}
+                className={`mr-1 flex w-1/2 items-center justify-center rounded-lg bg-accent-blue py-2 ${
+                  creatingGroupLoading && "cursor-wait"
+                } `}
                 onClick={createGroupFunc}
                 disabled={creatingGroupLoading}
               >
@@ -425,8 +438,9 @@ const AddGroup = () => {
               <button
                 onClick={cancelCreateGroup}
                 disabled={creatingGroupLoading}
-                className={`w-1/2 rounded-lg bg-gray-500 py-2 ${creatingGroupLoading && "cursor-wait"
-                  } `}
+                className={`w-1/2 rounded-lg bg-gray-500 py-2 ${
+                  creatingGroupLoading && "cursor-wait"
+                } `}
               >
                 Cancel
               </button>
@@ -478,9 +492,9 @@ const AddGroup = () => {
             )}
 
             <motion.div
-              initial={{ y: 10, opacity: 0 }}
+              initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -10, opacity: 0 }}
+              exit={{ y: -20, opacity: 0 }}
               transition={{ duration: 0.2 }}
               style={divStyles}
               ref={scrollContainerRef}
@@ -508,8 +522,9 @@ const AddGroup = () => {
                         };
                         return (
                           <div
-                            className={`${user.type == "group" ? "hidden" : ""
-                              }`}
+                            className={`${
+                              user.type == "group" ? "hidden" : ""
+                            }`}
                             key={`active${user.id}`}
                           >
                             <UserCard

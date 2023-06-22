@@ -70,10 +70,22 @@ const SelectMenu = ({ optionsArr, selectedMenuText, onClickFunc }) => {
   const selectedMenu = optionsArr.find(
     (option) => option.text == selectedMenuText
   );
+  
+  useEffect(() => {
+    const handleClick = (e)=>{
+      if (!e.target.closest(".optionsMenu")) {
+        setshowMenuOptions(false)
+      }
+    }
+    window.addEventListener("click", handleClick)
+    return () => window.removeEventListener("click", handleClick) 
+  }, [])
+  
+
   return (
-    <div className="relative">
+    <div className="relative optionsMenu menu w-[50%] ">
       <div
-        className="flex w-[50%] cursor-pointer
+        className="flex w-full cursor-pointer
        items-center
        justify-between rounded-lg
         bg-light-secondary p-2 dark:bg-dark-secondary"
@@ -86,76 +98,90 @@ const SelectMenu = ({ optionsArr, selectedMenuText, onClickFunc }) => {
           <BsChevronDown size={10} />
         </i>
       </div>
-      {showMenuOptions && (
-        <div
-          className="absolute top-0 left-0 flex w-[50%] flex-col
-        rounded-lg bg-light-secondary p-2 dark:bg-dark-secondary 
-        
-        "
-        >
-          {optionsArr
-            .sort((a, b) => {
-              if (a.text === selectedMenuText) return -1;
-              if (b.text === selectedMenuText) return 1;
-              return 0;
-            })
-            .map((option, index) => (
-              <div
-                key={index}
-                onClick={() => {
-                  setshowMenuOptions(false);
-                  onClickFunc(option);
-                }}
-                className={`relative flex cursor-pointer items-center ${
-                  index !== optionsArr.length - 1 && "mb-1"
-                } p-2 px-2 ${
-                  index === 0 && "bg-hover-light dark:bg-hover-dark"
-                } rounded-lg hover:bg-hover-light hover:dark:bg-hover-dark `}
-              >
-                {index === 0 && (
-                  <span className=" absolute bottom-[25%] top-[25%] left-0 z-[1] w-1 rounded-sm bg-accent-blue"></span>
-                )}
-                <i className="mr-2">{option.icon}</i>
-                {option.text}
-              </div>
-            ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {showMenuOptions && (
+          <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -7, opacity: 0 }}
+            className="absolute top-0 left-0 flex w-full flex-col
+           rounded-lg bg-light-secondary p-2 dark:bg-dark-secondary optionsMenu"
+           
+          >
+            {optionsArr
+              .sort((a, b) => {
+                if (a.text === selectedMenuText) return -1;
+                if (b.text === selectedMenuText) return 1;
+                return 0;
+              })
+              .map((option, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    setshowMenuOptions(false);
+                    onClickFunc(option);
+                  }}
+                  className={`relative flex cursor-pointer items-center ${index !== optionsArr.length - 1 && "mb-1"
+                    } p-2 px-2 ${index === 0 && "bg-hover-light dark:bg-hover-dark"
+                    } rounded-lg hover:bg-hover-light hover:dark:bg-hover-dark `}
+                >
+                  {index === 0 && (
+                    <span className=" absolute bottom-[25%] top-[25%] left-0 z-[1] w-1 rounded-sm bg-accent-blue"></span>
+                  )}
+                  <i className="mr-2">{option.icon}</i>
+                  {option.text}
+                </div>
+              ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
-const Modal = ({ modalObject, setshowModal }) => {
+const Modal = ({ modalObject, showModal, setshowModal }) => {
   return (
-    <div className="Poll-input fixed inset-0 z-50 flex  items-center justify-center bg-gray-900 bg-opacity-50">
-      <div
-        className="w-[35%]
-       max-w-[500px] rounded-lg bg-light-secondary dark:bg-dark-secondary"
-      >
-        <div className="rounded-t-lg bg-light-primary p-5 dark:bg-dark-primary">
-          <h1 className="text-xl font-medium">{modalObject.header}</h1>
-          <p className="mt-1 text-sm">{modalObject.description}</p>
-        </div>
-        <div className="z-[99] flex rounded-lg p-5 [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
-          <button
-            className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
-            onClick={() => {
-              setshowModal(false);
-            }}
+    <AnimatePresence>
+      {showModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="Poll-input fixed inset-0 z-50 flex  items-center justify-center bg-gray-900 bg-opacity-50"
+        >
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            className="w-[35%] min-w-[300px]
+          max-w-[500px] rounded-lg bg-light-secondary dark:bg-dark-secondary"
           >
-            {modalObject.returnText}
-          </button>
-          <button
-            className="bg-blue-500 p-4"
-            onClick={() => {
-              setshowModal(false);
-              modalObject.disCardFunc();
-            }}
-          >
-            {modalObject.discardText}
-          </button>
-        </div>
-      </div>
-    </div>
+            <div className="rounded-t-lg bg-light-primary p-5 dark:bg-dark-primary">
+              <h1 className="text-xl font-medium  md:text-xl">{modalObject.header}</h1>
+              <p className="mt-1 text-sm">{modalObject.description}</p>
+            </div>
+            <div className="z-[99] flex flex-col md:flex-row rounded-lg p-5 [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
+              <button
+                className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
+                onClick={() => {
+                  setshowModal(false);
+                }}
+              >
+                {modalObject.returnText}
+              </button>
+              <button
+                className="bg-blue-500 p-4"
+                onClick={() => {
+                  setshowModal(false);
+                  modalObject.disCardFunc();
+                }}
+              >
+                {modalObject.discardText}
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 const Settings = () => {
@@ -244,15 +270,17 @@ const Settings = () => {
   }
   return (
     <div className=" h-screen">
-      {showModal && (
-        <Modal modalObject={modalObject} setshowModal={setshowModal} />
-      )}
+      <Modal
+        modalObject={modalObject}
+        showModal={showModal}
+        setshowModal={setshowModal}
+      />
+
       <Goback text={"Settings"} />
       <motion.div
-        initial={{ y: 10, opacity: 0 }}
+        initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -10, opacity: 0 }}
-        transition={{ duration: 0.2 }}
+        exit={{ y: -20, opacity: 0 }}
         className="scrollBar h-[calc(100vh-70px-66px)] overflow-scroll md:h-[calc(100vh-66px)]"
       >
         <div className="flex flex-col">

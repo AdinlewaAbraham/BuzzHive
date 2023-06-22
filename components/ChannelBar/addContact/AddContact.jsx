@@ -146,9 +146,9 @@ const AddContact = () => {
         />
       </div>
       <motion.div
-        initial={{ y: 10, opacity: 0 }}
+        initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -10, opacity: 0 }}
+        exit={{ y: -20, opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
         {loading ? (

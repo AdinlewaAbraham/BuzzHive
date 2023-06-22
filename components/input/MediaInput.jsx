@@ -7,6 +7,7 @@ import VideoPlayer from "./VideoPlayer";
 import { UserContext } from "../App";
 import VideoThumbnail from "react-video-thumbnail";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MediaInput = ({
   picVidmedia,
@@ -14,13 +15,12 @@ const MediaInput = ({
   setpicVidmediaToNull,
   setblurredPicVidmedia,
 }) => {
-  const { ChatObject, setChats } = useContext(SelectedChannelContext);
+  const { ChatObject, setChats, setallowScrollObject } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
   const [mediaCaption, setmediaCaption] = useState("");
   const [ImageBase64, setImageBase64] = useState();
   const [videoLength, setvideoLength] = useState(0);
   const isImage = picVidmedia.type.startsWith("image");
-  console.log(isImage);
 
   async function base64toFile(base64String, fileName) {
     const arr = base64String.split(",");
@@ -56,66 +56,85 @@ const MediaInput = ({
     setvideoLength(state);
   }
   return (
-    <div className="media-container absolute bottom-[65px] left-2 z-10 w-[80%] ">
-      {picVidmedia.type.startsWith("image/") ? (
-        <div className="">
-        <img src={URL.createObjectURL(picVidmedia)} alt="Downscaled media " className=" rounded-t-lg " /></div>
-      ) : (
-        <>
-          {/* dont want to render  this component (<VideoThumbnail/>) below because i only need the thumbnail */}
-          <VideoThumbnail
-            videoUrl={URL.createObjectURL(picVidmedia)}
-            thumbnailHandler={(thumbnail) => setImageBase64(thumbnail)}
-            width={null}
-            snapshotAtTime={5}
-            height={null}
-            renderThumbnail={false}
-          />
-          <VideoPlayer
-            src={URL.createObjectURL(picVidmedia)}
-            setvideoLengthFunc={setvideoLengthFunc}
-          />
-        </>
-      )}
+    <AnimatePresence>
+      <motion.div
+        className="media-container absolute bottom-[65px] left-2 z-10 w-[80%] "
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -50 }}
+      >
+        {picVidmedia.type.startsWith("image/") ? (
+          <div className="">
+            <img
+              src={URL.createObjectURL(picVidmedia)}
+              alt="Downscaled media "
+              className=" rounded-t-lg "
+            />
+          </div>
+        ) : (
+          <>
+            {/* dont want to render  this component (<VideoThumbnail/>) below because i only need the thumbnail */}
+            <div className="hidden">
+              <VideoThumbnail
+                videoUrl={URL.createObjectURL(picVidmedia)}
+                thumbnailHandler={(thumbnail) => setImageBase64(thumbnail)}
+                width={null}
+                snapshotAtTime={5}
+                height={null}
+                renderThumbnail={false}
+              />
+            </div>
+            <VideoPlayer
+              src={URL.createObjectURL(picVidmedia)}
+              setvideoLengthFunc={setvideoLengthFunc}
+            />
+          </>
+        )}
 
-      <div className="flex items-center justify-between bg-primary p-2 rounded-b-lg ">
-        <BsEmojiSmile />
-        <input
-          autoFocus
-          type="text"
-          className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
-          placeholder="Caption (optional)"
-          onChange={(e) => {
-            setmediaCaption(e.target.value);
-          }}
-        />
-        <div
-          className="flex items-center rounded-md bg-blue-600 px-2 py-2"
-          onClick={async () => {
-            let currentTime = new Date().getTime();
-        
-            let seconds = Math.floor(currentTime / 1000);
-            let nanoseconds = (currentTime % 1000) * 10 ** 6;
-        
-            let time = { seconds: seconds, nanoseconds: nanoseconds };
-            await handlePicVidUpload(
-              picVidmedia,
-              blurredPicVidmedia,
-              ChatObject,
-              mediaCaption,
-              User,
-              time,
-              setChatsFunc,
-              videoLength
-            ).then(() => {
-              setpicVidmediaToNull(null);
-            });
-          }}
-        >
-          <AiOutlineSend />
+        <div className="bg-primary flex items-center justify-between rounded-b-lg p-2 ">
+          <BsEmojiSmile />
+          <input
+            autoFocus
+            type="text"
+            className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
+            placeholder="Caption (optional)"
+            onChange={(e) => {
+              setmediaCaption(e.target.value);
+            }}
+          />
+          <div
+            className="flex items-center rounded-md bg-blue-600 px-2 py-2"
+            onClick={async () => {
+              let currentTime = new Date().getTime();
+
+              let seconds = Math.floor(currentTime / 1000);
+              let nanoseconds = (currentTime % 1000) * 10 ** 6;
+
+              let time = { seconds: seconds, nanoseconds: nanoseconds };
+              setallowScrollObject({
+                scrollTo: "bottom",
+                scrollBehaviour: "smooth",
+                allowScroll: true,
+              });
+              await handlePicVidUpload(
+                picVidmedia,
+                blurredPicVidmedia,
+                ChatObject,
+                mediaCaption,
+                User,
+                time,
+                setChatsFunc,
+                videoLength
+              ).then(() => {
+                setpicVidmediaToNull(null);
+              });
+            }}
+          >
+            <AiOutlineSend />
+          </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

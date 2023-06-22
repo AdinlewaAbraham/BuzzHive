@@ -20,6 +20,7 @@ import MediaInput from "./MediaInput";
 import PollInput from "./PollInput";
 import FileInput from "./FileInput";
 import { Timestamp } from "firebase/firestore";
+import { motion, AnimatePresence } from "framer-motion";
 const Input = () => {
   const { User } = useContext(UserContext);
   const {
@@ -162,50 +163,60 @@ const Input = () => {
   ]);
   return (
     <>
-      {showPopup && (
-        <div
-          className="Poll-input fixed inset-0 z-50 flex  items-center justify-center bg-gray-900 bg-opacity-50"
-          ref={popupRef}
-        >
-          <div
-            className=" w-[35%] min-w-[200px]
-           max-w-[500px] rounded-lg  bg-light-secondary dark:bg-dark-secondary"
+      <AnimatePresence>
+        {showPopup && (
+          <motion.div
+            className="Poll-input fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <div className="bg-primary rounded-t-lg p-5">
-              <h1 className="text-lg font-medium md:text-xl">
-                Discard unsent message
-              </h1>
-              <p className="mt-1 text-sm">
-                Your message, including attached media, will not be sent if you
-                leave this screen
-              </p>
-            </div>
-            <div className="z-[99] flex flex-col rounded-lg p-5 md:flex-row [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
-              <button
-                className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
-                onClick={() => {
-                  setShowPopup(false);
-                }}
-              >
-                return to media
-              </button>
-              <button
-                className="mt-2 bg-blue-500 p-4 md:mt-0"
-                onClick={() => {
-                  setfile(null);
-                  setpicVidmedia(null);
-                  setblurredPicVidmedia(null);
-                  setShowPopup(false);
-                  setshowPollInput(false);
-                  setshowSendContact(false);
-                }}
-              >
-                Discard
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            <motion.div
+              className="w-[35%] min-w-[300px] max-w-[500px] rounded-lg bg-light-secondary dark:bg-dark-secondary"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+            >
+              <div className="bg-primary rounded-t-lg p-5">
+                <h1 className="text-lg font-medium md:text-xl">
+                  Discard unsent message
+                </h1>
+                <p className="mt-1 text-sm">
+                  {showPollInput
+                    ? "Your poll, including attached options and settings, will not be sent if you leave this screen."
+                    : `Your message, including attached ${
+                        file ? "file" : "media"
+                      }, will not be sent if you
+                  leave this screen`}
+                </p>
+              </div>
+              <div className="z-[99] flex flex-col rounded-lg p-5 md:flex-row [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
+                <button
+                  className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
+                  onClick={() => {
+                    setShowPopup(false);
+                  }}
+                >
+                  return to {file ? "file" : showPollInput ? "poll" : "media"}
+                </button>
+                <button
+                  className="mt-2 bg-blue-500 p-4 md:mt-0"
+                  onClick={() => {
+                    setfile(null);
+                    setpicVidmedia(null);
+                    setblurredPicVidmedia(null);
+                    setShowPopup(false);
+                    setshowPollInput(false);
+                    setshowSendContact(false);
+                  }}
+                >
+                  Discard
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {ReplyObject.ReplyTextId && (
         <div
           className="ml-[1px] max-h-[90px] truncate px-10 py-2 dark:bg-[#1d232a]"
@@ -249,7 +260,13 @@ const Input = () => {
           {file && <FileInput file={file} setfile={setfile} />}
         </div>
         {showPollInput && (
-          <PollInput setshowPollInputFunc={() => setshowPollInput(false)} />
+          <motion.div
+            initial={{ opacity: 0,  }}
+            animate={{ opacity: 1,  }}
+            exit={{ opacity: 0, }}
+          >
+            <PollInput setshowPollInputFunc={() => setshowPollInput(false)} />
+          </motion.div>
         )}
         <div className="relative flex">
           <div
@@ -273,96 +290,101 @@ const Input = () => {
           >
             <ImAttachment />
           </div>
-          {showMediaPicker && (
-            <div
-              className="detectMe MediaPicker absolute bottom-[52px] z-[99]  w-[160px] rounded-lg
+          <AnimatePresence>
+            {showMediaPicker && (
+              <motion.div
+                className="detectMe MediaPicker absolute bottom-[52px] z-[99]  w-[160px] rounded-lg
                bg-light-primary px-1 py-2
                 text-[15px] dark:bg-dark-primary  [&>div>div>svg]:mr-2 [&>div>div]:flex
-            [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 
-            [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-hover-light
-             dark:hover:[&>div]:bg-hover-dark"
-            >
-              <div className="file-input px-0 py-0">
-                <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
-                  <i className="mr-2 text-muted-light dark:text-muted-dark">
-                    <AiOutlineFile />
-                  </i>
-                  File
-                  <input
-                    type="file"
-                    className="hidden h-full w-full cursor-pointer"
-                    onChange={(e) => {
-                      if (e.target.files[0].size > 20971520) {
-                        alert("Selected file exceeds the 20MB limit.");
-                        e.target.value = null; 
-                        return;
-                      }
-                      e.target.files[0];
-                      setfile(e.target.files[0]);
-                      e.target.files[0];
-                      setshowMediaPicker(false);
-                    }}
-                  />
-                </label>
-              </div>
-              <div>
-                <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
-                  <i className="mr-2 text-muted-light dark:text-muted-dark">
-                    <RiGalleryLine />
-                  </i>
-                  Photo or video
-                  <input
-                    type="file"
-                    className="hidden h-full w-full cursor-pointer"
-                    onChange={async (e) => {
-                      if (e.target.files[0].size > 20971520) {
-                        alert("Selected file exceeds the 20MB limit.");
-                        e.target.value = null;
-                        return;
-                      }
-                      if (e.target.files[0].type.startsWith("image")) {
-                        const blob = await downScalePicVid(
-                          e.target.files[0],
-                          0.7,
-                          1,
-                          0
-                        );
-                        const downscaledBlod = await downScalePicVid(
-                          blob,
-                          0.35,
-                          0.1,
-                          2
-                        );
-                        setpicVidmedia(blob);
-                        setblurredPicVidmedia(downscaledBlod);
-                      } else {
-                        const videoObj = e.target.files[0];
-                        videoObj;
-                        setpicVidmedia(videoObj);
-                        setblurredPicVidmedia(null);
-                      }
-                      setshowMediaPicker(false);
-                    }}
-                    accept="image/png, image/jpeg, video/mp4"
-                  />
-                </label>
-              </div>
-              <div
-                className="Poll-input"
-                onClick={() => {
-                  setshowPollInput(true);
-                  setshowMediaPicker(false);
-                }}
+               [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 
+               [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-hover-light
+                dark:hover:[&>div]:bg-hover-dark"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
               >
-                <div>
-                  <i className="mr-2 rotate-90 text-muted-light dark:text-muted-dark">
-                    <TiChartBarOutline />
-                  </i>
-                  Poll
+                <div className="file-input px-0 py-0">
+                  <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
+                    <i className="mr-2 text-muted-light dark:text-muted-dark">
+                      <AiOutlineFile />
+                    </i>
+                    File
+                    <input
+                      type="file"
+                      className="hidden h-full w-full cursor-pointer"
+                      onChange={(e) => {
+                        if (e.target.files[0].size > 20971520) {
+                          alert("Selected file exceeds the 20MB limit.");
+                          e.target.value = null;
+                          return;
+                        }
+                        e.target.files[0];
+                        setfile(e.target.files[0]);
+                        e.target.files[0];
+                        setshowMediaPicker(false);
+                      }}
+                    />
+                  </label>
                 </div>
-              </div>
-            </div>
-          )}
+                <div>
+                  <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
+                    <i className="mr-2 text-muted-light dark:text-muted-dark">
+                      <RiGalleryLine />
+                    </i>
+                    Photo or video
+                    <input
+                      type="file"
+                      className="hidden h-full w-full cursor-pointer"
+                      onChange={async (e) => {
+                        if (e.target.files[0].size > 20971520) {
+                          alert("Selected file exceeds the 20MB limit.");
+                          e.target.value = null;
+                          return;
+                        }
+                        if (e.target.files[0].type.startsWith("image")) {
+                          const blob = await downScalePicVid(
+                            e.target.files[0],
+                            0.7,
+                            1,
+                            0
+                          );
+                          const downscaledBlod = await downScalePicVid(
+                            blob,
+                            0.35,
+                            0.1,
+                            2
+                          );
+                          setpicVidmedia(blob);
+                          setblurredPicVidmedia(downscaledBlod);
+                        } else {
+                          const videoObj = e.target.files[0];
+                          videoObj;
+                          setpicVidmedia(videoObj);
+                          setblurredPicVidmedia(null);
+                        }
+                        setshowMediaPicker(false);
+                      }}
+                      accept="image/png, image/jpeg, video/mp4"
+                    />
+                  </label>
+                </div>
+                <div
+                  className="Poll-input"
+                  onClick={() => {
+                    setshowPollInput(true);
+                    setshowMediaPicker(false);
+                  }}
+                >
+                  <div>
+                    <i className="mr-2 rotate-90 text-muted-light dark:text-muted-dark">
+                      <TiChartBarOutline />
+                    </i>
+                    Poll
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <input
           type="text"

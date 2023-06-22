@@ -39,7 +39,7 @@ function VideoPlayer({ src, setvideoLengthFunc }) {
         <source src={src} type="video/mp4" />
       </video>
       <div className="absolute bottom-0 left-0 flex w-full items-center justify-start p-2 pb-6">
-        <p className="absolute mr-2 text-[50px] ">{formatDuration(duration)}</p>
+        <p className="absolute mr-2 text-4xl ">{formatDuration(duration)}</p>
         <div className="flex w-full items-center justify-center">
           <button
             onClick={() => handlePlayPause()}

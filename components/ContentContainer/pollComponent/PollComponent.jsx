@@ -14,8 +14,8 @@ const PollComponent = ({ PollObject }) => {
   }, [options]);
 
   async function handleVote(optionId) {
+    if (PollObject.status === "pending") return;
     const messages = JSON.parse(localStorage.getItem(ChatObject.activeChatId));
-    messages;
     const messageIndex = messages.findIndex(
       (message) => message.id === PollObject.id
     );
@@ -24,20 +24,12 @@ const PollComponent = ({ PollObject }) => {
     if (!allowMultipleAnswers) {
       for (let i = 0; i < messageOptions.length; i++) {
         if (messageOptions[i]["id"] === optionId) {
-          true;
           continue;
         }
-        i;
         const votes = messageOptions[i]["votes"];
-        messageOptions[i]["votes"];
-        messageOptions[i];
-        votes;
         if (!votes) return;
         const optionVotedFor = votes.findIndex((vote) => vote.id === User.id);
         if (optionVotedFor !== -1) {
-          "removing " + optionVotedFor;
-          "removing " + messageOptions[i]["id"];
-          messageOptions[i];
           await modifyPollVote(
             ChatObject.activeChatType,
             PollObject.id,
@@ -53,8 +45,6 @@ const PollComponent = ({ PollObject }) => {
     const optionIndex = messageOptions.findIndex(
       (option) => option.id === optionId
     );
-    optionIndex;
-    messageOptions;
     const votes = messageOptions[optionIndex]["votes"];
     if (!votes) return;
     const containsId = votes.some((vote) => vote.id === User.id);
@@ -78,14 +68,18 @@ const PollComponent = ({ PollObject }) => {
         <div
           key={option.id}
           className="group flex cursor-pointer items-center justify-center"
-          onClick={() => { handleVote(option.id) }}
+          onClick={() => {
+            handleVote(option.id);
+          }}
         >
           <div
-            className={`  mr-2 flex h-6 w-6 border border-black
-             items-center justify-center rounded-full
-           bg-accent-blue ${option.votes.some(vote => vote.id === User.id) && "bg-blue-800"} p-1`}
+            className={`  mr-2 flex h-6 w-6 items-center justify-center
+             rounded-full border border-black
+           bg-accent-blue ${
+             option.votes.some((vote) => vote.id === User.id) && "bg-blue-800"
+           } p-1`}
           >
-            {option.votes.some(vote => vote.id === User.id) && (
+            {option.votes.some((vote) => vote.id === User.id) && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

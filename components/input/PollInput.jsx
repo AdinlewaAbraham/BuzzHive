@@ -4,11 +4,12 @@ import { AiOutlineSend } from "react-icons/ai";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
-import { useAutoAnimate } from '@formkit/auto-animate/react'
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import Checkbox from "../Checkbox";
+import { motion } from "framer-motion";
 
-
-const PollInput = ({setshowPollInputFunc}) => {
-  const { ChatObject, setChats } = useContext(SelectedChannelContext);
+const PollInput = ({ setshowPollInputFunc }) => {
+  const { ChatObject, setChats, setallowScrollObject } = useContext(SelectedChannelContext);
   const [inputs, setInputs] = useState([
     { id: "1", value: "" },
     { id: "2", value: "" },
@@ -19,7 +20,7 @@ const PollInput = ({setshowPollInputFunc}) => {
   const [pollQuestion, setpollQuestion] = useState("");
   const [allowMultipleAnswers, setallowMultipleAnswers] = useState(false);
 
-  const [animationParent] = useAutoAnimate({ duration: 300 })
+  const [animationParent] = useAutoAnimate({ duration: 300 });
 
   const [height, setHeight] = useState(window.innerHeight - 362);
   const targetDivRef = useRef(null);
@@ -32,13 +33,12 @@ const PollInput = ({setshowPollInputFunc}) => {
       }
     };
 
-    handleResize(); // Calculate initial height
+    handleResize();
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
-    // Clean up the event listener when the component unmounts
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -70,7 +70,7 @@ const PollInput = ({setshowPollInputFunc}) => {
   const handleDrop = (e, id) => {
     setcurrentDraggedOptionId(null);
     e.preventDefault();
-    (e);
+    e;
     const sourceId = e.dataTransfer.getData("text/plain");
     const newInputs = [...inputs];
     const sourceIndex = newInputs.findIndex((input) => input.id === sourceId);
@@ -98,7 +98,7 @@ const PollInput = ({setshowPollInputFunc}) => {
     return mappedArray;
   };
   function handlePollSend() {
-    setshowPollInputFunc()
+    setshowPollInputFunc();
     if (!ChatObject.activeChatId) return;
     const newarr = [...inputs].filter((option) => option.value !== "");
     const options = mapInputs(newarr);
@@ -106,8 +106,8 @@ const PollInput = ({setshowPollInputFunc}) => {
       alert("Please add value ");
       return;
     }
-    (options);
-    (inputs);
+    options;
+    inputs;
     if (!pollQuestion) {
       alert("Please add poll question");
       return;
@@ -137,18 +137,27 @@ const PollInput = ({setshowPollInputFunc}) => {
       dataObject: dataOBJ || {},
       status: "pending",
     };
+    setallowScrollObject({
+      scrollTo: "bottom",
+      scrollBehaviour: "smooth",
+      allowScroll: true,
+    });
 
-    setChats((prevChats) => [...prevChats, pollObject])
+    setChats((prevChats) => [...prevChats, pollObject]);
     if (ChatObject.activeChatType === "group") {
       sendGroupMessage(
-        User.id,User.photoUrl,
+        User.id,
+        User.photoUrl,
         ChatObject.activeChatId,
         pollQuestion,
         User.name,
         "poll",
         time,
         {},
-        dataOBJ, null,()=>{},false
+        dataOBJ,
+        null,
+        () => {},
+        false
       );
     } else {
       sendMessage(
@@ -160,18 +169,19 @@ const PollInput = ({setshowPollInputFunc}) => {
         "poll",
         time,
         {},
-        dataOBJ,null, ()=>{}, false
+        dataOBJ,
+        null,
+        () => {},
+        false
       );
     }
   }
-  (ChatObject);
-
+  ChatObject;
 
   return (
     <>
-      <div className="inset-0 fixed" ref={targetDivRef}></div>
-      <div className="detectMe  absolute bottom-[65px] left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg p-4 shadow-lg bg-primary">
-
+      <div className="fixed inset-0" ref={targetDivRef}></div>
+      <div className="detectMe  bg-primary absolute bottom-[65px] left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg p-4 shadow-lg">
         <h1 className="mb-2 text-lg font-semibold">Create a poll</h1>
         <p className="mb-1">Question</p>
         <input
@@ -183,22 +193,28 @@ const PollInput = ({setshowPollInputFunc}) => {
           value={pollQuestion}
         />
         <p className="mb-1">Options</p>
-        <div className={`rounded-lg bg-secondary px-1 max-h-[calc(100vh-365px)] scrollBar
-         ${height < (32 * inputs.length) + 32 && "overflow-y-scroll"} `}>
+        <div
+          className={`bg-secondary scrollBar max-h-[calc(100vh-365px)] rounded-lg px-1
+         ${height < 32 * inputs.length + 32 && "overflow-y-scroll"} `}
+        >
           <ul ref={animationParent} className="">
             {inputs.map((input, index) => (
-
               <div
                 key={input.id}
                 className={`flex w-full items-center  
-                           ${index !== inputs.length - 1 && "border-b border-[#2c2b2b] "} 
+                           ${
+                             index !== inputs.length - 1 &&
+                             "border-b border-[#2c2b2b] "
+                           } 
                p-2 transition-all duration-150 
-               ${currentDraggedOptionId === input.id && index !== inputs.length - 1
-                    ? dragIndex < index
-                      ? "pb-10"
-                      : "pt-10"
-                    : ""
-                  } ${index !== inputs.length - 1 ? "cursor-grab" : ""}`}
+               ${
+                 currentDraggedOptionId === input.id &&
+                 index !== inputs.length - 1
+                   ? dragIndex < index
+                     ? "pb-10"
+                     : "pt-10"
+                   : ""
+               } ${index !== inputs.length - 1 ? "cursor-grab" : ""}`}
                 draggable={index !== inputs.length - 1}
                 onDragStart={(e) => {
                   if (index === inputs.length - 1) return;
@@ -216,7 +232,6 @@ const PollInput = ({setshowPollInputFunc}) => {
                   handleDragOver(e, input.id);
                 }}
               >
-
                 <input
                   className=" z-50 w-full bg-inherit outline-none"
                   key={input.id}
@@ -234,15 +249,14 @@ const PollInput = ({setshowPollInputFunc}) => {
           </ul>
         </div>
         <div className="mt-5 flex items-center justify-between">
-          <div onClick={() => setallowMultipleAnswers(!allowMultipleAnswers)}>
-            <input
-              type="checkbox"
-              onChange={(e) => {
-                (e.target.checked);
-                setallowMultipleAnswers(e.target.checked);
-              }}
-              checked={allowMultipleAnswers}
-            />
+          <div
+            onClick={() => setallowMultipleAnswers(!allowMultipleAnswers)}
+            className="flex items-center"
+          >
+            <div className="relative">
+              <div className="absolute inset-0"></div>
+              <Checkbox isChecked={allowMultipleAnswers} />
+            </div>
             Allow multiple answers
           </div>
           <div

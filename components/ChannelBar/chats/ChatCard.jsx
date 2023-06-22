@@ -413,7 +413,14 @@ const ChatCard = ({
       </div>
       <div className="flex  w-[calc(100%-62px)] flex-col items-start  justify-between truncate">
         <div className="flex w-full  items-center justify-between">
-          <h3 className=" font-normal ">{name}</h3>
+          <h3 className=" flex items-center font-normal ">
+            {name}{" "}
+            {id === "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && (
+              <i className="ml-2 flex items-center border text-accent-blue">
+                <MdVerified />
+              </i>
+            )}
+          </h3>
           <p className="text-muted  text-[11px]">{formatTime(timestamp)}</p>
         </div>
 

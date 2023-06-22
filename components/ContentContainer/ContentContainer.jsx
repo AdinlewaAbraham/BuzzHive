@@ -24,7 +24,8 @@ import { GiCancel } from "react-icons/gi";
 import { BsChevronUp, BsChevronDown } from "react-icons/bs";
 import { RxDividerVertical } from "react-icons/rx";
 import { CircularProgress } from "@mui/joy";
-import InfiniteScroll from 'react-infinite-scroller';
+import InfiniteScroll from "react-infinite-scroller";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ContentContainer = () => {
   const {
@@ -47,8 +48,7 @@ const ContentContainer = () => {
   const [IsMobile, setIsMobile] = useState(false);
   const secondDivRef = useRef(null);
   const [invalidURL, setinvalidURL] = useState(true);
-  const [Searchanchor, setSearchanchor] = useState(null);
-  const isOpen = Boolean(Searchanchor);
+  const [Searchanchor, setSearchanchor] = useState(false);
   const [searchedMessages, setsearchedMessages] = useState([]);
   const [currentSearchIndex, setcurrentSearchIndex] = useState(-1);
 
@@ -61,6 +61,7 @@ const ContentContainer = () => {
   const [activeIndexId, setactiveIndexId] = useState();
 
   const scrollContainerRef = useRef(null);
+
   useEffect(() => {
     function widthResizer() {
       const width = window.innerWidth < 768;
@@ -75,7 +76,7 @@ const ContentContainer = () => {
   }, []);
   useEffect(() => {
     setshowSearchPara(false);
-  }, [isOpen]);
+  }, [Searchanchor]);
 
   useEffect(() => {
     if (ChatObject.photoUrl && ChatObject.photoUrl.props) {
@@ -85,7 +86,7 @@ const ContentContainer = () => {
   useEffect(() => {
     if (!IsMobile) setshowChats(true);
   }, [IsMobile]);
-
+  
   useEffect(() => {
     if (secondDivRef.current && allowScrollObject.allowScroll) {
       if (allowScrollObject.scrollTo === "bottom") {
@@ -106,16 +107,14 @@ const ContentContainer = () => {
   }, [sortedChats]);
 
   useEffect(() => {
-    console.log(searchedMessages[currentSearchIndex]);
-
     if (searchedMessages[currentSearchIndex]) {
       setactiveIndexId(searchedMessages[currentSearchIndex].id);
     }
   }, [currentSearchIndex]);
 
   useEffect(() => {
-    sethasMoreTop(true)
-  }, [ChatObject.activeChatId])
+    sethasMoreTop(true);
+  }, [ChatObject.activeChatId]);
 
   useMemo(() => {
     if (Chats == []) return;
@@ -135,8 +134,9 @@ const ContentContainer = () => {
 
   const mainContentStyle = {
     overflowY: "auto",
-    height: `calc(100vh - 123px${ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
-      })`,
+    height: `calc(100vh - 123px${
+      ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
+    })`,
   };
   const handleSearch = (event) => {
     setSearchText(event.target.value);
@@ -157,6 +157,19 @@ const ContentContainer = () => {
     setsearchedMessages(reversedChats);
     setcurrentSearchIndex(-1);
   };
+  
+  const handleScroll = () => {
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+      const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
+      if (distanceToBottom > 50) {
+        setshowScrollTobottom(true);
+      } else {
+        setshowScrollTobottom(false);
+      }
+    }
+  };
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
@@ -167,10 +180,7 @@ const ContentContainer = () => {
               ChatObject={ChatObject}
             />
           )}
-          <div
-            className="z-20 flex max-h-[66px] cursor-pointer  items-center justify-between bg-[#fcfcfc] px-[13px] dark:bg-[#1d232a] md:ml-[1px]"
-
-          >
+          <div className="relative z-20 flex max-h-[66px] cursor-pointer  items-center justify-between bg-[#fcfcfc] px-[13px] dark:bg-[#1d232a] md:ml-[1px]">
             <div className="flex h-full items-center p-[13px]">
               {IsMobile && (
                 <div
@@ -190,10 +200,17 @@ const ContentContainer = () => {
                 }}
               >
                 <div
-                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${ChatObject.photoUrl === null ? "pt-[3px]" : ""
-                    }`}
+                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${
+                    ChatObject.photoUrl === null ? "pt-[3px]" : ""
+                  }`}
                 >
-                  <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500">
+                  <div
+                    className={`flex h-[40px] w-[40px] items-center justify-center rounded-full
+                   ${
+                     !(ChatObject.photoUrl && invalidURL) &&
+                     "bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500"
+                   } `}
+                  >
                     <div className="flex items-center justify-center rounded-full bg-inherit text-[30px]">
                       {ChatObject.photoUrl && invalidURL ? (
                         <img
@@ -219,117 +236,116 @@ const ContentContainer = () => {
             </div>
 
             <div
-              className=" hover:bg-hover cursor-pointer rounded-lg  p-3 "
-              onClick={(e) => {
-                setSearchanchor(e.currentTarget);
+              className={` hover:bg-hover ${
+                Searchanchor && "bg-hover"
+              } cursor-pointer rounded-lg  p-3 `}
+              onClick={() => {
+                setSearchanchor(!Searchanchor);
               }}
             >
               <AiOutlineSearch />
             </div>
-            <Menu
-              anchorEl={Searchanchor}
-              variant="plain"
-              open={isOpen}
-              disableFocusRipple={true}
-              onClose={() => { }}
-              placement={"bottom-end"}
-              sx={{
-                backgroundColor: "transparent",
-                boxShadow: "none",
-                paddingTop: "15px",
-              }}
-            >
-              <div
-                className="[&>i]: [&>i]:text-muted relative flex rounded-lg 
+            <AnimatePresence>
+              {Searchanchor && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -20, opacity: 0 }}
+                  className="absolute top-[70px] right-1"
+                >
+                  <div
+                    className="[&>i]: [&>i]:text-muted relative flex rounded-lg 
               bg-light-primary p-2 dark:bg-dark-primary
                [&>i]:cursor-pointer [&>i]:rounded-lg  [&>i]:p-2
                [&>i]:text-lg"
-              >
-                <div className="relative flex w-full items-center justify-center">
-                  <input
-                    autoFocus
-                    type="text"
-                    className=" mr-1 flex w-full items-center justify-center rounded-lg bg-light-secondary py-1 px-3
+                  >
+                    <div className="relative flex w-full items-center justify-center">
+                      <input
+                        autoFocus
+                        type="text"
+                        className=" mr-1 flex w-full items-center justify-center rounded-lg bg-light-secondary py-1 px-3
                    pr-[50px]  text-black placeholder-muted-light outline-none
                    dark:bg-dark-secondary  dark:text-white dark:placeholder-muted-dark"
-                    placeholder="Search"
-                    onChange={handleSearch}
-                  />
-                  {showSearchPara && (
-                    <p className="text-muted absolute right-3 flex whitespace-nowrap text-center  text-[12px] ">
-                      {searchedMessages.length === 0
-                        ? 0
-                        : currentSearchIndex + 1}{" "}
-                      of {searchedMessages.length}
-                    </p>
-                  )}
-                </div>
-                <i
-                  className="hover:bg-hover "
-                  onClick={() => {
-                    if (currentSearchIndex === searchedMessages.length - 1)
-                      return;
+                        placeholder="Search"
+                        onChange={handleSearch}
+                      />
+                      {showSearchPara && (
+                        <p className="text-muted absolute right-3 flex whitespace-nowrap text-center  text-[12px] ">
+                          {searchedMessages.length === 0
+                            ? 0
+                            : currentSearchIndex + 1}{" "}
+                          of {searchedMessages.length}
+                        </p>
+                      )}
+                    </div>
+                    <i
+                      className="hover:bg-hover "
+                      onClick={() => {
+                        if (currentSearchIndex === searchedMessages.length - 1)
+                          return;
 
-                    const nextIndex = Math.min(
-                      currentSearchIndex + 1,
-                      searchedMessages.length - 1
-                    );
-                    const scrollToElement = searchedMessages[nextIndex];
+                        const nextIndex = Math.min(
+                          currentSearchIndex + 1,
+                          searchedMessages.length - 1
+                        );
+                        const scrollToElement = searchedMessages[nextIndex];
 
-                    if (scrollToElement) {
-                      document
-                        .getElementById(scrollToElement.id)
-                        ?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "center",
-                        });
+                        if (scrollToElement) {
+                          document
+                            .getElementById(scrollToElement.id)
+                            ?.scrollIntoView({
+                              behavior: "smooth",
+                              block: "center",
+                            });
 
-                      setcurrentSearchIndex(nextIndex);
-                    }
-                  }}
-                >
-                  <BsChevronUp />
-                </i>
-                <i
-                  className="hover:bg-hover mr-1"
-                  onClick={() => {
-                    if (currentSearchIndex === 0) return;
+                          setcurrentSearchIndex(nextIndex);
+                        }
+                      }}
+                    >
+                      <BsChevronUp />
+                    </i>
+                    <i
+                      className="hover:bg-hover mr-1"
+                      onClick={() => {
+                        if (currentSearchIndex === 0) return;
 
-                    const prevIndex = Math.max(currentSearchIndex - 1, 0);
-                    const scrollToElement = searchedMessages[prevIndex];
+                        const prevIndex = Math.max(currentSearchIndex - 1, 0);
+                        const scrollToElement = searchedMessages[prevIndex];
 
-                    if (scrollToElement) {
-                      document
-                        .getElementById(scrollToElement.id)
-                        ?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "center",
-                        });
+                        if (scrollToElement) {
+                          document
+                            .getElementById(scrollToElement.id)
+                            ?.scrollIntoView({
+                              behavior: "smooth",
+                              block: "center",
+                            });
 
-                      setcurrentSearchIndex(prevIndex);
-                    }
-                  }}
-                >
-                  <BsChevronDown />
-                </i>
-                <div className="text-muted flex items-center justify-center">
-                  <i className="h-4">
-                    <RxDividerVertical />
-                  </i>
-                </div>
-                <i
-                  className="hover:bg-hover"
-                  onClick={() => {
-                    setSearchanchor(null);
-                    setSearchText("");
-                    setsearchedMessages([]);
-                    setactiveIndexId("");
-                  }}
-                >
-                  <GiCancel />
-                </i>
-              </div>
-            </Menu>
+                          setcurrentSearchIndex(prevIndex);
+                        }
+                      }}
+                    >
+                      <BsChevronDown />
+                    </i>
+                    <div className="text-muted flex items-center justify-center">
+                      <i className="h-4">
+                        <RxDividerVertical />
+                      </i>
+                    </div>
+                    <i
+                      className="hover:bg-hover"
+                      onClick={() => {
+                        setSearchanchor(false);
+                        setSearchText("");
+                        setsearchedMessages([]);
+                        setactiveIndexId("");
+                      }}
+                    >
+                      <GiCancel />
+                    </i>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           <main
             style={mainContentStyle}
@@ -345,10 +361,9 @@ const ContentContainer = () => {
             ) : (
               <div
                 className="scrollBar w-full overflow-y-auto"
-                //  onScroll={handleScroll}
+                  onScroll={handleScroll}
                 ref={scrollContainerRef}
                 id="scrollContainer"
-                
               >
                 <InfiniteScroll
                   pageStart={0}
@@ -360,7 +375,8 @@ const ContentContainer = () => {
 
                     const newMessages = messages.filter(
                       (message) =>
-                        message.timestamp?.seconds < firstBottomMessage.timestamp?.seconds
+                        message.timestamp?.seconds <
+                        firstBottomMessage.timestamp?.seconds
                     );
                     if (newMessages.length === 0 && hasMoreTop) {
                       sethasMoreTop(false);
@@ -369,7 +385,7 @@ const ContentContainer = () => {
                       (a, b) => a.timestamp.seconds - b.timestamp.seconds
                     );
                     const first30 = sortedMessages.splice(-30);
-                    const newChats = [...first30, ...sortedChats]
+                    const newChats = [...first30, ...sortedChats];
                     setChats(newChats);
                   }}
                   hasMore={hasMoreTop}
@@ -379,7 +395,8 @@ const ContentContainer = () => {
                         <CircularProgress variant="plain" size="sm" />
                       </i>{" "}
                       loading more chats...
-                    </div>}
+                    </div>
+                  }
                   useWindow={false}
                   isReverse
                 >
@@ -406,10 +423,11 @@ const ContentContainer = () => {
                 }}
                 className="absolute right-[20px] z-10 cursor-pointer rounded-lg p-3 dark:bg-[#1d232a]"
                 style={{
-                  bottom: `${ReplyObject.ReplyTextId
-                    ? `${replyDivHeight + 120}px`
-                    : "120px"
-                    }`,
+                  bottom: `${
+                    ReplyObject.ReplyTextId
+                      ? `${replyDivHeight + 120}px`
+                      : "120px"
+                  }`,
                 }}
               >
                 <AiOutlineArrowDown size={23} />

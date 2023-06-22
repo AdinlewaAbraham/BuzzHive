@@ -205,14 +205,14 @@ const VideoComponent = ({
                 <div className="absolute bottom-0 left-2 flex text-black ">
                   {isDownloading ? (
                     <div>
-                      <div className="flex items-center">
-                        <BsCameraVideo />
+                      <div className="flex items-center text-xs mb-[4px] text-muted">
+                       <i className="mr-1"><BsCameraVideo /></i> 
                         {dataObject.length && <>{dataObject.length}</>}
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center">
-                      <FiDownload />
+                    <div className="flex items-center text-xs mb-[4px] text-muted">
+                     <i className="mr-1" ><FiDownload /></i> 
                       {(dataObject.size / (1024 * 1024)).toFixed(2)}MB
                     </div>
                   )}
@@ -220,8 +220,8 @@ const VideoComponent = ({
               )}
               {dataObject.status === "uploading" ||
                 (isDownloaded && (
-                  <div className="absolute  bottom-0 left-2 flex items-center">
-                    <BsCameraVideo />
+                  <div className="absolute text-xs mb-[4px] text-muted bottom-0 left-2 flex items-center">
+                  <i className="mr-1"><BsCameraVideo /></i>  
                     {dataObject.length && (
                       <>{formatDuration(dataObject.length, true)}</>
                     )}

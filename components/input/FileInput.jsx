@@ -5,7 +5,21 @@ import { handleFileUpload } from "@/utils/messagesUtils/handleFileUpload";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { UserContext } from "../App";
 import { AiOutlineSend } from "react-icons/ai";
-import { FaFilePdf, FaFileWord, FaFileExcel, FaFileAlt, FaPaperPlane, FaFileAudio, FaFileCsv, FaFileArchive, FaFilePowerpoint, FaFileCode, FaFileImage, FaFileVideo } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FaFilePdf,
+  FaFileWord,
+  FaFileExcel,
+  FaFileAlt,
+  FaPaperPlane,
+  FaFileAudio,
+  FaFileCsv,
+  FaFileArchive,
+  FaFilePowerpoint,
+  FaFileCode,
+  FaFileImage,
+  FaFileVideo,
+} from "react-icons/fa";
 
 export const RenderFileType = ({ type, size }) => {
   let fileType;
@@ -58,7 +72,11 @@ export const RenderFileType = ({ type, size }) => {
       break;
 
     default:
-      if (type.startsWith("text/") || type.startsWith("application/") || type.endsWith("+xml")) {
+      if (
+        type.startsWith("text/") ||
+        type.startsWith("application/") ||
+        type.endsWith("+xml")
+      ) {
         fileType = <FaFileCode size={size} />;
       } else {
         fileType = <FaFileAlt size={size} />;
@@ -69,10 +87,9 @@ export const RenderFileType = ({ type, size }) => {
   return fileType;
 };
 
-
 const FileInput = ({ file, setfile }) => {
   const { User } = useContext(UserContext);
-  const { ChatObject, setChats, Chats } = useContext(SelectedChannelContext);
+  const { ChatObject, setChats, Chats, setallowScrollObject } = useContext(SelectedChannelContext);
   const [fileCaption, setfileCaption] = useState("");
 
   function setChatsFunc(chats) {
@@ -80,47 +97,60 @@ const FileInput = ({ file, setfile }) => {
   }
 
   return (
-    <div className="file-input absolute bottom-[65px] left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg bg-primary p-4 shadow-md ">
-      <div className="flex flex-col items-center justify-center">
-        <RenderFileType type={file.type} size={100} />
-        {file.name}
-      </div>
-
-      <div className="flex items-center justify-between mt-2 ">
-        <BsEmojiSmile />
-        <input
-          autoFocus
-          type="text"
-          className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
-          placeholder="Caption (optional)"
-          onChange={(e) => {
-            setfileCaption(e.target.value);
-          }}
-        />
-        <div
-          className="flex items-center rounded-md bg-accent-blue px-2 py-2"
-          onClick={async () => {
-            const capturedId = JSON.parse(
-              JSON.stringify(ChatObject.activeChatId)
-            );
-            const capturedFile = file;
-            setfile(null);
-            await handleFileUpload(
-              capturedFile,
-              ChatObject,
-              fileCaption,
-              User,
-              setChatsFunc,
-              Chats,
-              capturedId,
-              ChatObject.activeChatId
-            );
-          }}
-        >
-          <AiOutlineSend />
+    <AnimatePresence>
+      <motion.div
+        className="file-input bg-primary absolute bottom-[65px] left-2 z-10 flex
+       w-[50%] min-w-[260px] flex-col rounded-lg p-4 shadow-md "
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -50 }}
+      >
+        <div className="flex flex-col items-center justify-center">
+          <RenderFileType type={file.type} size={100} />
+          {file.name}
         </div>
-      </div>
-    </div>
+
+        <div className="mt-2 flex items-center justify-between ">
+          <BsEmojiSmile />
+          <input
+            autoFocus
+            type="text"
+            className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
+            placeholder="Caption (optional)"
+            onChange={(e) => {
+              setfileCaption(e.target.value);
+            }}
+          />
+          <div
+            className="flex items-center rounded-md bg-accent-blue px-2 py-2"
+            onClick={async () => {
+              const capturedId = JSON.parse(
+                JSON.stringify(ChatObject.activeChatId)
+              );
+              const capturedFile = file;
+              setfile(null);
+              setallowScrollObject({
+                scrollTo: "bottom",
+                scrollBehaviour: "smooth",
+                allowScroll: true,
+              });
+              await handleFileUpload(
+                capturedFile,
+                ChatObject,
+                fileCaption,
+                User,
+                setChatsFunc,
+                Chats,
+                capturedId,
+                ChatObject.activeChatId
+              );
+            }}
+          >
+            <AiOutlineSend />
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

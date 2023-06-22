@@ -40,12 +40,11 @@ export async function sendMessage(
     const conversationId =
       user1Id > user2Id ? user1Id + user2Id : user2Id + user1Id;
     const newConversationRef = doc(conversationsRef, conversationId);
-    const User = JSON.parse(localStorage.getItem("user"));
     const newConversationData = {
       participants: [user1Id, user2Id],
       lastMessage: { text: messageText, type: type, status: "sent" },
       senderId: senderId,
-      senderDisplayName: User.name,
+      senderDisplayName: senderDisplayName,
       timestamp: time,
     };
     await setDoc(newConversationRef, newConversationData);

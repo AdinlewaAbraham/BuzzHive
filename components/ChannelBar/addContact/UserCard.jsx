@@ -1,18 +1,13 @@
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { useContext, useEffect } from "react";
 import { UserContext } from "../../App";
-import {
-  collection,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  query,
-} from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import Img from "@/components/Img";
 import AddUserPopUp from "./AddUserPopUp";
 import { useState } from "react";
 import { useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MdVerified } from "react-icons/md";
 const UserCard = ({ user }) => {
   const {
     setChats,
@@ -40,20 +35,30 @@ const UserCard = ({ user }) => {
 
   return (
     <>
-      {showUserPopup && (
-        <div className="Poll-input fixed inset-0 z-50 flex  items-center justify-center bg-gray-900 bg-opacity-50">
-          <div
-            className="clickEvent max-w-[500px] rounded-lg bg-light-secondary dark:bg-dark-secondary"
+      <AnimatePresence>
+        {showUserPopup && (
+          <motion.div
+            className="Poll-input fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <AddUserPopUp
-              setShowUserPopupTofalse={() => {
-                setShowUserPopup(false);
-              }}
-              user={user}
-            />
-          </div>
-        </div>
-      )}
+            <motion.div
+              className="clickEvent max-w-[500px] rounded-lg bg-light-secondary dark:bg-dark-secondary"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+            >
+              <AddUserPopUp
+                setShowUserPopupTofalse={() => {
+                  setShowUserPopup(false);
+                }}
+                user={user}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div
         key={user.id}
         className="clickEvent flex cursor-pointer items-center truncate rounded-lg px-4  py-3 hover:bg-hover-light dark:hover:bg-hover-dark"
@@ -64,14 +69,19 @@ const UserCard = ({ user }) => {
         <div className="mr-4 h-[45px] w-[45px] rounded-full">
           <Img
             src={user.photoUrl}
-            styles="rounded-full bg-"
+            styles="rounded-full h-[45px]"
             imgStyles="rounded-full"
-            personalSize="60"
+            personalSize="45"
             groupSize="60"
           />
         </div>
         <div>
-          <p className="">{user.name}</p>
+          <p className="flex items-center border"> 
+          <span>{user.name}</span>
+            { user.id !== "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && <i className="text-accent-blue ml-2 flex items-center border" >
+              <MdVerified /></i>
+              }
+              </p>
           <p className="text-sm text-muted-light dark:text-muted-dark">
             {user.bio}
           </p>

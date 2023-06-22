@@ -43,8 +43,8 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
     const objectKey = title === "Bio" ? "bio" : "name";
     const userRef = doc(db, "users", User.id);
     updateDoc(userRef, { [objectKey]: toBeUpdated });
-    if (objectKey === "name"){
-      updateDoc(userRef, {["queryName"]: toBeUpdated.toLocaleLowerCase()})
+    if (objectKey === "name") {
+      updateDoc(userRef, { ["queryName"]: toBeUpdated.toLocaleLowerCase() })
     }
     setshowInput(false);
   };
@@ -60,6 +60,7 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
             ref={inputRef}
             className="w-full bg-transparent outline-none"
             onChange={(e) => settoBeUpdated(e.target.value)}
+            maxLength={title === "Bio" ? 100 : 25}
           />
           <div
             onClick={() => handleSubmit(title)}
@@ -105,16 +106,15 @@ const ProfileSettings = () => {
     <div className="px-2">
       <Goback text={"Profile"} />
       <motion.div
-        initial={{ y: 10, opacity: 0 }}
+        initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -10, opacity: 0 }}
+        exit={{ y: -20, opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
         <section className="flex items-center justify-center">
           <div
-            className={`flex  ${
-              User.photoUrl === null ? "pt-[3px]" : ""
-            } group relative h-[100px] w-[100px] cursor-pointer justify-center bg-inherit 
+            className={`flex  ${User.photoUrl === null ? "pt-[3px]" : ""
+              } group relative h-[100px] w-[100px] cursor-pointer justify-center bg-inherit 
           [&>i]:flex [&>i]:h-full [&>i]:items-center [&>i]:justify-center `}
           >
             {isUploading && (

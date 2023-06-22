@@ -42,7 +42,10 @@
     @apply bg-light-secondary dark:bg-dark-secondary;
   }
 }
-/* target element with overflow */
+
+html {
+  scroll-behavior: smooth;
+}
 .scrollBar::-webkit-scrollbar-thumb {
   border-radius: 999px;
 }
@@ -123,4 +126,25 @@
 
 .messageDiv:after {
   border-top-left-radius: 0px;
+}
+.menu-enter {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.menu-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.menu-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.menu-exit-active {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 300ms, transform 300ms;
 }
