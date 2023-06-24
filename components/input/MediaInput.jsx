@@ -58,7 +58,7 @@ const MediaInput = ({
   return (
     <AnimatePresence>
       <motion.div
-        className="media-container absolute bottom-[65px] left-2 z-10 w-[80%] "
+        className="media-container absolute bottom-[65px] left-2 z-10 w-[80%] min-w-[300px] "
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}

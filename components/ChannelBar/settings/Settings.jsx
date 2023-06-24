@@ -70,20 +70,19 @@ const SelectMenu = ({ optionsArr, selectedMenuText, onClickFunc }) => {
   const selectedMenu = optionsArr.find(
     (option) => option.text == selectedMenuText
   );
-  
+
   useEffect(() => {
-    const handleClick = (e)=>{
+    const handleClick = (e) => {
       if (!e.target.closest(".optionsMenu")) {
-        setshowMenuOptions(false)
+        setshowMenuOptions(false);
       }
-    }
-    window.addEventListener("click", handleClick)
-    return () => window.removeEventListener("click", handleClick) 
-  }, [])
-  
+    };
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, []);
 
   return (
-    <div className="relative optionsMenu menu w-[50%] ">
+    <div className="optionsMenu menu relative w-[50%] ">
       <div
         className="flex w-full cursor-pointer
        items-center
@@ -101,12 +100,11 @@ const SelectMenu = ({ optionsArr, selectedMenuText, onClickFunc }) => {
       <AnimatePresence>
         {showMenuOptions && (
           <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -7, opacity: 0 }}
-            className="absolute top-0 left-0 flex w-full flex-col
-           rounded-lg bg-light-secondary p-2 dark:bg-dark-secondary optionsMenu"
-           
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -7, opacity: 0 }}
+            className="optionsMenu absolute top-0 left-0 flex w-full
+           flex-col rounded-lg bg-light-secondary p-2 dark:bg-dark-secondary"
           >
             {optionsArr
               .sort((a, b) => {
@@ -121,9 +119,11 @@ const SelectMenu = ({ optionsArr, selectedMenuText, onClickFunc }) => {
                     setshowMenuOptions(false);
                     onClickFunc(option);
                   }}
-                  className={`relative flex cursor-pointer items-center ${index !== optionsArr.length - 1 && "mb-1"
-                    } p-2 px-2 ${index === 0 && "bg-hover-light dark:bg-hover-dark"
-                    } rounded-lg hover:bg-hover-light hover:dark:bg-hover-dark `}
+                  className={`relative flex cursor-pointer items-center ${
+                    index !== optionsArr.length - 1 && "mb-1"
+                  } p-2 px-2 ${
+                    index === 0 && "bg-hover-light dark:bg-hover-dark"
+                  } rounded-lg hover:bg-hover-light hover:dark:bg-hover-dark `}
                 >
                   {index === 0 && (
                     <span className=" absolute bottom-[25%] top-[25%] left-0 z-[1] w-1 rounded-sm bg-accent-blue"></span>
@@ -156,10 +156,12 @@ const Modal = ({ modalObject, showModal, setshowModal }) => {
           max-w-[500px] rounded-lg bg-light-secondary dark:bg-dark-secondary"
           >
             <div className="rounded-t-lg bg-light-primary p-5 dark:bg-dark-primary">
-              <h1 className="text-xl font-medium  md:text-xl">{modalObject.header}</h1>
+              <h1 className="text-xl font-medium  md:text-xl">
+                {modalObject.header}
+              </h1>
               <p className="mt-1 text-sm">{modalObject.description}</p>
             </div>
-            <div className="z-[99] flex flex-col md:flex-row rounded-lg p-5 [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
+            <div className="z-[99] flex flex-col rounded-lg p-5 md:flex-row [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
               <button
                 className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
                 onClick={() => {
@@ -227,7 +229,12 @@ const Settings = () => {
 
   const [loading, setloading] = useState(false);
   const [complete, setcomplete] = useState(false);
-  const { setdeleteMediaTrigger } = useContext(SelectedChannelContext);
+  const {
+    setdeleteMediaTrigger,
+    setSelectedChannel,
+    setprevSelectedChannel,
+    prevSelectedChannel,
+  } = useContext(SelectedChannelContext);
   async function handleDelete(option) {
     setloading(option);
     const optionsDatabaseLocation = {
@@ -276,7 +283,13 @@ const Settings = () => {
         setshowModal={setshowModal}
       />
 
-      <Goback text={"Settings"} />
+      <Goback
+        text={"Settings"}
+        clickFunc={() => {
+          setSelectedChannel(prevSelectedChannel || "chats");
+          setprevSelectedChannel("settings");
+        }}
+      />
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

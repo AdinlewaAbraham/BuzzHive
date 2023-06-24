@@ -36,7 +36,7 @@ const UserCard = (p) => {
   return (
     <div
       key={p.id}
-      className="mr-1 flex cursor-pointer items-center rounded-md px-2 py-2 hover:bg-hover-light dark:hover:bg-hover-dark"
+      className="mr-1 flex group cursor-pointer items-center rounded-xl px-2 py-2 hover:bg-hover-light dark:hover:bg-hover-dark"
       onClick={p.onSelect}
     >
       {p.photoUrl && invalidURL ? (
@@ -274,7 +274,8 @@ const AddGroup = () => {
       setOpen(true);
       return;
     }
-    setSelectedChannel("chats");
+    setSelectedChannel(prevSelectedChannel || "chats");
+    setprevSelectedChannel("addGroup");
   }
   function cancelCreateGroup() {
     setOpen(true);

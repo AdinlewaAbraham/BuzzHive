@@ -4,8 +4,11 @@ import { motion } from "framer-motion";
 
 const Checkbox = ({ isChecked, size, styles  }) => {
   return (
-    <div className={` ${styles} mr-2 flex h-${size || "5"} w-${size || "5"} items-center justify-center rounded-[3px]
-     border-gray-300 bg-accent-blue pb-[4px]  pl-[2px] group-hover:bg-blue-600`}>
+    <div className={` ${styles} mr-2 flex h-${size || "5"} w-${size || "5"} items-center 
+    justify-center rounded-[3px]
+      ${isChecked && "bg-accent-blue"} ${!isChecked && "border-[1.5px]"} box-border border-[#aaa] dark:border-[#767575] pb-[4px]  pl-[2px] 
+      group-hover:backdrop-brightness-90
+      dark:group-hover:backdrop-brightness-125	 `}>
       {isChecked && (
         <svg
           xmlns="http://www.w3.org/2000/svg"

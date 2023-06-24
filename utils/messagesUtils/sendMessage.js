@@ -31,7 +31,7 @@ export async function sendMessage(
     reactions: [],
     replyObject: replyObj || {},
     dataObject: fileObj || {},
-    status: "sent",
+    status: user1Id === user2Id ? "seen" : "sent",
     isForwarded:isForwarded || false,
   };
 
@@ -42,7 +42,7 @@ export async function sendMessage(
     const newConversationRef = doc(conversationsRef, conversationId);
     const newConversationData = {
       participants: [user1Id, user2Id],
-      lastMessage: { text: messageText, type: type, status: "sent" },
+      lastMessage: { text: messageText, type: type, status: user1Id === user2Id ? "seen" :"sent" },
       senderId: senderId,
       senderDisplayName: senderDisplayName,
       timestamp: time,

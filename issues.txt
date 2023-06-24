@@ -1,4 +1,4 @@
-make about profile functional
+make about profile functional ------
 look into verifying yourself 
 opening pic and video with animations 
 deleting photos or files in storage setting causes downloading bug 
@@ -6,16 +6,11 @@ add error bound indicators for errors
 fix not scrolling to the unread message when clicking on chat room(i think i am not filtering the message well) 
 fix random scrolls 
 fix poll component, video comp ui 
-fix profile pic not been displayed on sidebar and about profile ------
-check input ui
-fix vid comp loading hieght issues
-fix mobile video input component and also check other mobile components
-prev selected channel not working properly
-mark message as seen if send to self 
-fix welcome message from been sent twice
-make poll votes faster 
-make scroll indicator detection more efficient
+fix mobile video input component and also check other mobile components 
+fix welcome message from been sent twice    
+make poll votes faster  
 
 
+optimize pls 
 clean up stuff 
 use <img/>

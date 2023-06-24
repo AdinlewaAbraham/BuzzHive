@@ -136,9 +136,9 @@ const SideBar = () => {
             <div
               className={`flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-lg bg-inherit [&>i]:flex [&>i]:h-full [&>i]:items-center [&>i]:justify-center `}
             >
-              {User.photoURL && invalidURL ? (
+              {User.photoUrl && invalidURL ? (
                 <img
-                  src={User.photoURL}
+                  src={User.photoUrl}
                   alt="profile pic"
                   className={`h-full w-full rounded-lg object-cover`}
                   onError={() => setinvalidURL(false)}

@@ -44,7 +44,7 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
     const userRef = doc(db, "users", User.id);
     updateDoc(userRef, { [objectKey]: toBeUpdated });
     if (objectKey === "name") {
-      updateDoc(userRef, { ["queryName"]: toBeUpdated.toLocaleLowerCase() })
+      updateDoc(userRef, { ["queryName"]: toBeUpdated.toLocaleLowerCase() });
     }
     setshowInput(false);
   };
@@ -102,9 +102,17 @@ const ProfileSettings = () => {
       setisUploading(false);
     });
   };
+  const { setSelectedChannel, setprevSelectedChannel, prevSelectedChannel } =
+    useContext(SelectedChannelContext);
   return (
     <div className="px-2">
-      <Goback text={"Profile"} />
+      <Goback
+        text={"Profile"}
+        clickFunc={() => {
+          setSelectedChannel(prevSelectedChannel || "chats");
+          setprevSelectedChannel("profileSettings");
+        }}
+      />
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -113,8 +121,9 @@ const ProfileSettings = () => {
       >
         <section className="flex items-center justify-center">
           <div
-            className={`flex  ${User.photoUrl === null ? "pt-[3px]" : ""
-              } group relative h-[100px] w-[100px] cursor-pointer justify-center bg-inherit 
+            className={`flex  ${
+              User.photoUrl === null ? "pt-[3px]" : ""
+            } group relative h-[100px] w-[100px] cursor-pointer justify-center bg-inherit 
           [&>i]:flex [&>i]:h-full [&>i]:items-center [&>i]:justify-center `}
           >
             {isUploading && (

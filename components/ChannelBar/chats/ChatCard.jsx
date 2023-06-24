@@ -141,7 +141,6 @@ const ChatCard = ({
       return;
     }
     const lastMessage = messages[messages.length - 1];
-    console.log(lastMessage);
     const Chats = getStoredChats();
     const updatedArr = Chats.map((obj) => {
       if (obj.id == id) {

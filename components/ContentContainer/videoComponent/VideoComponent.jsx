@@ -129,7 +129,6 @@ const VideoComponent = ({
     const storedVideo = await getVideoFromIndexedDB(`video-${messageId}`);
     if (storedVideo) {
       setVideoSrc(URL.createObjectURL(storedVideo));
-      console.log(storedVideo);
       setisDownloaded(true);
     } else {
       await downloadVideo();
@@ -164,12 +163,13 @@ const VideoComponent = ({
                 animation="wave"
                 variant="rectangular"
                 width={285}
-                height={240}
+                height={150}
               />
           ) : (
             <>
               {imageError ? (
-                <BsFillImageFill size={250} />
+                <i className="mb-2">
+                <BsFillImageFill size={200} /></i>
               ) : (
                 <div className={`relative `}>
                   {!isDownloaded && (

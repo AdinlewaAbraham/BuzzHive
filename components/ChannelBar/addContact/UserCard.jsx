@@ -61,7 +61,7 @@ const UserCard = ({ user }) => {
       </AnimatePresence>
       <div
         key={user.id}
-        className="clickEvent flex cursor-pointer items-center truncate rounded-lg px-4  py-3 hover:bg-hover-light dark:hover:bg-hover-dark"
+        className="clickEvent flex rounded-xl cursor-pointer items-center truncate px-4  py-3 hover:bg-hover-light dark:hover:bg-hover-dark"
         onClick={() => {
           setShowUserPopup(true);
         }}

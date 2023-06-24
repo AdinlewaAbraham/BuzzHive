@@ -181,7 +181,7 @@ const PollInput = ({ setshowPollInputFunc }) => {
   return (
     <>
       <div className="fixed inset-0" ref={targetDivRef}></div>
-      <div className="detectMe  bg-primary absolute bottom-[65px] left-2 z-10 flex w-[50%] min-w-[260px] flex-col rounded-lg p-4 shadow-lg">
+      <div className="detectMe  bg-primary absolute bottom-[65px] left-2 z-10 flex w-[50%] min-w-[300px] flex-col rounded-lg p-4 shadow-lg">
         <h1 className="mb-2 text-lg font-semibold">Create a poll</h1>
         <p className="mb-1">Question</p>
         <input
@@ -251,7 +251,7 @@ const PollInput = ({ setshowPollInputFunc }) => {
         <div className="mt-5 flex items-center justify-between">
           <div
             onClick={() => setallowMultipleAnswers(!allowMultipleAnswers)}
-            className="flex items-center"
+            className="flex items-center group cursor-pointer"
           >
             <div className="relative">
               <div className="absolute inset-0"></div>

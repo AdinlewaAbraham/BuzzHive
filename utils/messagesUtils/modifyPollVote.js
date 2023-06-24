@@ -22,11 +22,8 @@ export async function modifyPollVote(
   if (!messageDoc.exists()) return;
 
   const messageData = messageDoc.data();
-  console.log(messageData);
   const { dataObject } = messageData;
-  console.log(dataObject);
   const { options } = dataObject;
-  console.log(options);
   const User = JSON.parse(localStorage.getItem("user"));
   console.log(User);
   console.log(options);

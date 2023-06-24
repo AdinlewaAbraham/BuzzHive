@@ -14,13 +14,10 @@ import {
 import { db } from "../firebaseUtils/firebase";
 
 export async function changeMessagesStatus(activeChatId, type, status) {
-  activeChatId;
   const User = JSON.parse(localStorage.getItem("user"));
   const { unReadMessages } = User;
   const lastMessageTimestamp = unReadMessages[activeChatId];
 
-  lastMessageTimestamp;
-  activeChatId;
   const queryRef = collection(
     db,
     type === "group" ? "groups" : "conversations",

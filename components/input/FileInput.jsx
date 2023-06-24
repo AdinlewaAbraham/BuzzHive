@@ -100,7 +100,7 @@ const FileInput = ({ file, setfile }) => {
     <AnimatePresence>
       <motion.div
         className="file-input bg-primary absolute bottom-[65px] left-2 z-10 flex
-       w-[50%] min-w-[260px] flex-col rounded-lg p-4 shadow-md "
+       w-[50%] min-w-[300px] flex-col rounded-lg p-4 shadow-md "
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}

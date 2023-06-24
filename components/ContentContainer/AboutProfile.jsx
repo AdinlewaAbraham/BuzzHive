@@ -18,11 +18,11 @@ import { UserContext } from "../App";
 import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
 import { MdOutlineModeEditOutline } from "react-icons/md";
-import Goback from "../ChannelBar/Goback";
+import { MdClose } from "react-icons/md";
 
 const Menu = ({ icon, header, context }) => {
   return (
-    <div className="flex items-center my-3">
+    <div className="my-3 flex items-center">
       {icon}
       <div className="ml-3">
         <h4>{header}</h4>
@@ -47,19 +47,25 @@ const Header = ({ title, isActive, onClick }) => {
 };
 
 const Media = () => {
-  return <div className="w-full h-[350px]">Component Media</div>;
+  return <div className="h-[350px] w-full">Component Media</div>;
 };
 
 const Files = () => {
-  return <div className="w-full h-[350px]">Component Files</div>;
+  return <div className="h-[350px] w-full">Component Files</div>;
 };
 
-const Links = () => {
-  return <div className="w-full h-[350px]">Component Links</div>;
-};
-
-const Participants = () => {
-  return <div className="w-full h-[350px]">Component Participants</div>;
+const Participants = ({ groupObject }) => {
+  const participants = groupObject?.members;
+  console.log(participants);
+  return (
+    <div className="flex h-[350px] w-full flex-col">
+      {participants ? (
+        participants.map((member) => <span>{member}</span>)
+      ) : (
+        <>loading...</>
+      )}
+    </div>
+  );
 };
 
 const AboutProfile = ({ setshowProfile, ChatObject }) => {
@@ -71,8 +77,19 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
   const [isAdmin, setisAdmin] = useState(false);
   const [invalidURL, setinvalidURL] = useState(true);
   const [showMenu, setshowMenu] = useState(false);
+  const [groupObject, setGroupObject] = useState();
 
   const { User } = useContext(UserContext);
+
+  useEffect(() => {
+    const getGroupObject = async () => {
+      if (ChatObject.activeChatType !== "group") return;
+      const groupRef = doc(db, "groups", ChatObject.activeChatId);
+      const groupSnapshot = await getDoc(groupRef);
+      setGroupObject(groupSnapshot.data());
+    };
+    return () => getGroupObject();
+  }, []);
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -80,10 +97,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
         return <Media />;
       case "Files":
         return <Files />;
-      case "Links":
-        return <Links />;
       case "Participants":
-        return <Participants />;
+        return <Participants groupObject={groupObject} />;
       default:
         return null;
     }
@@ -117,105 +132,114 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
     .then((querySnapshot) => {
       const isUserInArray = !querySnapshot.empty;
       setisAdmin(isUserInArray);
-      (isUserInArray);
+      isUserInArray;
     })
     .catch((error) => {
       console.error("Error getting document: ", error);
     });
-  (ChatObject);
+  ChatObject;
   return (
-    <div className="dark:bg-dark-secondary bg-light-secondary inset-0 left-[1px] absolute z-30 ">
-      <div
-        className=" p-[16px] pt-0 flex items-center absolute w-full top-0 cursor-pointer"
-        onClick={() => {
-          setshowProfile(false);
-        }}
-      >
-       <Goback text={"Contact info"} />
+    <div className=" absolute inset-0 left-[1px] z-40 bg-light-secondary dark:bg-dark-secondary">
+      <div className=" bg-primary  h-[66px] w-full pl-4">
+        <div
+          className="flex h-full max-w-max cursor-pointer items-center"
+          onClick={() => {
+            setshowProfile(false);
+          }}
+        >
+          <i className="mr-4">
+            <MdClose size={30} />
+          </i>
+          <h4>
+            {ChatObject.activeChatType === "group" ? "Group" : "Contact"} info
+          </h4>
+        </div>
       </div>
-      <div className="">
-        <div className="flex flex-col items-center justify-center mb-5 py-10 dark:bg-[#1d232a] relative">
-          {showMenu && (
-            <ul className="absolute top-[50%] right-[0]">
-              <li>Remove image</li>
-              <li>Open image</li>
-              <li>Remove image</li>
-            </ul>
-          )}
-          <div
-            className={`ImgParentComp bg-inherit w-[200px] h-[200px] flex justify-center items-center rounded-full relative cursor-pointer`}
-          >
+      <div className="scrollBar h-[calc(100vh-76px)] overflow-y-auto ">
+        <div className="">
+          <div className="relative mb-5 flex flex-col items-center justify-center py-10 dark:bg-[#1d232a]">
+            {showMenu && (
+              <ul className="absolute top-[50%] right-[0]">
+                <li>Remove image</li>
+                <li>Open image</li>
+                <li>Remove image</li>
+              </ul>
+            )}
             <div
-              className="ImgChildComp absolute inset-0 opacity-0 rounded-full flex justify-center items-center"
-              onClick={() => {
-                isAdmin ? setshowMenu(true) : "open img";
-              }}
+              className={`ImgParentComp relative flex h-[200px] w-[200px] cursor-pointer items-center justify-center rounded-full bg-inherit`}
             >
-              {isAdmin && (
-                <label className="flex items-center justify-center w-full h-full cursor-pointer py-1 px-2">
-                  <MdOutlineModeEditOutline size={30} />
-                  <input
-                    type="file"
-                    className="hidden w-full h-full cursor-pointer"
-                    onChange={async (e) => {}}
-                    accept="image/png, image/jpeg"
-                  />
-                </label>
+              <div
+                className="ImgChildComp absolute inset-0 flex items-center justify-center rounded-full opacity-0"
+                onClick={() => {
+                  isAdmin ? setshowMenu(true) : "open img";
+                }}
+              >
+                {isAdmin && (
+                  <label className="flex h-full w-full cursor-pointer items-center justify-center py-1 px-2">
+                    <MdOutlineModeEditOutline size={30} />
+                    <input
+                      type="file"
+                      className="hidden h-full w-full cursor-pointer"
+                      onChange={async (e) => {}}
+                      accept="image/png, image/jpeg"
+                    />
+                  </label>
+                )}
+              </div>
+
+              {ChatObject.photoUrl && invalidURL ? (
+                <img
+                  src={ChatObject.photoUrl}
+                  alt="profile pic"
+                  className={`h-full w-full rounded-full object-cover`}
+                  onError={() => setinvalidURL(false)}
+                />
+              ) : ChatObject.activeChatType === "group" ? (
+                <MdGroup size="80%" />
+              ) : (
+                <FaUserAlt size="50%" />
               )}
             </div>
-
-            {ChatObject.photoUrl && invalidURL ? (
-              <img
-                src={ChatObject.photoUrl}
-                alt="profile pic"
-                className={`rounded-full object-cover h-full w-full`}
-                onError={() => setinvalidURL(false)}
-              />
-            ) : ChatObject.activeChatType === "group" ? (
-              <MdGroup size="80%" />
-            ) : (
-              <FaUserAlt size="50%" />
-            )}
+            <h3 className="mt-2">{ChatObject.displayName}</h3>
           </div>
-          <h3 className="mt-2">{ChatObject.displayName}</h3>
-        </div>
-        <div className="dark:bg-[#1d232a] p-5 mb-5">
-          <Menu
-            icon={<BiAt />}
-            header="username"
-            context={ChatObject.displayName}
-          />
-          <Menu
-            icon={<AiOutlineInfoCircle />}
-            header="Bio"
-            context={ChatObject.displayName}
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center justify-around p-5 mb-5 dark:bg-[#1d232a]">
-        <div className="flex justify-around w-full">
-          {["Media", "Files", "Links", "Participants"].map((header) => (
-            <Header
-              title={header}
-              isActive={activeComponent === header}
-              onClick={() => handleHeaderClick(header)}
+          <div className="mb-5 p-5 dark:bg-[#1d232a]">
+            <Menu
+              icon={<BiAt />}
+              header="username"
+              context={ChatObject.displayName}
             />
-          ))}
+            <Menu
+              icon={<AiOutlineInfoCircle />}
+              header="Bio"
+              context={ChatObject.displayName}
+            />
+          </div>
         </div>
-        <div>{renderComponent()}</div>
-      </div>
-      <div className="flex  text-red-500 items-center dark:bg-[#1d232a] w-full p-5 cursor-pointer mb-5">
-        {ChatObject.activeChatType === "group" ? (
-          <>
-            <BiLogOut /> Exit Group{" "}
-          </>
-        ) : (
-          <>
-            <ImBlocked />
-            Block {ChatObject.displayName}
-          </>
-        )}
+
+        <div className="mb-5 flex flex-col items-center justify-around p-5 dark:bg-[#1d232a]">
+          <div className="flex w-full justify-around">
+            {["Media", "Files", "Participants"].map((header) => (
+              <Header
+                title={header}
+                isActive={activeComponent === header}
+                onClick={() => handleHeaderClick(header)}
+              />
+            ))}
+          </div>
+          <div>{renderComponent()}</div>
+        </div>
+        <div className="mb-5  flex w-full cursor-pointer items-center p-5 text-red-500 dark:bg-[#1d232a]">
+          {ChatObject.activeChatType === "group" ? (
+            <>
+              <BiLogOut /> Exit Group{" "}
+            </>
+          ) : (
+            <>
+              <ImBlocked />
+              Block {ChatObject.displayName}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

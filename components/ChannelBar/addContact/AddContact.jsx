@@ -117,7 +117,8 @@ const AddContact = () => {
     maxHeight: `calc(100vh - 125px)`,
   };
   function goBack() {
-    setSelectedChannel(prevSelectedChannel);
+    console.log(prevSelectedChannel)
+    setSelectedChannel(prevSelectedChannel || "chats");
     setprevSelectedChannel("addcontact");
   }
   return (

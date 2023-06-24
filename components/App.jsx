@@ -32,7 +32,7 @@ const App = () => {
 
     return async function () {
       if (!isFunctionRunning) {
-        isFunctionRunning = true;
+        isFunctionRunning = true;z
         try {
           const firstText =
             "Hey there! 👋 It's Abraham, and I'm excited to introduce you to my chat app, BuzzHive! I've been working on this project as part of my portfolio, and I'm thrilled to share it with you. So, buckle up and get ready for a buzzing experience! 🐝";
