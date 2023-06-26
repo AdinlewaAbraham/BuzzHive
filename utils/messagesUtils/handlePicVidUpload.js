@@ -15,7 +15,6 @@ export const handlePicVidUpload = async (
   videoLength
 ) => {
   if (!downscaledBlob) return;
-  console.log(downscaledBlob);
   const id = uuidv4();
   const isImage = downscaledBlob.type.includes("image");
   const storageRef = ref(
@@ -134,7 +133,6 @@ export const handlePicVidUpload = async (
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
-        console.log("Upload is " + progress + "% done");
         const newAcctiveChatId = JSON.parse(
           sessionStorage.getItem("activeChatId")
         );

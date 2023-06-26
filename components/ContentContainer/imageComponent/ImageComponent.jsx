@@ -9,7 +9,10 @@ import UploadCircularAnimation from "../UploadCircularAnimation";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { Skeleton } from "@mui/material";
 
-const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
+const ImageComponent = ({ chat }) => {
+  const { dataObject } = chat
+  const blurredSRC = dataObject.blurredPixelatedBlobDownloadURL
+  const downloadSRC = dataObject.downloadURL
   const { User } = useContext(UserContext);
   const { deleteMediaTrigger } = useContext(SelectedChannelContext);
   const [downloadProgress, setDownloadProgress] = useState(0);
@@ -42,7 +45,6 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
     const imageBlob = await getImgFromIndexedDB(`image-${chat.id}`);
     if (imageBlob) {
       setisDownloaded(true);
-      console.log(true);
     } else {
       setisDownloaded(false);
       setimageBlob(null);
@@ -76,13 +78,10 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
   }, [downloadSRC, User]);
   useEffect(() => {
     validateImage();
-    console.log('validateImage')
   }, [deleteMediaTrigger, User]);
 
   const downloadImage = async (Url, type) => {
     if (!Url) return;
-    console.log(Url);
-    console.log(type);
     setisDownloading(true);
     try {
       const response = await axios({
@@ -118,64 +117,65 @@ const ImageComponent = ({ blurredSRC, downloadSRC, messageId, chat }) => {
   };
 
   return (
-    <div className="relative flex items-center justify-center">
-      <div className="">
-        {!imageBlob || chat.dataObject.status === "uploading" ? (
+    <div>
+      <div className="relative flex items-center justify-center">
+        <div className="">
+          {!imageBlob || chat.dataObject.status === "uploading" ? (
+            <>
+              {!blurredImageBlob ? (
+                <Skeleton
+                  animation="wave"
+                  variant="rectangular"
+                  width={285}
+                  height={240}
+                />
+              ) : (
+                <img
+                  src={URL.createObjectURL(blurredImageBlob)}
+                  className="object-cover"
+                  width={300}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              {!imageBlob ? (
+                <>No image available</>
+              ) : (
+                <img
+                  src={URL.createObjectURL(imageBlob)}
+                  alt="Preview"
+                  className="object-cover"
+                  width={300}
+                />
+              )}
+            </>
+          )}
+        </div>
+        {chat.dataObject.status === "uploading" && (
+          <div className="absolute">
+            <UploadCircularAnimation progress={chat.dataObject.progress} />
+          </div>
+        )}
+
+        {console.log(isDownloaded)}
+        {!isDownloaded && (
           <>
-            {!blurredImageBlob ? (
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width={285}
-                height={240}
-              />
+            {isDownloading ? (
+              <div className="absolute">
+                <DownloadCircularAnimation progress={downloadProgress} />
+              </div>
             ) : (
-              <img
-                src={URL.createObjectURL(blurredImageBlob)}
-                className="object-cover"
-                width={300}
-              />
-            )}
-          </>
-        ) : (
-          <>
-            {!imageBlob ? (
-              <>No image available</>
-            ) : (
-              <img
-                src={URL.createObjectURL(imageBlob)}
-                alt="Preview"
-                className="object-cover"
-                width={300}
-              />
+              <button
+                className="absolute"
+                onClick={() => downloadImage(downloadSRC, "image")}
+              >
+                <FiDownload color="black" size={30} />
+              </button>
             )}
           </>
         )}
-      </div>
-      {chat.dataObject.status === "uploading" && (
-        <div className="absolute">
-          <UploadCircularAnimation progress={chat.dataObject.progress} />
-        </div>
-      )}
-
-      {console.log(isDownloaded)}
-      {!isDownloaded && (
-        <>
-          {isDownloading ? (
-            <div className="absolute">
-              <DownloadCircularAnimation progress={downloadProgress} />
-            </div>
-          ) : (
-            <button
-              className="absolute"
-              onClick={() => downloadImage(downloadSRC, "image")}
-            >
-              <FiDownload color="black" size={30} />
-            </button>
-          )}
-        </>
-      )}
-    </div>
+      </div></div>
   );
 };
 export default ImageComponent;

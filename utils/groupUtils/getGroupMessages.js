@@ -9,13 +9,11 @@ export const getGroupMessages = async (groupId) => {
   const [chats, setchats] = useState([]);
   let s = [];
   onSnapshot(q, (snapshot) => {
-    console.log("satrt");
     let chats = [];
     snapshot.forEach((doc) => {
       chats.push(doc.data());
     });
     setchats(chats);
   });
-  console.log(chats);
   return chats;
 };

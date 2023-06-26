@@ -14,13 +14,13 @@ import { BsCameraVideo } from "react-icons/bs";
 import { formatDuration } from "@/utils/actualUtils/formatDuration";
 import { Skeleton } from "@mui/material";
 
-const VideoComponent = ({
-  blurredSRC,
-  downloadSRC,
-  messageId,
-  messageText,
-  dataObject,
-}) => {
+const VideoComponent = ({chat}) => {
+  const { dataObject } = chat
+  const blurredSRC = dataObject.blurredPixelatedBlobDownloadURL
+  const downloadSRC = dataObject.downloadURL
+  const messageId = chat.id
+  const messageText = chat.text
+
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
 
@@ -138,7 +138,7 @@ const VideoComponent = ({
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div key={messageId}>
+    <div key={messageId} className="">
       {videoPlayer && (
         <MediaPlayer
           VideoSRC={videoSrc}
@@ -159,17 +159,17 @@ const VideoComponent = ({
           }}
         >
           {loadingThumbnail ? (
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                width={285}
-                height={150}
-              />
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width={285}
+              height={150}
+            />
           ) : (
             <>
               {imageError ? (
                 <i className="mb-2">
-                <BsFillImageFill size={200} /></i>
+                  <BsFillImageFill size={200} /></i>
               ) : (
                 <div className={`relative `}>
                   {!isDownloaded && (
@@ -185,9 +185,9 @@ const VideoComponent = ({
               <div className="absolute text-blue-500">
                 {isDownloaded
                   ? !isDownloading &&
-                    dataObject.status !== "uploading" && (
-                      <BsFillPlayBtnFill size={30} />
-                    )
+                  dataObject.status !== "uploading" && (
+                    <BsFillPlayBtnFill size={30} />
+                  )
                   : !isDownloading && <FiDownload color="black" size={30} />}
               </div>
 
@@ -206,13 +206,13 @@ const VideoComponent = ({
                   {isDownloading ? (
                     <div>
                       <div className="flex items-center text-xs mb-[4px] text-muted">
-                       <i className="mr-1"><BsCameraVideo /></i> 
+                        <i className="mr-1"><BsCameraVideo /></i>
                         {dataObject.length && <>{dataObject.length}</>}
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-center text-xs mb-[4px] text-muted">
-                     <i className="mr-1" ><FiDownload /></i> 
+                      <i className="mr-1" ><FiDownload /></i>
                       {(dataObject.size / (1024 * 1024)).toFixed(2)}MB
                     </div>
                   )}
@@ -221,7 +221,7 @@ const VideoComponent = ({
               {dataObject.status === "uploading" ||
                 (isDownloaded && (
                   <div className="absolute text-xs mb-[4px] text-muted bottom-0 left-2 flex items-center">
-                  <i className="mr-1"><BsCameraVideo /></i>  
+                    <i className="mr-1"><BsCameraVideo /></i>
                     {dataObject.length && (
                       <>{formatDuration(dataObject.length, true)}</>
                     )}

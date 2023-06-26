@@ -14,7 +14,7 @@ import { IoMdPerson } from "react-icons/io";
 import { AiOutlineSearch } from "react-icons/ai";
 import { BiArrowBack } from "react-icons/bi";
 import { AiOutlineArrowDown, AiOutlineLine } from "react-icons/ai";
-import AboutProfile from "./AboutProfile";
+import AboutProfile from "./aboutProfle/AboutProfile";
 import MessageCard from "./MessageCard";
 import Img from "../Img";
 import { FaUserAlt } from "react-icons/fa";
@@ -86,7 +86,7 @@ const ContentContainer = () => {
   useEffect(() => {
     if (!IsMobile) setshowChats(true);
   }, [IsMobile]);
-  
+
   useEffect(() => {
     if (secondDivRef.current && allowScrollObject.allowScroll) {
       if (allowScrollObject.scrollTo === "bottom") {
@@ -134,9 +134,8 @@ const ContentContainer = () => {
 
   const mainContentStyle = {
     overflowY: "auto",
-    height: `calc(100vh - 123px${
-      ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
-    })`,
+    height: `calc(100vh - 123px${ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
+      })`,
   };
   const handleSearch = (event) => {
     setSearchText(event.target.value);
@@ -157,7 +156,7 @@ const ContentContainer = () => {
     setsearchedMessages(reversedChats);
     setcurrentSearchIndex(-1);
   };
-  
+
   const handleScroll = () => {
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
@@ -200,16 +199,14 @@ const ContentContainer = () => {
                 }}
               >
                 <div
-                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${
-                    ChatObject.photoUrl === null ? "pt-[3px]" : ""
-                  }`}
+                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${ChatObject.photoUrl === null ? "pt-[3px]" : ""
+                    }`}
                 >
                   <div
                     className={`flex h-[40px] w-[40px] items-center justify-center rounded-full
-                   ${
-                     !(ChatObject.photoUrl && invalidURL) &&
-                     "bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500"
-                   } `}
+                   ${!(ChatObject.photoUrl && invalidURL) &&
+                      "bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500"
+                      } `}
                   >
                     <div className="flex items-center justify-center rounded-full bg-inherit text-[30px]">
                       {ChatObject.photoUrl && invalidURL ? (
@@ -236,9 +233,8 @@ const ContentContainer = () => {
             </div>
 
             <div
-              className={` hover:bg-hover ${
-                Searchanchor && "bg-hover"
-              } cursor-pointer rounded-lg  p-3 `}
+              className={` hover:bg-hover ${Searchanchor && "bg-hover"
+                } cursor-pointer rounded-lg  p-3 `}
               onClick={() => {
                 setSearchanchor(!Searchanchor);
               }}
@@ -361,7 +357,7 @@ const ContentContainer = () => {
             ) : (
               <div
                 className="scrollBar w-full overflow-y-auto"
-                  onScroll={handleScroll}
+                onScroll={handleScroll}
                 ref={scrollContainerRef}
                 id="scrollContainer"
               >
@@ -423,11 +419,10 @@ const ContentContainer = () => {
                 }}
                 className="absolute right-[20px] z-10 cursor-pointer rounded-lg p-3 dark:bg-[#1d232a]"
                 style={{
-                  bottom: `${
-                    ReplyObject.ReplyTextId
+                  bottom: `${ReplyObject.ReplyTextId
                       ? `${replyDivHeight + 120}px`
                       : "120px"
-                  }`,
+                    }`,
                 }}
               >
                 <AiOutlineArrowDown size={23} />

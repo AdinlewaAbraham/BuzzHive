@@ -5,8 +5,6 @@ export const downScalePicVid = async (file, qualityScale, pixelScale, blurRadius
   const isImage = file.type.startsWith("image/");
   const isVideo = file.type.startsWith("video/");
 
-  console.log(isImage);
-  console.log(isVideo);
 
   // Create an HTML5 Canvas element
   const canvas = document.createElement("canvas");
@@ -14,7 +12,6 @@ export const downScalePicVid = async (file, qualityScale, pixelScale, blurRadius
   // Load the file into the canvas
   let media;
   if (isImage) {
-    console.log("ran");
     media = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -29,7 +26,6 @@ export const downScalePicVid = async (file, qualityScale, pixelScale, blurRadius
     return file;
   }
 
-  console.log(media);
   canvas.width = media.width * pixelScale;
   canvas.height = media.height * pixelScale;
   const ctx = canvas.getContext("2d");
@@ -50,7 +46,6 @@ export const downScalePicVid = async (file, qualityScale, pixelScale, blurRadius
     canvas.toBlob(resolve, isImage ? "image/jpeg" : "video/mp4", qualityScale);
   });
   downscaledBlob.name = file.name
-  console.log(downscaledBlob);
   return downscaledBlob;
 };
 

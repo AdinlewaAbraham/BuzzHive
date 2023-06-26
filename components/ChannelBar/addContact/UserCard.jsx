@@ -66,22 +66,20 @@ const UserCard = ({ user }) => {
           setShowUserPopup(true);
         }}
       >
-        <div className="mr-4 h-[45px] w-[45px] rounded-full">
-          <Img
-            src={user.photoUrl}
-            styles="rounded-full h-[45px]"
-            imgStyles="rounded-full"
-            personalSize="45"
-            groupSize="60"
-          />
-        </div>
+        <Img
+          src={user.photoUrl}
+          styles=" h-[45px] w-[45px] mr-4 rounded-full"
+          imgStyles="rounded-full"
+          personalSize="45"
+          groupSize="60"
+        />
         <div>
-          <p className="flex items-center border"> 
-          <span>{user.name}</span>
-            { user.id !== "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && <i className="text-accent-blue ml-2 flex items-center border" >
+          <p className="flex items-center border">
+            <span>{user.name}</span>
+            {user.id !== "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && <i className="text-accent-blue ml-2 flex items-center border" >
               <MdVerified /></i>
-              }
-              </p>
+            }
+          </p>
           <p className="text-sm text-muted-light dark:text-muted-dark">
             {user.bio}
           </p>

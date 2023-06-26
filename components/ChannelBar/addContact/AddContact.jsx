@@ -105,7 +105,6 @@ const AddContact = () => {
     console.log(container.scrollHeight);
     if (triggerHeight >= container.scrollHeight - 30 && hasMore) {
       addUsers();
-      console.log("fetching users...");
     }
   };
 

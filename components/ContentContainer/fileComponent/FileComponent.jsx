@@ -8,7 +8,7 @@ import { openDB } from "idb";
 import { BsDot } from "react-icons/bs";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 
-const FileComponent = ({ chat }) => {
+const FileComponent = ({ chat, defaultColor }) => {
   const downloadSRC = chat.dataObject.downloadURL;
   const [isDownloaded, setisDownloaded] = useState(false);
   const [isDownloading, setisDownloading] = useState(false);
@@ -150,7 +150,7 @@ const FileComponent = ({ chat }) => {
   const { baseName, extName } = getFileExtension(chat.dataObject.name);
   return (
     <div
-      className={`truncate ${chat.senderId === User.id ? "bg-blue-400":"dark:bg-gray-500 bg-light-secondary" } rounded-lg p-2 ${
+      className={`truncate ${chat.senderId === User.id && !defaultColor ? "bg-blue-400":"dark:bg-gray-500 bg-light-secondary" } rounded-lg p-2 ${
         chat.text !== "" && "mb-2"
       }`}
     >
@@ -192,7 +192,7 @@ const FileComponent = ({ chat }) => {
       </div>
       <div
         className={`[&>div>button]:py-1 [&>div>button]:w-full [&>div>button]:rounded-lg 
-          ${chat.senderId === User.id ? "[&>div>button]:bg-blue-300":"dark:[&>div>button]:bg-[#252d35] [&>div>button]:bg-light-primary" } ${
+          ${chat.senderId === User.id && !defaultColor ? "[&>div>button]:bg-blue-300":"dark:[&>div>button]:bg-[#252d35] [&>div>button]:bg-light-primary" } ${
          (isDownloading || chat.dataObject.status === "uploading") &&
          "[&>div>button]:hover:cursor-not-allowed"
        }`}

@@ -36,7 +36,7 @@ const UserCard = (p) => {
   return (
     <div
       key={p.id}
-      className="mr-1 flex group cursor-pointer items-center rounded-xl px-2 py-2 hover:bg-hover-light dark:hover:bg-hover-dark"
+      className="group mr-1 flex cursor-pointer items-center rounded-xl px-2 py-2 hover:bg-hover-light dark:hover:bg-hover-dark"
       onClick={p.onSelect}
     >
       {p.photoUrl && invalidURL ? (
@@ -53,7 +53,6 @@ const UserCard = (p) => {
       )}
       <div className="flex items-center">
         <p className="">{p.name}</p>
-        {console.log(p.id)}
         {p.id === "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && (
           <i className="ml-2 flex items-center border text-accent-blue">
             <MdVerified />
@@ -255,8 +254,6 @@ const AddGroup = () => {
     if (!container) return;
 
     let triggerHeight = container.scrollTop + container.offsetHeight;
-    console.log(triggerHeight);
-    console.log(container.scrollHeight);
     if (triggerHeight >= container.scrollHeight - 20 && hasMore) {
       addUsers();
     }
@@ -507,7 +504,7 @@ const AddGroup = () => {
                 <div className="relative">
                   <h2
                     className="sticky top-0 mb-1 bg-light-primary p-2 pt-0
-                 text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark "
+                  text-muted-light dark:bg-dark-primary dark:text-muted-dark "
                   >
                     Active chats
                   </h2>
@@ -549,7 +546,7 @@ const AddGroup = () => {
 
               <h2
                 className="sticky top-0 mb-1 mt-1 rounded-lg bg-light-primary p-2
-             text-xl text-muted-light dark:bg-dark-primary dark:text-muted-dark"
+              text-muted-light dark:bg-dark-primary dark:text-muted-dark"
               >
                 All users
               </h2>

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import Img from "../Img";
+import Img from "../../Img";
 import { db } from "@/utils/firebaseUtils/firebase";
 import {
   collection,
@@ -14,11 +14,14 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 import { ImBlocked } from "react-icons/im";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
-import { UserContext } from "../App";
+import { UserContext } from "../../App";
 import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { MdClose } from "react-icons/md";
+import ParticipantsComponent from "./ParticipantsComponent";
+import FileSection from "./FileSection";
+import MediaSection from "./MediaSection";
 
 const Menu = ({ icon, header, context }) => {
   return (
@@ -36,9 +39,8 @@ const Header = ({ title, isActive, onClick }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   return ChatObject.activeChatType === "group" || title !== "Participants" ? (
     <div
-      className={`mb-5 cursor-pointer ${
-        isActive ? "border-b-2 border-blue-500 " : ""
-      }`}
+      className={`mb-5 cursor-pointer ${isActive ? "border-b-2 border-blue-500 " : ""
+        }`}
       onClick={onClick}
     >
       {title}
@@ -46,27 +48,6 @@ const Header = ({ title, isActive, onClick }) => {
   ) : null;
 };
 
-const Media = () => {
-  return <div className="h-[350px] w-full">Component Media</div>;
-};
-
-const Files = () => {
-  return <div className="h-[350px] w-full">Component Files</div>;
-};
-
-const Participants = ({ groupObject }) => {
-  const participants = groupObject?.members;
-  console.log(participants);
-  return (
-    <div className="flex h-[350px] w-full flex-col">
-      {participants ? (
-        participants.map((member) => <span>{member}</span>)
-      ) : (
-        <>loading...</>
-      )}
-    </div>
-  );
-};
 
 const AboutProfile = ({ setshowProfile, ChatObject }) => {
   const [profile, setprofile] = useState();
@@ -90,15 +71,19 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
     };
     return () => getGroupObject();
   }, []);
+  useEffect(() => {
+    setActiveComponent("Media")
+  }, [ChatObject.activeChatId])
+  
 
   const renderComponent = () => {
     switch (activeComponent) {
       case "Media":
-        return <Media />;
+        return <MediaSection />;
       case "Files":
-        return <Files />;
+        return <FileSection />;
       case "Participants":
-        return <Participants groupObject={groupObject} />;
+        return <ParticipantsComponent groupObject={groupObject} />;
       default:
         return null;
     }
@@ -137,7 +122,6 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
     .catch((error) => {
       console.error("Error getting document: ", error);
     });
-  ChatObject;
   return (
     <div className=" absolute inset-0 left-[1px] z-40 bg-light-secondary dark:bg-dark-secondary">
       <div className=" bg-primary  h-[66px] w-full pl-4">
@@ -180,7 +164,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                     <input
                       type="file"
                       className="hidden h-full w-full cursor-pointer"
-                      onChange={async (e) => {}}
+                      onChange={async (e) => { }}
                       accept="image/png, image/jpeg"
                     />
                   </label>
@@ -226,12 +210,12 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
               />
             ))}
           </div>
-          <div>{renderComponent()}</div>
+          <div className="w-full">{renderComponent()}</div>
         </div>
         <div className="mb-5  flex w-full cursor-pointer items-center p-5 text-red-500 dark:bg-[#1d232a]">
           {ChatObject.activeChatType === "group" ? (
             <>
-              <BiLogOut /> Exit Group{" "}
+              <BiLogOut /> Exit Group
             </>
           ) : (
             <>

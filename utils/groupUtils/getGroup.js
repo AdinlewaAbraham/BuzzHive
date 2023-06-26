@@ -6,7 +6,6 @@ export const getGroup = async (groupId) => {
   try {
     const groupSnapshot = await getDoc(groupDoc);
     if (groupSnapshot.exists()) {
-      console.log(groupSnapshot.data());
       return groupSnapshot.data();
     } else  throw new Error(`this group with this ID ${groupId} does not exists`);
   } catch (err) {

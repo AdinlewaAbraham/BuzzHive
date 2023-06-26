@@ -364,6 +364,9 @@ const MessageCard = ({
       } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
+      onClick={()=>{
+        console.log(chat.type)
+      }}
     >
       {ChatObject.activeChatType === "group" &&
         chat.senderId !== User.id &&
@@ -493,18 +496,11 @@ const MessageCard = ({
             <>
               {chat.dataObject.type.startsWith("image") ? (
                 <ImageComponent
-                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                  downloadSRC={chat.dataObject.downloadURL}
-                  messageId={chat.id}
                   chat={chat}
                 />
               ) : (
                 <VideoComponent
-                  blurredSRC={chat.dataObject.blurredPixelatedBlobDownloadURL}
-                  downloadSRC={chat.dataObject.downloadURL}
-                  messageId={chat.id}
-                  messageText={chat.text}
-                  dataObject={chat.dataObject}
+                chat={chat}
                 />
               )}
             </>
