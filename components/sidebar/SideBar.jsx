@@ -1,12 +1,12 @@
 import { useState, useEffect, useContext } from "react";
 import { MdOutlineChat, MdOutlinePermIdentity } from "react-icons/md";
-import {
-  MdPersonAddAlt,
-  MdOutlineGroupAdd,
-} from "react-icons/md";
+import { MdPersonAddAlt, MdOutlineGroupAdd } from "react-icons/md";
 import { AiOutlineSetting } from "react-icons/ai";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { UserContext } from "../App";
+
+import { createUser } from "@/utils/userUtils/createUser";
+import {  faker } from "@faker-js/faker";
 
 import { deleteDB } from "idb";
 const SideBarIcon = ({ icon, text, clickevent }) => {
@@ -15,7 +15,7 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
     selectedChannel,
     prevSelectedChannel,
     setprevSelectedChannel,
-    ChatObject
+    ChatObject,
   } = useContext(SelectedChannelContext);
 
   const [IsMobile, setIsMobile] = useState(false);
@@ -48,7 +48,9 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
   return (
     <div className="relative flex items-center justify-center md:mb-1 md:w-[5%] md:min-w-[70px] md:max-w-[70px]">
       <span
-        className={`duration-150 ease-out rounded-sm ${(IsMobile && ChatObject.activeChatId !== "") && "hidden"} ${
+        className={`rounded-sm duration-150 ease-out ${
+          IsMobile && ChatObject.activeChatId !== "" && "hidden"
+        } ${
           selectedChannel === clickevent
             ? ` opacity-1  right-[25%] md:bottom-[25%] ${
                 channels[prevSelectedChannel] > channels[clickevent] &&
@@ -90,7 +92,6 @@ const SideBar = () => {
     setMounted(true);
   }, []);
 
-
   async function clearIndexedDB() {
     try {
       await deleteDB("myDatabase");
@@ -100,6 +101,15 @@ const SideBar = () => {
     }
   }
 
+  const addUser = async () => {
+    for (let i = 0; i < 40; i++) {
+      const fakeDisplayName =  faker.internet.userName()
+      const fakeEmail = faker.internet.email()
+      const fakePhotoUrl =  faker.image.avatar();
+      const fakeBio = " faker.lorem.sentence();"
+      createUser(faker.string.uuid(), fakeDisplayName, fakeEmail, fakePhotoUrl, fakeBio);
+    }
+  };
   return (
     <div
       className=" flex h-[70px] w-full items-center justify-center
@@ -107,6 +117,7 @@ const SideBar = () => {
       md:h-screen md:max-h-screen md:w-[5%] md:min-w-[70px] md:max-w-[70px] md:flex-col 
        md:justify-between md:pt-10 md:pb-5 "
     >
+      {/* <button onClick={() => addUser()}>add user</button> */}
       <i className="flex md:flex-col">
         <SideBarIcon
           icon={<MdOutlineChat size="23" />}
@@ -124,7 +135,7 @@ const SideBar = () => {
           text="Add group"
         />
       </i>
-<button onClick={()=>localStorage.clear()}>clear</button>
+      <button onClick={() => localStorage.clear()}>clear</button>
       <div className="flex items-center justify-center md:flex-col ">
         <SideBarIcon
           icon={<AiOutlineSetting size={22} />}

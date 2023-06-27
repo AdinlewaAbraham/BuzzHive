@@ -117,8 +117,8 @@ const ImageComponent = ({ chat }) => {
   };
 
   return (
-    <div>
-      <div className="relative flex items-center justify-center">
+    <div className="">
+      <div className="relative flex items-center justify-center h-full">
         <div className="">
           {!imageBlob || chat.dataObject.status === "uploading" ? (
             <>
@@ -132,7 +132,7 @@ const ImageComponent = ({ chat }) => {
               ) : (
                 <img
                   src={URL.createObjectURL(blurredImageBlob)}
-                  className="object-cover"
+                  className="h-full object-scale-down"
                   width={300}
                 />
               )}

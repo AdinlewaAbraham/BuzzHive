@@ -22,6 +22,9 @@ check button does not change back to edit if there is no change
 add error indicators for create group  
 add loading state for profile edit name and bio
 increase height for infinityscroll
+cant send multple media files at the same time
+setting file name not working correctly 
+add file indicatior for audio in file component
 
 optimize pls 
 clean up stuff 

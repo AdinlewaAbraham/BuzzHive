@@ -10,6 +10,7 @@ const FileSection = () => {
   const [locked, setLocked] = useState(false);
   const [lastFile, setLastFile] = useState(null);
 
+    const FileChunkCount = 20
   useEffect(() => {
     const getFileMessages = () => {
       const messages = JSON.parse(
@@ -18,10 +19,11 @@ const FileSection = () => {
       const fileMessages = messages.filter(
         (message) => message.type === "file"
       );
+      console.log(fileMessages.length)
       setFileMessages(fileMessages);
       const firstRenderBatch = JSON.parse(JSON.stringify(fileMessages)).splice(
         0,
-        20
+        FileChunkCount
       );
       setRenderedFiles(firstRenderBatch);
       setLastFile(firstRenderBatch[firstRenderBatch.length - 1]?.id);
@@ -48,9 +50,8 @@ const FileSection = () => {
     const spliceIndex = fileMessages.findIndex(
       (media) => media.id === lastFile
     );
-    const FileChunkCount = 20
     const newFileMessages = JSON.parse(JSON.stringify(fileMessages)).splice(
-      spliceIndex,
+      spliceIndex + 1,
       FileChunkCount
     );
     setLastFile(newFileMessages[newFileMessages.length - 1]?.id);
@@ -65,7 +66,7 @@ const FileSection = () => {
 
   return (
     <div
-      className="scrollBar h-[350px] w-full overflow-y-auto "
+      className="scrollBar h-[350px] w-full overflow-y-auto  pr-1"
       onScroll={handleOnScroll}
       ref={scrollContainerRef}
     >

@@ -413,7 +413,7 @@ const AddGroup = () => {
                 />
               </div>
             </div>
-            <div className="  left-0 bottom-0 mt-auto flex w-full">
+            <div className="  left-0 bottom-0 mt-auto flex w-full" >
               <button
                 className={`mr-1 flex w-1/2 items-center justify-center rounded-lg bg-accent-blue py-2 ${
                   creatingGroupLoading && "cursor-wait"
@@ -449,7 +449,8 @@ const AddGroup = () => {
             <div className="mb-3 flex w-full items-center justify-center">
               <input
                 type="text"
-                className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+                className=" w-[90%] rounded-lg bg-light-secondary px-3 py-2 
+                placeholder-muted-light outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
                 placeholder="Search"
                 onChange={(e) => {
                   const newSearchQuery = e.target.value;

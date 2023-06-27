@@ -13,6 +13,7 @@ const MediaSection = () => {
   const [hasMore, setHasMore] = useState(true);
   const [locked, setLocked] = useState(false);
   const [lastMediaFile, setLastMediaFile] = useState(null);
+  const mediaChunkCount = 5;
   useEffect(() => {
     const getMediaMessages = () => {
       const messages = JSON.parse(
@@ -24,7 +25,7 @@ const MediaSection = () => {
       setMediaMessages(MediaMessages);
       const firstRenderBatch = JSON.parse(JSON.stringify(MediaMessages)).splice(
         0,
-        20
+        mediaChunkCount
       );
       setRenderedMedia(firstRenderBatch);
       setLastMediaFile(firstRenderBatch[firstRenderBatch.length - 1]?.id);
@@ -32,7 +33,6 @@ const MediaSection = () => {
 
     return () => getMediaMessages();
   }, [ChatObject.activeChatId]);
-
 
   const scrollContainerRef = useRef(null);
   const handleOnScroll = () => {
@@ -53,9 +53,8 @@ const MediaSection = () => {
     const spliceIndex = mediaMessages.findIndex(
       (media) => media.id === lastMediaFile
     );
-    const mediaChunkCount = 20
     const newMediaMessages = JSON.parse(JSON.stringify(mediaMessages)).splice(
-      spliceIndex,
+      spliceIndex + 1,
       mediaChunkCount
     );
     setLastMediaFile(newMediaMessages[newMediaMessages.length - 1]?.id);
@@ -73,35 +72,21 @@ const MediaSection = () => {
       {mediaMessages === null ? (
         <>loading...</>
       ) : (
-        <ImageList
-          variant="masonry"
-          cols={3}
-          gap={8}
-          className="scrollBar overflow-x-hidden"
+        <div
+          className="scrollBar grid grid-cols-3 gap-2 overflow-x-hidden pr-1"
           onScroll={handleOnScroll}
           ref={scrollContainerRef}
         >
-          {/* <InfiniteScroll
-                        pageStart={0}
-                        loadMore={
-                            loadMoreMediaFiles
-                        }
-                        hasMore={hasMore}
-                        loader={<div>loading...</div>}
-                    > */}
-          {renderedMedia.map((message) =>
-            message.type === "image" ? (
-              <ImageListItem className="">
+          {renderedMedia.map((message) => (
+            <div className="flex h-[200px] items-center justify-center object-contain overflow-hidden bg-secondary cursor-pointer">
+              {message.type === "image" ? (
                 <ImageComponent chat={message} />
-              </ImageListItem>
-            ) : (
-              <ImageListItem>
+              ) : (
                 <VideoComponent chat={message} />
-              </ImageListItem>
-            )
-          )}
-          {/* </InfiniteScroll> */}
-        </ImageList>
+              )}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

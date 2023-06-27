@@ -6,6 +6,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   where,
 } from "firebase/firestore";
@@ -29,7 +30,7 @@ const Menu = ({ icon, header, context }) => {
       {icon}
       <div className="ml-3">
         <h4>{header}</h4>
-        <p>{context}</p>
+        <p className="text-muted text-sm">{context}</p>
       </div>
     </div>
   );
@@ -39,15 +40,15 @@ const Header = ({ title, isActive, onClick }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   return ChatObject.activeChatType === "group" || title !== "Participants" ? (
     <div
-      className={`mb-5 cursor-pointer ${isActive ? "border-b-2 border-blue-500 " : ""
-        }`}
+      className={`mb-5 cursor-pointer ${
+        isActive ? "border-b-2 border-blue-500 " : ""
+      }`}
       onClick={onClick}
     >
       {title}
     </div>
   ) : null;
 };
-
 
 const AboutProfile = ({ setshowProfile, ChatObject }) => {
   const [profile, setprofile] = useState();
@@ -58,23 +59,11 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
   const [isAdmin, setisAdmin] = useState(false);
   const [invalidURL, setinvalidURL] = useState(true);
   const [showMenu, setshowMenu] = useState(false);
-  const [groupObject, setGroupObject] = useState();
 
   const { User } = useContext(UserContext);
-
   useEffect(() => {
-    const getGroupObject = async () => {
-      if (ChatObject.activeChatType !== "group") return;
-      const groupRef = doc(db, "groups", ChatObject.activeChatId);
-      const groupSnapshot = await getDoc(groupRef);
-      setGroupObject(groupSnapshot.data());
-    };
-    return () => getGroupObject();
-  }, []);
-  useEffect(() => {
-    setActiveComponent("Media")
-  }, [ChatObject.activeChatId])
-  
+    setActiveComponent("Media");
+  }, [ChatObject.activeChatId]);
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -83,7 +72,12 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
       case "Files":
         return <FileSection />;
       case "Participants":
-        return <ParticipantsComponent groupObject={groupObject} />;
+        return (
+          <ParticipantsComponent
+            groupObject={profile}
+            setGroupObject={setprofile}
+          />
+        );
       default:
         return null;
     }
@@ -95,16 +89,13 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
   };
 
   useEffect(() => {
-    const getProfileBio = async () => {
-      const queryLocation =
-        ChatObject.activeChatType === "group" ? "groups" : "users";
-      const ProfileRef = doc(db, queryLocation, ChatObject.otherUserId);
-      const ProfileSnapshot = await getDoc(ProfileRef);
-      setprofile(ProfileSnapshot.data());
-    };
-    return () => {
-      getProfileBio();
-    };
+    const queryLocation =
+      ChatObject.activeChatType === "group" ? "groups" : "users";
+    const ProfileRef = doc(db, queryLocation, ChatObject.otherUserId);
+    const unsubscribe = onSnapshot(ProfileRef, (snapshot) => {
+      setprofile(snapshot.data());
+    });
+    return () => unsubscribe();
   }, []);
 
   const q = query(
@@ -117,7 +108,6 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
     .then((querySnapshot) => {
       const isUserInArray = !querySnapshot.empty;
       setisAdmin(isUserInArray);
-      isUserInArray;
     })
     .catch((error) => {
       console.error("Error getting document: ", error);
@@ -150,7 +140,10 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
               </ul>
             )}
             <div
-              className={`ImgParentComp relative flex h-[200px] w-[200px] cursor-pointer items-center justify-center rounded-full bg-inherit`}
+              className={`ImgParentComp relative ${
+                !(ChatObject.photoUrl && invalidURL) && "bg-cover"
+              } 
+              flex h-[200px] w-[200px] cursor-pointer items-center justify-center rounded-full bg-inherit`}
             >
               <div
                 className="ImgChildComp absolute inset-0 flex items-center justify-center rounded-full opacity-0"
@@ -164,7 +157,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                     <input
                       type="file"
                       className="hidden h-full w-full cursor-pointer"
-                      onChange={async (e) => { }}
+                      onChange={async (e) => {}}
                       accept="image/png, image/jpeg"
                     />
                   </label>
@@ -179,12 +172,21 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                   onError={() => setinvalidURL(false)}
                 />
               ) : ChatObject.activeChatType === "group" ? (
-                <MdGroup size="80%" />
+                <MdGroup size="70%" />
               ) : (
                 <FaUserAlt size="50%" />
               )}
             </div>
-            <h3 className="mt-2">{ChatObject.displayName}</h3>
+            <h3 className="mt-2 text-lg font-medium">
+              {ChatObject.displayName}
+            </h3>
+            {ChatObject.activeChatType === "group" && (
+              <p className="text-muted text-sm">
+                {" "}
+                Group <span className="text-xs">&#x25CF;</span>{" "}
+                {profile?.members?.length} participants{" "}
+              </p>
+            )}
           </div>
           <div className="mb-5 p-5 dark:bg-[#1d232a]">
             <Menu
@@ -195,12 +197,16 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
             <Menu
               icon={<AiOutlineInfoCircle />}
               header="Bio"
-              context={ChatObject.displayName}
+              context={profile?.bio}
             />
           </div>
         </div>
 
-        <div className="mb-5 flex flex-col items-center justify-around p-5 dark:bg-[#1d232a]">
+        <div
+          className={`  ${
+            ChatObject.activeChatType === "group" && "mb-5"
+          } flex flex-col items-center justify-around p-5 dark:bg-[#1d232a]`}
+        >
           <div className="flex w-full justify-around">
             {["Media", "Files", "Participants"].map((header) => (
               <Header
@@ -212,18 +218,15 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
           </div>
           <div className="w-full">{renderComponent()}</div>
         </div>
-        <div className="mb-5  flex w-full cursor-pointer items-center p-5 text-red-500 dark:bg-[#1d232a]">
-          {ChatObject.activeChatType === "group" ? (
-            <>
-              <BiLogOut /> Exit Group
-            </>
-          ) : (
-            <>
-              <ImBlocked />
-              Block {ChatObject.displayName}
-            </>
-          )}
-        </div>
+        {ChatObject.activeChatType === "group" && (
+          <div className="mb-5  flex w-full cursor-pointer items-center p-5 text-red-500 dark:bg-[#1d232a]">
+            {ChatObject.activeChatType === "group" && (
+              <>
+                <BiLogOut /> Exit Group
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
