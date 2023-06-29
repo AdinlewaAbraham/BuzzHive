@@ -217,7 +217,7 @@ const ParticipantsComponent = ({ groupObject }) => {
       ref={scrollContainerRef}
     >
       {showAddParticipants && (
-        <AddParticipants setShowAddParticipants={setShowAddParticipants} />
+        <AddParticipants setShowAddParticipants={setShowAddParticipants} groupObject={groupObject} />
       )}
       <div>
         {groupObject.admins.includes(User.id) && (

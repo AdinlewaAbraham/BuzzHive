@@ -47,7 +47,7 @@ const UserCard = (p) => {
           onError={() => setinvalidURL(false)}
         />
       ) : (
-        <i className="mr-2 flex h-[45px] w-[45px] items-center justify-center rounded-full bg-cover ">
+        <i className="mr-2 flex h-[45px] w-[45px] items-center justify-center rounded-full bg-coverColor ">
           <FaUserAlt size={22} />
         </i>
       )}

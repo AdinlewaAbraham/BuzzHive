@@ -1,4 +1,4 @@
-make about profile functional ------
+make about profile functional ------  profile circle stuff and make header better
 look into verifying yourself 
 opening pic and video with animations 
 deleting photos or files in storage setting causes downloading bug 
@@ -25,6 +25,9 @@ increase height for infinityscroll
 cant send multple media files at the same time
 setting file name not working correctly 
 add file indicatior for audio in file component
+
+
+find a way to make add users list in add participants unique 
 
 optimize pls 
 clean up stuff 

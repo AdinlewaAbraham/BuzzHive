@@ -32,7 +32,7 @@
   .bg-hover {
     @apply bg-hover-light dark:bg-hover-dark;
   }
-  .bg-cover {
+  .bg-coverColor {
     @apply bg-imgCover-light dark:bg-imgCover-dark;
   }
   .bg-primary {
@@ -82,7 +82,7 @@ html {
 }
 
 .ImgParentComp:hover .ImgChildComp {
-  background-color: rgba(155, 145, 145, 0.2);
+  background-color: rgba(32 ,34, 37 , 0.2);
   opacity: 1;
 }
 
@@ -148,3 +148,6 @@ html {
   transform: scale(0.8);
   transition: opacity 300ms, transform 300ms;
 }
+
+
+

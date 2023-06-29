@@ -138,7 +138,7 @@ const SelectMenu = ({ optionsArr, selectedMenuText, onClickFunc }) => {
     </div>
   );
 };
-const Modal = ({ modalObject, showModal, setshowModal }) => {
+export const Modal = ({ modalObject, showModal, setshowModal }) => {
   return (
     <AnimatePresence>
       {showModal && (

@@ -11,7 +11,8 @@ import {
   orderBy,
   query,
   updateDoc,
-  where,startAfter
+  where,
+  startAfter,
 } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import { UserContext } from "@/components/App";
@@ -21,6 +22,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { GiCancel } from "react-icons/gi";
 import { CircularProgress } from "@mui/joy";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
+import Goback from "@/components/ChannelBar/Goback";
 const UserCard = (p) => {
   const [invalidURL, setinvalidURL] = useState(true);
   return (
@@ -37,7 +39,7 @@ const UserCard = (p) => {
           onError={() => setinvalidURL(false)}
         />
       ) : (
-        <i className="mr-2 flex h-[45px] w-[45px] items-center justify-center rounded-full bg-cover ">
+        <i className="mr-2 flex h-[45px] w-[45px] items-center justify-center rounded-full bg-coverColor ">
           <FaUserAlt size={22} />
         </i>
       )}
@@ -56,7 +58,7 @@ const UserCard = (p) => {
   );
 };
 
-const AddParticipants = ({ setShowAddParticipants }) => {
+const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
   const [animationParent] = useAutoAnimate({ duration: 150 });
   const [activeUsers, setactiveUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,6 +69,7 @@ const AddParticipants = ({ setShowAddParticipants }) => {
   const [addingUser, setAddingUser] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [height, setHeight] = useState(0);
+  const [IsMobile, setIsMobile] = useState(false);
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
   const ref = useRef(null);
@@ -83,7 +86,6 @@ const AddParticipants = ({ setShowAddParticipants }) => {
 
       const querySnapshot = await getDocs(q);
       const fetchedUsers = querySnapshot.docs.map((doc) => doc.data());
-      console.log(fetchedUsers);
       setUsers(fetchedUsers);
       setHasMore(querySnapshot.docs.length === 15);
     } catch (error) {
@@ -95,8 +97,20 @@ const AddParticipants = ({ setShowAddParticipants }) => {
 
   useEffect(() => {
     data ? setactiveUsers(JSON.parse(data)) : 0;
-    console.log("changed");
     fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    function widthResizer() {
+      const width = window.innerWidth < 768;
+      setIsMobile(width);
+    }
+
+    widthResizer();
+
+    window.addEventListener("resize", widthResizer);
+
+    return () => window.removeEventListener("resize", widthResizer);
   }, []);
 
   useLayoutEffect(() => {
@@ -106,7 +120,6 @@ const AddParticipants = ({ setShowAddParticipants }) => {
 
   const filterUsersWithQuery = (SearchQuery) => {
     const filteredUsers = activeUsers.filter((user) => {
-      console.log(user);
       const lowercaseName = user.senderDisplayName.toLowerCase();
       const lowercaseSearchQuery = SearchQuery.toLowerCase();
       return lowercaseName.includes(lowercaseSearchQuery);
@@ -154,6 +167,7 @@ const AddParticipants = ({ setShowAddParticipants }) => {
     const updatedUsers = selectedUsers.filter((user) => user.id !== userId);
     setselectedUsers(updatedUsers);
   };
+  console.log(groupObject)
   const addUsersToGroup = async () => {
     if (addingUser) return;
     setAddingUser(true);
@@ -197,10 +211,11 @@ const AddParticipants = ({ setShowAddParticipants }) => {
       addUsers();
     }
   };
+
   const divStyles = {
-    maxHeight: `calc(100vh - 125px${
+    maxHeight: `calc(100vh - 200px${
       selectedUsers.length > 0
-        ? ` - ${height}px - "60px"`
+        ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
         : ""
     })`,
     transition: "height ease-in-out 150ms",
@@ -209,9 +224,12 @@ const AddParticipants = ({ setShowAddParticipants }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-70">
       <div
         className="bg-primary w-[35%] min-w-[300px]
-       max-w-[500px] rounded-lg p-4 shadow-xl"
+       max-w-[500px] rounded-lg p-4 pt-0 shadow-xl"
       >
-        <button onClick={() => setShowAddParticipants(false)}>close</button>
+        <Goback
+          text={"Add participant"}
+          clickFunc={() => setShowAddParticipants(false)}
+        />
         {selectedUsers.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -254,26 +272,30 @@ const AddParticipants = ({ setShowAddParticipants }) => {
             </div>
           </motion.div>
         )}
-        <input
-          type="text"
-          className=" bg-secondary w-[90%]  rounded-lg px-3 py-2 
+        <div className="flex w-full items-center justify-center mb-3">
+          <input
+            type="text"
+            className=" bg-secondary w-[90%]  rounded-lg px-3 py-2 
           placeholder-muted-light outline-none dark:placeholder-muted-dark"
-          placeholder="Search"
-          onChange={(e) => {
-            const newSearchQuery = e.target.value;
-            if (newSearchQuery === "") {
-              fetchUsers();
-              let data = localStorage.getItem(`${User.id}_userChats`);
-              data ? setactiveUsers(JSON.parse(data)) : 0;
-            } else {
-              fetchedUsersWithQuery(newSearchQuery);
-              filterUsersWithQuery(newSearchQuery);
-            }
-          }}
-        />
+            placeholder="Search"
+            onChange={(e) => {
+              const newSearchQuery = e.target.value;
+              if (newSearchQuery === "") {
+                fetchUsers();
+                let data = localStorage.getItem(`${User.id}_userChats`);
+                data ? setactiveUsers(JSON.parse(data)) : 0;
+              } else {
+                fetchedUsersWithQuery(newSearchQuery);
+                filterUsersWithQuery(newSearchQuery);
+              }
+            }}
+          />
+        </div>
         {selectedUsers.length > 0 && (
           <button
-            className={` ${addingUser && "cursor-wait"} w-full rounded-lg bg-accent-blue py-2`}
+            className={` ${
+              addingUser && "cursor-wait"
+            } w-full rounded-lg bg-accent-blue py-2 mb-3`}
             onClick={() => addUsersToGroup()}
           >
             {addingUser ? (
@@ -285,10 +307,12 @@ const AddParticipants = ({ setShowAddParticipants }) => {
             )}
           </button>
         )}
-        <div className="border scrollBar overflow-y-auto" 
-              style={divStyles}
-              ref={scrollContainerRef}
-              onScroll={handleOnScroll}>
+        <div
+          className="scrollBar overflow-y-auto"
+          style={divStyles}
+          ref={scrollContainerRef}
+          onScroll={handleOnScroll}
+        >
           {activeUsers?.length > 0 && (
             <div className="relative">
               <h2
@@ -370,7 +394,7 @@ const AddParticipants = ({ setShowAddParticipants }) => {
             <>
               {[1, 2, 3, 4, 5].map((key) => (
                 <div
-                  className="flex cursor-pointer items-center px-4 py-4"
+                  className="relative flex cursor-pointer items-center px-4 py-4"
                   key={key}
                   style={{ width: "100%" }}
                 >
@@ -383,15 +407,15 @@ const AddParticipants = ({ setShowAddParticipants }) => {
               ))}
             </>
           )}
-          
+
           {addUsersLoading && (
-                <div className="mb-5 flex items-center justify-center">
-                  <i className="mr-1">
-                    <CircularProgress variant="plain" size="sm" />
-                  </i>{" "}
-                  loading...
-                </div>
-              )}
+            <div className="mb-5 flex items-center justify-center">
+              <i className="mr-1">
+                <CircularProgress variant="plain" size="sm" />
+              </i>{" "}
+              loading...
+            </div>
+          )}
         </div>
       </div>
     </div>

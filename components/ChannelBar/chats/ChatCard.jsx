@@ -396,7 +396,7 @@ const ChatCard = ({
         handleChatClick();
       }}
     >
-      <div className=" flex h-[50px] w-[50px] items-center justify-center rounded-full bg-cover text-[#ffffff]">
+      <div className=" flex h-[50px] w-[50px] items-center justify-center rounded-full bg-coverColor text-[#ffffff]">
         {img && invalidURL ? (
           <img
             src={img}
