@@ -11,11 +11,12 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import { updateDoc, doc, onSnapshot } from "firebase/firestore";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "@/utils/firebaseUtils/firebase";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import { AnimatePresence, motion } from "framer-motion";
 
 const EditProfileInfo = ({ title, toBeEdited }) => {
   const [showInput, setshowInput] = useState(false);
@@ -85,25 +86,87 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
 };
 
 const ProfileSettings = () => {
-  const { User } = useContext(UserContext);
+  const { User, setUser } = useContext(UserContext);
   const [showEditDisplayNameInput, setshowEditDisplayNameInput] =
     useState(false);
   const [showEditAboutInput, setshowEditAboutInput] = useState(false);
   const [invalidURL, setinvalidURL] = useState(true);
+  const [progress, setProgress] = useState(0);
   const [isUploading, setisUploading] = useState(false);
+  const [dontShowText, setDontShowText] = useState(false);
+  const [showMenu, setshowMenu] = useState(false);
+  const [showCheckMark, setShowCheckMark] = useState(false);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (!e.target.closest(".Menu")) {
+        setshowMenu(false);
+      }
+    };
+    window.addEventListener("click", (e) => handleClick(e));
+    return window.removeEventListener("click", (e) => handleClick(e));
+  }, []);
+
   const handleProfilePicChange = async (picture) => {
+    setProgress(0);
+    setUser({ ...User, photoUrl: URL.createObjectURL(picture) });
+
+    setinvalidURL(true);
     setisUploading(true);
     const reducedQualityImg = await downScalePicVid(picture, 0.7, 1, 0);
     const profilePicRef = ref(storage, `users/profilePicture/${User.id}`);
     const userRef = doc(db, "users", User.id);
-    await uploadBytesResumable(profilePicRef, reducedQualityImg);
-    getDownloadURL(profilePicRef).then(async (profilePictureURL) => {
-      await updateDoc(userRef, { ["photoUrl"]: profilePictureURL });
-      setisUploading(false);
-    });
+    const uploadTask = uploadBytesResumable(profilePicRef, reducedQualityImg);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(progress);
+      },
+      (error) => {
+        console.log("Upload error:", error);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setShowCheckMark(true);
+
+          await updateDoc(userRef, { ["photoUrl"]: downloadURL }).then(() => {
+            setTimeout(() => {
+              setDontShowText(true);
+              setShowCheckMark(false);
+            }, 300);
+          });
+
+          setTimeout(() => {
+            setisUploading(false);
+          }, 500);
+          setTimeout(() => {
+            setDontShowText(false);
+          }, 1000);
+        } catch (error) {
+          console.log("Error getting download URL:", error);
+        }
+      }
+    );
   };
   const { setSelectedChannel, setprevSelectedChannel, prevSelectedChannel } =
     useContext(SelectedChannelContext);
+    const removeImg =async()=>{
+      setshowMenu(false)
+      const userRef = doc(db, "users", User.id)
+
+      setUser({...User, photoUrl: null})
+
+      await updateDoc(userRef, { ["photoUrl"]: null })
+      const profilePicRef = ref(storage, `users/profilePicture/${User.id}`);
+      await deleteObject(profilePicRef)
+        .then(() => true)
+        .catch(() => false);
+    }
+    
   return (
     <div className="px-2">
       <Goback
@@ -119,55 +182,117 @@ const ProfileSettings = () => {
         exit={{ y: -20, opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
-        <section className="flex items-center justify-center">
+        <div className="flex w-full items-center justify-center">
           <div
-            className={`flex  ${
-              User.photoUrl === null ? "pt-[3px]" : ""
-            } group relative h-[100px] w-[100px] cursor-pointer justify-center bg-inherit 
-          [&>i]:flex [&>i]:h-full [&>i]:items-center [&>i]:justify-center `}
+            className={`Menu relative  ${
+              !(User.photoUrl && invalidURL) && "bg-coverColor"
+            } 
+              ${isUploading && "scale-90"} 
+              flex h-[100px] w-[100px] cursor-pointer items-center justify-center  rounded-full bg-inherit
+              shadow-2xl transition-transform duration-300 `}
           >
             {isUploading && (
-              <div
-                className="absolute inset-0 flex cursor-wait items-center
-           justify-center bg-gray-900 bg-opacity-50 "
-              >
-                <CircularProgress size="sm" variant="plain" />
+              <div style={{ position: "absolute", inset: -2 }}>
+                <CircularProgressbar
+                  value={progress}
+                  styles={buildStyles({
+                    textColor: "#333",
+                    pathColor: "#3f51b5",
+                    trailColor: "transparent",
+                  })}
+                  strokeWidth={3}
+                />
               </div>
             )}
-            {!isUploading && (
-              <label
-                className="absolute inset-0 flex cursor-pointer items-center
-           justify-center bg-gray-900 bg-opacity-50 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-              >
-                <div>
-                  <MdOutlineModeEditOutline size={20} />
-                </div>
-                <input
-                  type="file"
-                  accept="image/png, image/jpeg"
-                  className="hidden h-full w-full cursor-pointer"
-                  onChange={(e) => handleProfilePicChange(e.target.files[0])}
-                />
-              </label>
-            )}
+            <div
+              className={` absolute inset-0 flex  items-center  ${
+                isUploading && "opacity-100"
+              }  justify-center rounded-full bg-gray-900 
+                bg-opacity-50 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
+              onClick={() => {
+                !isUploading ? setshowMenu(true) : "open img";
+              }}
+            >
+              <AnimatePresence>
+                {showCheckMark && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="40"
+                    height="40"
+                  >
+                    <motion.path
+                      fill="none"
+                      strokeWidth="2"
+                      stroke="#008000"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M1 16.5l6.857 5.857L23.5 4"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 0.8 }}
+                      exit={{ pathLength: 0 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                    />
+                  </svg>
+                )}
+              </AnimatePresence>
+              {isUploading && !showCheckMark && !dontShowText && (
+                <p className="text-2xl font-medium">{progress.toFixed(0)}%</p>
+              )}
+              {!isUploading && !dontShowText && (
+                <MdOutlineModeEditOutline size={30} />
+              )}
+            </div>
             {User.photoUrl && invalidURL ? (
               <img
-                width={100}
-                height={100}
                 src={User.photoUrl}
                 alt="profile pic"
                 className={`h-full w-full rounded-full object-cover`}
                 onError={() => setinvalidURL(false)}
               />
             ) : (
-              <i>
-                <FaUserAlt size="75" />
-              </i>
+              <FaUserAlt size="40%" />
             )}
+            <AnimatePresence>
+              {showMenu && (
+                <motion.ul
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -10, opacity: 0 }}
+                  className="Menu bg-secondary hover:[&>li]:bg-coverColor [&>li]: [&>li]: [&>li]: absolute bottom-[-140px] rounded-lg
+                              p-2 [&>li]:whitespace-nowrap [&>li]:rounded-lg [&>li]:p-2
+                              "
+                >
+                  <li
+                    onClick={() => {
+                      removeImg();
+                    }}
+                  >
+                    Remove image
+                  </li>
+                  <li>View image</li>
+                  <li className="relative">
+                    Change image
+                    <label className="absolute inset-0 flex h-full w-full cursor-pointer items-center justify-center ">
+                      <input
+                        type="file"
+                        className="hidden h-full w-full cursor-pointer"
+                        onChange={async (e) => {
+                          handleProfilePicChange(e.target.files[0]);
+                          setshowMenu(false);
+                        }}
+                        accept="image/png, image/jpeg"
+                      />
+                    </label>
+                  </li>
+                </motion.ul>
+              )}
+            </AnimatePresence>
           </div>
-        </section>
+        </div>
+
         <div className="mb-7 text-center">
-          <h4>{User.name}</h4>
+          <h4 className="font-medium mt-2">{User.name}</h4>
           <p className="text-muted-light dark:text-muted-dark">{User.bio}</p>
         </div>
         <section>

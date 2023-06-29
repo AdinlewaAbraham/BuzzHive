@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Img from "../../Img";
 import { db, storage } from "@/utils/firebaseUtils/firebase";
 import {
@@ -27,16 +27,19 @@ import FileSection from "./FileSection";
 import MediaSection from "./MediaSection";
 import { removeMember } from "@/utils/groupUtils/removeMember";
 import { Modal } from "@/components/ChannelBar/settings/Settings";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, animate } from "framer-motion";
 import { motion } from "framer-motion";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
+  deleteObject,
+  getMetadata,
 } from "firebase/storage";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 
 const Menu = ({ icon, header, context }) => {
   return (
@@ -79,6 +82,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
 
   const [progress, setProgress] = useState(0);
   const [isUploading, setisUploading] = useState(false);
+  const [dontShowText, setDontShowText] = useState(false);
+  const [showCheckMark, setShowCheckMark] = useState(false);
 
   const { User } = useContext(UserContext);
   useEffect(() => {
@@ -158,7 +163,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
     });
   };
 
-  const handleImageChange = (file) => {
+  const handleImageChange = async (file, dataObject) => {
+    setProgress(0);
     setChatObject((prevState) => ({
       ...prevState,
       photoUrl: URL.createObjectURL(file),
@@ -166,9 +172,10 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
     setinvalidURL(true);
     setisUploading(true);
     const storage = getStorage();
-    const storageRef = ref(storage, "groupIcons/" + ChatObject.activeChatId);
+    const storageRef = ref(storage, "groupIcons/" + dataObject.activeChatId);
 
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    const uploadPic = await downScalePicVid(file, 0.7, 1, 0);
+    const uploadTask = uploadBytesResumable(storageRef, uploadPic);
 
     uploadTask.on(
       "state_changed",
@@ -183,11 +190,41 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
       async () => {
         try {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setShowCheckMark(true);
+
+          const groupRef = doc(db, "groups", dataObject.activeChatId);
+          await updateDoc(groupRef, { photoUrl: downloadURL }).then(() => {
+            setTimeout(() => {
+              setDontShowText(true);
+              setShowCheckMark(false);
+            }, 300);
+          });
+
+          setTimeout(() => {
+            setisUploading(false);
+          }, 500);
+          setTimeout(() => {
+            setDontShowText(false);
+          }, 1000);
         } catch (error) {
           console.log("Error getting download URL:", error);
         }
       }
     );
+  };
+  const removeImg = async () => {
+    setshowMenu(false);
+    const groupRef = doc(db, "groups", ChatObject.activeChatId);
+    setChatObject((prevState) => ({
+      ...prevState,
+      photoUrl: null,
+    }));
+    await updateDoc(groupRef, { photoUrl: null });
+    const storageRef = ref(storage, "groupIcons/" + ChatObject.activeChatId);
+
+    await deleteObject(storageRef)
+      .then(() => true)
+      .catch(() => false);
   };
   return (
     <div className=" absolute inset-0 left-[1px] z-40 bg-light-secondary dark:bg-dark-secondary">
@@ -217,28 +254,55 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
               flex h-[200px] w-[200px] cursor-pointer items-center justify-center  rounded-full bg-inherit
               shadow-2xl transition-transform duration-300 `}
             >
-              <div style={{ position: "absolute", inset: -20 }}>
-                <CircularProgressbar
-                  value={50}
-                  text={`${15}%`}
-                  styles={buildStyles({
-                    textColor: "#333",
-                    pathColor: "#3f51b5",
-                    trailColor: "transparent",
-                  })}
-                />
-              </div>
+              {isUploading && (
+                <div style={{ position: "absolute", inset: -5 }}>
+                  <CircularProgressbar
+                    value={progress}
+                    styles={buildStyles({
+                      textColor: "#333",
+                      pathColor: "#3f51b5",
+                      trailColor: "transparent",
+                    })}
+                    strokeWidth={2.5}
+                  />
+                </div>
+              )}
               <div
                 className={` absolute inset-0 flex  items-center  ${
                   isUploading && "opacity-100"
                 }  justify-center rounded-full bg-gray-900 
                 bg-opacity-50 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
                 onClick={() => {
-                  isAdmin ? setshowMenu(true) : "open img";
+                  isAdmin && !isUploading ? setshowMenu(true) : "open img";
                 }}
               >
-                {isUploading && <>{progress}</>}
-                {isAdmin && !isUploading && (
+                <AnimatePresence>
+                  {showCheckMark && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="80"
+                      height="80"
+                    >
+                      <motion.path
+                        fill="none"
+                        strokeWidth="2"
+                        stroke="#008000"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M1 16.5l6.857 5.857L23.5 4"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 0.8 }}
+                        exit={{ pathLength: 0 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                      />
+                    </svg>
+                  )}
+                </AnimatePresence>
+                {isUploading && !showCheckMark && !dontShowText && (
+                  <p className="text-5xl font-medium">{progress.toFixed(0)}%</p>
+                )}
+                {isAdmin && !isUploading && !dontShowText && (
                   <MdOutlineModeEditOutline size={30} />
                 )}
               </div>
@@ -261,10 +325,16 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -10, opacity: 0 }}
                     className="Menu bg-secondary hover:[&>li]:bg-coverColor [&>li]: [&>li]: [&>li]: [&>li]: absolute bottom-[-140px]
-                rounded-lg p-2 [&>li]:rounded-lg [&>li]:p-2
-                "
+                              rounded-lg p-2 [&>li]:rounded-lg [&>li]:p-2
+                              "
                   >
-                    <li>Remove image</li>
+                    <li
+                      onClick={() => {
+                        removeImg();
+                      }}
+                    >
+                      Remove image
+                    </li>
                     <li>View image</li>
                     <li className="relative">
                       Change image
@@ -273,7 +343,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                           type="file"
                           className="hidden h-full w-full cursor-pointer"
                           onChange={async (e) => {
-                            handleImageChange(e.target.files[0]);
+                            handleImageChange(e.target.files[0], ChatObject);
+                            setshowMenu(false);
                           }}
                           accept="image/png, image/jpeg"
                         />

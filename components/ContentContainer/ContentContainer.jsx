@@ -114,6 +114,7 @@ const ContentContainer = () => {
 
   useEffect(() => {
     sethasMoreTop(true);
+    setshowProfile(false)
   }, [ChatObject.activeChatId]);
 
   useMemo(() => {
