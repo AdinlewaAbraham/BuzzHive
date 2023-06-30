@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdVerified } from "react-icons/md";
+import Badge from "@/components/Badge";
 const UserCard = ({ user }) => {
   const {
     setChats,
@@ -74,11 +75,9 @@ const UserCard = ({ user }) => {
           groupSize="60"
         />
         <div>
-          <p className="flex items-center border">
+          <p className="flex items-center">
             <span>{user.name}</span>
-            {user.id !== "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && <i className="text-accent-blue ml-2 flex items-center border" >
-              <MdVerified /></i>
-            }
+            <Badge id={user.id} />
           </p>
           <p className="text-sm text-muted-light dark:text-muted-dark">
             {user.bio}

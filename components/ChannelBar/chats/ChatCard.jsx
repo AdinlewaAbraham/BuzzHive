@@ -28,6 +28,7 @@ import {
 import { formatCount } from "@/utils/actualUtils/formatCount";
 
 import { formatTime } from "@/utils/actualUtils/formatTime";
+import Badge from "@/components/Badge";
 const ChatCard = ({
   img,
   name,
@@ -419,6 +420,7 @@ const ChatCard = ({
                 <MdVerified />
               </i>
             )}
+            <Badge id={otherUserId} />
           </h3>
           <p className="text-muted  text-[11px]">{formatTime(timestamp)}</p>
         </div>

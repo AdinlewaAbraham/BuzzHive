@@ -26,6 +26,7 @@ import { RxDividerVertical } from "react-icons/rx";
 import { CircularProgress } from "@mui/joy";
 import InfiniteScroll from "react-infinite-scroller";
 import { motion, AnimatePresence } from "framer-motion";
+import Badge from "../Badge";
 
 const ContentContainer = () => {
   const {
@@ -114,7 +115,7 @@ const ContentContainer = () => {
 
   useEffect(() => {
     sethasMoreTop(true);
-    setshowProfile(false)
+    setshowProfile(false);
   }, [ChatObject.activeChatId]);
 
   useMemo(() => {
@@ -135,8 +136,9 @@ const ContentContainer = () => {
 
   const mainContentStyle = {
     overflowY: "auto",
-    height: `calc(100vh - 123px${ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
-      })`,
+    height: `calc(100vh - 123px${
+      ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
+    })`,
   };
   const handleSearch = (event) => {
     setSearchText(event.target.value);
@@ -200,14 +202,16 @@ const ContentContainer = () => {
                 }}
               >
                 <div
-                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${ChatObject.photoUrl === null ? "pt-[3px]" : ""
-                    }`}
+                  className={`flex h-[40px] w-[40px] items-center rounded-full justify-center${
+                    ChatObject.photoUrl === null ? "pt-[3px]" : ""
+                  }`}
                 >
                   <div
                     className={`flex h-[40px] w-[40px] items-center justify-center rounded-full
-                   ${!(ChatObject.photoUrl && invalidURL) &&
-                      "bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500"
-                      } `}
+                   ${
+                     !(ChatObject.photoUrl && invalidURL) &&
+                     "bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500"
+                   } `}
                   >
                     <div className="flex items-center justify-center rounded-full bg-inherit text-[30px]">
                       {ChatObject.photoUrl && invalidURL ? (
@@ -229,13 +233,15 @@ const ContentContainer = () => {
                     </div>
                   </div>
                 </div>
-                <div className="ml-[10px]">{ChatObject.displayName}</div>
+                <div className="ml-[10px]">{ChatObject.displayName}</div>{" "}
+                <Badge id={ChatObject.otherUserId} />
               </div>
             </div>
 
             <div
-              className={` hover:bg-hover ${Searchanchor && "bg-hover"
-                } cursor-pointer rounded-lg  p-3 `}
+              className={` hover:bg-hover ${
+                Searchanchor && "bg-hover"
+              } cursor-pointer rounded-lg  p-3 `}
               onClick={() => {
                 setSearchanchor(!Searchanchor);
               }}
@@ -245,24 +251,25 @@ const ContentContainer = () => {
             <AnimatePresence>
               {Searchanchor && (
                 <motion.div
-                  initial={{ y: 20, opacity: 0 }}
+                  initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -20, opacity: 0 }}
+                  transition={{ duration: 0.2, ease: "easeIn" }}
                   className="absolute top-[70px] right-1"
                 >
                   <div
                     className="[&>i]: [&>i]:text-muted relative flex rounded-lg 
-              bg-light-primary p-2 dark:bg-dark-primary
-               [&>i]:cursor-pointer [&>i]:rounded-lg  [&>i]:p-2
-               [&>i]:text-lg"
+                      bg-light-primary p-2 dark:bg-dark-primary
+                      [&>i]:cursor-pointer [&>i]:rounded-lg  [&>i]:p-2
+                      [&>i]:text-lg"
                   >
                     <div className="relative flex w-full items-center justify-center">
                       <input
                         autoFocus
                         type="text"
                         className=" mr-1 flex w-full items-center justify-center rounded-lg bg-light-secondary py-1 px-3
-                   pr-[50px]  text-black placeholder-muted-light outline-none
-                   dark:bg-dark-secondary  dark:text-white dark:placeholder-muted-dark"
+                          pr-[50px]  text-black placeholder-muted-light outline-none
+                          dark:bg-dark-secondary  dark:text-white dark:placeholder-muted-dark"
                         placeholder="Search"
                         onChange={handleSearch}
                       />
@@ -420,10 +427,11 @@ const ContentContainer = () => {
                 }}
                 className="absolute right-[20px] z-10 cursor-pointer rounded-lg p-3 dark:bg-[#1d232a]"
                 style={{
-                  bottom: `${ReplyObject.ReplyTextId
+                  bottom: `${
+                    ReplyObject.ReplyTextId
                       ? `${replyDivHeight + 120}px`
                       : "120px"
-                    }`,
+                  }`,
                 }}
               >
                 <AiOutlineArrowDown size={23} />

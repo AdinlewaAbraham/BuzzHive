@@ -40,6 +40,7 @@ import {
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
+import Badge from "@/components/Badge";
 
 const Menu = ({ icon, header, context }) => {
   return (
@@ -57,14 +58,14 @@ const Header = ({ title, isActive, onClick }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   return ChatObject.activeChatType === "group" || title !== "Participants" ? (
     <div
-      className={`mb-5 cursor-pointer ${
-        isActive ? "border-b-2 border-blue-500 " : ""
+      className={`pb-5 cursor-pointer w-full text-center ${
+        isActive ? "border-b-4  border-[#3B82F6]  " : "text-muted"
       }`}
       onClick={onClick}
     >
       {title}
     </div>
-  ) : null;
+  ) : false;
 };
 
 const AboutProfile = ({ setshowProfile, ChatObject }) => {
@@ -248,11 +249,11 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
           <div className=" bg-primary mb-5 flex flex-col items-center justify-center py-10">
             <div
               className={`Menu relative  ${
-                !(ChatObject.photoUrl && invalidURL) && "bg-coverColor"
+                !(ChatObject.photoUrl && invalidURL) && "bg-imgCover-light dark:bg-imgCover-dark"
               } 
               ${isUploading && "scale-90"} 
               flex h-[200px] w-[200px] cursor-pointer items-center justify-center  rounded-full bg-inherit
-              shadow-2xl transition-transform duration-300 `}
+            transition-transform duration-300 `}
             >
               {isUploading && (
                 <div style={{ position: "absolute", inset: -5 }}>
@@ -270,8 +271,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
               <div
                 className={` absolute inset-0 flex  items-center  ${
                   isUploading && "opacity-100"
-                }  justify-center rounded-full bg-gray-900 
-                bg-opacity-50 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
+                }  justify-center rounded-full bg-gray-900
+                dark:bg-opacity-50 bg-opacity-10 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
                 onClick={() => {
                   isAdmin && !isUploading ? setshowMenu(true) : "open img";
                 }}
@@ -314,9 +315,9 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                   onError={() => setinvalidURL(false)}
                 />
               ) : ChatObject.activeChatType === "group" ? (
-                <MdGroup size="70%" />
+                <MdGroup size="70%" color="#ffffff" />
               ) : (
-                <FaUserAlt size="50%" />
+                <FaUserAlt size="50%" color="#ffffff" />
               )}
               <AnimatePresence>
                 {showMenu && (
@@ -324,7 +325,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -10, opacity: 0 }}
-                    className="Menu bg-secondary hover:[&>li]:bg-coverColor [&>li]: [&>li]: [&>li]: [&>li]: absolute bottom-[-140px]
+                    className="Menu bg-secondary  hover:[&>li]:bg-hover-light dark:hover:[&>li]:bg-hover-dark
+                     [&>li]: [&>li]: [&>li]: [&>li]: absolute bottom-[-140px]
                               rounded-lg p-2 [&>li]:rounded-lg [&>li]:p-2
                               "
                   >
@@ -354,8 +356,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                 )}
               </AnimatePresence>
             </div>
-            <h3 className="mt-2 text-lg font-medium">
-              {ChatObject.displayName}
+            <h3 className="mt-2 text-lg font-medium flex items-center justify-center">
+              {ChatObject.displayName} <Badge id={ChatObject.otherUserId} />
             </h3>
             {ChatObject.activeChatType === "group" && (
               <p className="text-muted text-sm">
@@ -364,7 +366,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
               </p>
             )}
           </div>
-          <div className="mb-5 p-5 dark:bg-[#1d232a]">
+          <div className="mb-5 p-5 bg-primary">
             <Menu
               icon={<BiAt />}
               header="username"
@@ -381,9 +383,9 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
         <div
           className={`  ${
             ChatObject.activeChatType === "group" && "mb-5"
-          } flex flex-col items-center justify-around p-5 dark:bg-[#1d232a]`}
+          } flex flex-col items-center justify-around p-5  bg-primary`}
         >
-          <div className="flex w-full justify-around">
+          <div className="flex w-full justify-around mb-1">
             {["Media", "Files", "Participants"].map((header) => (
               <Header
                 title={header}
@@ -397,7 +399,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
         {ChatObject.activeChatType === "group" && (
           <div
             onClick={() => setShowModal(true)}
-            className="mb-3  flex w-full cursor-pointer items-center p-5 text-red-500 dark:bg-[#1d232a]"
+            className="mb-3  flex w-full cursor-pointer items-center p-5 text-red-500  bg-primary"
           >
             {ChatObject.activeChatType === "group" && (
               <>

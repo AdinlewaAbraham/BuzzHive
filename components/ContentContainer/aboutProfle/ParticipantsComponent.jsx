@@ -22,6 +22,7 @@ import { removeMember } from "@/utils/groupUtils/removeMember";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import AddParticipants from "./AddParticipants";
 import { CircularProgress } from "@mui/joy";
+import Badge from "@/components/Badge";
 
 const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
   const { User } = useContext(UserContext);
@@ -93,10 +94,10 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
             personalSize="45"
           />
           <div>
-            <h4>
-              {user.name}{" "}
+            <h4 className="flex items-center">
+              {user.name}<Badge id={user.id} /> {" "}
               {isAdmin && (
-                <span className="ml-3 rounded-md bg-green-700 px-1">admin</span>
+                <span className="ml-3 rounded-md bg-green-700 text-white px-1">admin</span>
               )}
             </h4>
             <p className="text-sm text-muted-light dark:text-muted-dark">
@@ -226,7 +227,7 @@ const ParticipantsComponent = ({ groupObject }) => {
             onClick={() => setShowAddParticipants(true)}
           >
             <i className="mr-4 flex h-[45px] w-[45px] items-center justify-center rounded-full bg-green-700 text-2xl">
-              <MdPersonAddAlt1 />
+              <MdPersonAddAlt1 color="#ffffff" />
             </i>
             Add participant
           </div>

@@ -3,6 +3,7 @@ import Img from "@/components/Img";
 import { UserContext } from "@/components/App";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
+import Badge from "@/components/Badge";
 
 const AddUserPopUp = ({ setShowUserPopupTofalse, user }) => {
   const { User } = useContext(UserContext);
@@ -29,7 +30,7 @@ const AddUserPopUp = ({ setShowUserPopupTofalse, user }) => {
           type="personnal"
         />
         <div className="my-2 text-center">
-          <p className="">{user.name}</p>
+          <p className="flex items-center justify-center">{user.name}<Badge id={user.id} /></p> 
           <p className="text-sm text-muted-light dark:text-muted-dark">
             {user.bio}
           </p>

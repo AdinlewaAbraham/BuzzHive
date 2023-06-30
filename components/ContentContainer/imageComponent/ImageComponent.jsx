@@ -8,11 +8,14 @@ import DownloadCircularAnimation from "../DownloadCircularAnimation";
 import UploadCircularAnimation from "../UploadCircularAnimation";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { Skeleton } from "@mui/material";
+import { MdClose, MdOutlineFileDownload } from "react-icons/md";
+import { AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const ImageComponent = ({ chat }) => {
-  const { dataObject } = chat
-  const blurredSRC = dataObject.blurredPixelatedBlobDownloadURL
-  const downloadSRC = dataObject.downloadURL
+  const { dataObject } = chat;
+  const blurredSRC = dataObject.blurredPixelatedBlobDownloadURL;
+  const downloadSRC = dataObject.downloadURL;
   const { User } = useContext(UserContext);
   const { deleteMediaTrigger } = useContext(SelectedChannelContext);
   const [downloadProgress, setDownloadProgress] = useState(0);
@@ -22,6 +25,7 @@ const ImageComponent = ({ chat }) => {
 
   const [imageBlob, setimageBlob] = useState();
   const [blurredImageBlob, setblurredImageBlob] = useState();
+  const [fullScreenMode, setfullScreenMode] = useState(false);
 
   async function initializeDB() {
     const db = await openDB("myImagesDatabase", 1, {
@@ -74,6 +78,16 @@ const ImageComponent = ({ chat }) => {
     }
   };
   useEffect(() => {
+    const handleClick = (e) => {
+      if (!e.target.closest(".Image")) {
+        setfullScreenMode(false);
+      }
+    };
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, []);
+
+  useEffect(() => {
     getStoredImages();
   }, [downloadSRC, User]);
   useEffect(() => {
@@ -90,7 +104,6 @@ const ImageComponent = ({ chat }) => {
         responseType: "blob",
         onDownloadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
-          console.log((loaded / total) * 100);
           setDownloadProgress((loaded / total) * 100);
         },
       });
@@ -115,10 +128,9 @@ const ImageComponent = ({ chat }) => {
       throw error;
     }
   };
-
   return (
-    <div className="">
-      <div className="relative flex items-center justify-center h-full">
+    <div>
+      <div className="relative flex h-full items-center justify-center">
         <div className="">
           {!imageBlob || chat.dataObject.status === "uploading" ? (
             <>
@@ -132,7 +144,7 @@ const ImageComponent = ({ chat }) => {
               ) : (
                 <img
                   src={URL.createObjectURL(blurredImageBlob)}
-                  className="h-full object-scale-down"
+                  className="object-cover"
                   width={300}
                 />
               )}
@@ -143,9 +155,10 @@ const ImageComponent = ({ chat }) => {
                 <>No image available</>
               ) : (
                 <img
+                  onClick={() => setfullScreenMode(true)}
                   src={URL.createObjectURL(imageBlob)}
                   alt="Preview"
-                  className="object-cover"
+                  className="Image cursor-pointer object-cover"
                   width={300}
                 />
               )}
@@ -157,8 +170,39 @@ const ImageComponent = ({ chat }) => {
             <UploadCircularAnimation progress={chat.dataObject.progress} />
           </div>
         )}
+        <AnimatePresence>
+          {fullScreenMode && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="bg-secondary fixed inset-0 z-[999] flex flex-col
+           items-center justify-center"
+            >
+              <div
+                className="absolute top-4 right-4  flex h-[66px] items-center justify-end rounded-lg bg-white px-4
+                text-[30px]  text-black dark:bg-black dark:text-white [&>i]:cursor-pointer"
+              >
+                <i>
+                  <a href={URL.createObjectURL(imageBlob)} download={chat.dataObject.name}>
+                    <MdOutlineFileDownload />
+                  </a>
+                </i>
 
-        {console.log(isDownloaded)}
+                <i className="ml-5" onClick={() => setfullScreenMode(false)}>
+                  <MdClose />
+                </i>
+              </div>
+              <img
+                src={URL.createObjectURL(imageBlob)}
+                alt="Preview"
+                className={` Image
+                min-h-max  object-contain
+               transition-all duration-500`}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
         {!isDownloaded && (
           <>
             {isDownloading ? (
@@ -175,7 +219,8 @@ const ImageComponent = ({ chat }) => {
             )}
           </>
         )}
-      </div></div>
+      </div>
+    </div>
   );
 };
 export default ImageComponent;

@@ -23,6 +23,7 @@ import { GiCancel } from "react-icons/gi";
 import { CircularProgress } from "@mui/joy";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import Goback from "@/components/ChannelBar/Goback";
+import Badge from "@/components/Badge";
 const UserCard = (p) => {
   const [invalidURL, setinvalidURL] = useState(true);
   return (
@@ -45,11 +46,7 @@ const UserCard = (p) => {
       )}
       <div className="flex items-center">
         <p className="">{p.name}</p>
-        {p.id === "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && (
-          <i className="ml-2 flex items-center border text-accent-blue">
-            <MdVerified />
-          </i>
-        )}
+        <Badge id={p.id} />
       </div>
       <div className="outlined-none ml-auto h-5 w-5 rounded-lg">
         <Checkbox isChecked={p.isSelected} />
@@ -337,7 +334,7 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
                         key={`active${user.id}`}
                       >
                         <UserCard
-                          id={user.id}
+                          id={user.otherParticipant}
                           photoUrl={user.senderDisplayImg}
                           name={user.senderDisplayName}
                           isSelected={selectedUsers.some(

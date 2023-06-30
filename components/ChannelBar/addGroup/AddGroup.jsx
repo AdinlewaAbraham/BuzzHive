@@ -30,6 +30,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Checkbox from "@/components/Checkbox";
 import { MdVerified } from "react-icons/md";
+import Badge from "@/components/Badge";
 
 const UserCard = (p) => {
   const [invalidURL, setinvalidURL] = useState(true);
@@ -53,11 +54,7 @@ const UserCard = (p) => {
       )}
       <div className="flex items-center">
         <p className="">{p.name}</p>
-        {p.id === "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && (
-          <i className="ml-2 flex items-center border text-accent-blue">
-            <MdVerified />
-          </i>
-        )}
+        <Badge id={p.id}/>
       </div>
       <div className="outlined-none ml-auto h-5 w-5 rounded-lg">
         <Checkbox isChecked={p.isSelected} />
@@ -527,7 +524,7 @@ const AddGroup = () => {
                             key={`active${user.id}`}
                           >
                             <UserCard
-                              id={user.id}
+                              id={user.otherParticipant}
                               photoUrl={user.senderDisplayImg}
                               name={user.senderDisplayName}
                               isSelected={selectedUsers.some(

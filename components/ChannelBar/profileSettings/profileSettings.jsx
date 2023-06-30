@@ -17,6 +17,7 @@ import CircularProgress from "@mui/joy/CircularProgress";
 import Image from "next/image";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { AnimatePresence, motion } from "framer-motion";
+import Badge from "@/components/Badge";
 
 const EditProfileInfo = ({ title, toBeEdited }) => {
   const [showInput, setshowInput] = useState(false);
@@ -185,11 +186,11 @@ const ProfileSettings = () => {
         <div className="flex w-full items-center justify-center">
           <div
             className={`Menu relative  ${
-              !(User.photoUrl && invalidURL) && "bg-coverColor"
+              !(User.photoUrl && invalidURL) && "bg-imgCover-light dark:bg-imgCover-dark"
             } 
               ${isUploading && "scale-90"} 
               flex h-[100px] w-[100px] cursor-pointer items-center justify-center  rounded-full bg-inherit
-              shadow-2xl transition-transform duration-300 `}
+              transition-transform duration-300 `}
           >
             {isUploading && (
               <div style={{ position: "absolute", inset: -2 }}>
@@ -208,7 +209,7 @@ const ProfileSettings = () => {
               className={` absolute inset-0 flex  items-center  ${
                 isUploading && "opacity-100"
               }  justify-center rounded-full bg-gray-900 
-                bg-opacity-50 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
+              dark:bg-opacity-50 bg-opacity-10 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
               onClick={() => {
                 !isUploading ? setshowMenu(true) : "open img";
               }}
@@ -251,7 +252,7 @@ const ProfileSettings = () => {
                 onError={() => setinvalidURL(false)}
               />
             ) : (
-              <FaUserAlt size="40%" />
+              <FaUserAlt size="40%" color="#ffffff" />
             )}
             <AnimatePresence>
               {showMenu && (
@@ -259,7 +260,7 @@ const ProfileSettings = () => {
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -10, opacity: 0 }}
-                  className="Menu bg-secondary hover:[&>li]:bg-coverColor [&>li]: [&>li]: [&>li]: absolute bottom-[-140px] rounded-lg
+                  className="Menu bg-secondary hover:[&>li]:bg-hover-light dark:hover:[&>li]:bg-hover-dark [&>li]: [&>li]: absolute bottom-[-140px] rounded-lg
                               p-2 [&>li]:whitespace-nowrap [&>li]:rounded-lg [&>li]:p-2
                               "
                 >
@@ -292,8 +293,8 @@ const ProfileSettings = () => {
         </div>
 
         <div className="mb-7 text-center">
-          <h4 className="font-medium mt-2">{User.name}</h4>
-          <p className="text-muted-light dark:text-muted-dark">{User.bio}</p>
+          <h4 className="font-medium mt-2 flex items-center justify-center ">{User.name}<Badge id={User.id} /></h4> 
+          <p className="text-muted-light  dark:text-muted-dark">{User.bio}</p>
         </div>
         <section>
           <EditProfileInfo title={"Display Name"} toBeEdited={User.name} />

@@ -46,6 +46,7 @@ import { CircularProgress } from "@mui/joy";
 import { ref, deleteObject } from "firebase/storage";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapse } from "@mui/material";
+import Badge from "../Badge";
 
 const MessageCard = ({
   chat,
@@ -364,8 +365,8 @@ const MessageCard = ({
       } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
-      onClick={()=>{
-        console.log(chat.type)
+      onClick={() => {
+        console.log(chat.type);
       }}
     >
       {ChatObject.activeChatType === "group" &&
@@ -423,8 +424,15 @@ const MessageCard = ({
         {chat.senderId !== User.id &&
           ChatObject.activeChatType === "group" &&
           !SamePrevSender && (
-            <p className="text-muted text-[11px] font-medium">
-              {chat.senderDisplayName}
+            <p
+              className={`text-muted text-[11px] ${
+                (chat.type === "pic/video" ||
+                  chat.type === "image" ||
+                  chat.type === "video"|| chat.type === "reply") &&
+                "mb-1 "
+              } font-medium flex items-center`}
+            >
+              {chat.senderDisplayName} <Badge id={chat.senderId} styles=" ml-[4px]"/>
             </p>
           )}
         {chat.isForwarded && (
@@ -495,13 +503,9 @@ const MessageCard = ({
           <div>
             <>
               {chat.dataObject.type.startsWith("image") ? (
-                <ImageComponent
-                  chat={chat}
-                />
+                <ImageComponent chat={chat} />
               ) : (
-                <VideoComponent
-                chat={chat}
-                />
+                <VideoComponent chat={chat} />
               )}
             </>
           </div>
@@ -607,7 +611,7 @@ const MessageCard = ({
           )}
           {forwardMessageModal && (
             <div
-              className="clickEvent bg-primary z-[100] w-[280px] rounded-lg p-2"
+              className="clickEvent bg-primary z-[100] w-[280px] rounded-lg p-3"
               ref={setPopperElement}
               style={styles.popper}
               {...attributes.popper}
@@ -735,7 +739,9 @@ const MessageCard = ({
             </div>
           )}
           <div
-            className={` relative ${chat.status === "pending" && "hidden"}  flex cursor-pointer items-center justify-center
+            className={` relative ${
+              chat.status === "pending" && "hidden"
+            }  flex cursor-pointer items-center justify-center
              rounded-r-full rounded-l-full bg-light-primary px-1 py-[6px] text-muted-light group-hover:opacity-100
              dark:bg-dark-primary dark:text-muted-dark md:opacity-0
               ${chat.senderId === currentId && "flex-row-reverse"}`}

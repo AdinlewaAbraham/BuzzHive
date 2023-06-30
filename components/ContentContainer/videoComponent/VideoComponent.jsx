@@ -13,13 +13,14 @@ import { FiDownload } from "react-icons/fi";
 import { BsCameraVideo } from "react-icons/bs";
 import { formatDuration } from "@/utils/actualUtils/formatDuration";
 import { Skeleton } from "@mui/material";
+import { AnimatePresence } from "framer-motion";
 
-const VideoComponent = ({chat}) => {
-  const { dataObject } = chat
-  const blurredSRC = dataObject.blurredPixelatedBlobDownloadURL
-  const downloadSRC = dataObject.downloadURL
-  const messageId = chat.id
-  const messageText = chat.text
+const VideoComponent = ({ chat }) => {
+  const { dataObject } = chat;
+  const blurredSRC = dataObject.blurredPixelatedBlobDownloadURL;
+  const downloadSRC = dataObject.downloadURL;
+  const messageId = chat.id;
+  const messageText = chat.text;
 
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
@@ -138,15 +139,17 @@ const VideoComponent = ({chat}) => {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div key={messageId} className="">
-      {videoPlayer && (
-        <MediaPlayer
-          VideoSRC={videoSrc}
-          setvideoPlayer={setvideoPlayer}
-          messageText={messageText}
-        />
-      )}
-
+    <div key={messageId}>
+      <AnimatePresence>
+        {videoPlayer && (
+          <MediaPlayer
+            VideoSRC={videoSrc}
+            setvideoPlayer={setvideoPlayer}
+            messageText={messageText}
+            fileName={chat.dataObject.name}
+          />
+        )}
+      </AnimatePresence>
       <div className=" flex items-center justify-center">
         <div
           className="relative z-[2] flex items-center justify-center"
@@ -169,7 +172,8 @@ const VideoComponent = ({chat}) => {
             <>
               {imageError ? (
                 <i className="mb-2">
-                  <BsFillImageFill size={200} /></i>
+                  <BsFillImageFill size={200} />
+                </i>
               ) : (
                 <div className={`relative `}>
                   {!isDownloaded && (
@@ -185,9 +189,9 @@ const VideoComponent = ({chat}) => {
               <div className="absolute text-blue-500">
                 {isDownloaded
                   ? !isDownloading &&
-                  dataObject.status !== "uploading" && (
-                    <BsFillPlayBtnFill size={30} />
-                  )
+                    dataObject.status !== "uploading" && (
+                      <BsFillPlayBtnFill size={30} />
+                    )
                   : !isDownloading && <FiDownload color="black" size={30} />}
               </div>
 
@@ -205,14 +209,18 @@ const VideoComponent = ({chat}) => {
                 <div className="absolute bottom-0 left-2 flex text-black ">
                   {isDownloading ? (
                     <div>
-                      <div className="flex items-center text-xs mb-[4px] text-muted">
-                        <i className="mr-1"><BsCameraVideo /></i>
+                      <div className="text-muted mb-[4px] flex items-center text-xs">
+                        <i className="mr-1">
+                          <BsCameraVideo />
+                        </i>
                         {dataObject.length && <>{dataObject.length}</>}
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center text-xs mb-[4px] text-muted">
-                      <i className="mr-1" ><FiDownload /></i>
+                    <div className="text-muted mb-[4px] flex items-center text-xs">
+                      <i className="mr-1">
+                        <FiDownload />
+                      </i>
                       {(dataObject.size / (1024 * 1024)).toFixed(2)}MB
                     </div>
                   )}
@@ -220,8 +228,10 @@ const VideoComponent = ({chat}) => {
               )}
               {dataObject.status === "uploading" ||
                 (isDownloaded && (
-                  <div className="absolute text-xs mb-[4px] text-muted bottom-0 left-2 flex items-center">
-                    <i className="mr-1"><BsCameraVideo /></i>
+                  <div className="text-muted absolute bottom-0 left-2 mb-[4px] flex items-center text-xs">
+                    <i className="mr-1">
+                      <BsCameraVideo />
+                    </i>
                     {dataObject.length && (
                       <>{formatDuration(dataObject.length, true)}</>
                     )}
