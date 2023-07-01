@@ -8,7 +8,13 @@ import { SelectedChannelProvider } from "@/context/SelectedChannelContext ";
 import { SigninWithGoogle } from "@/utils/userAuthentication/SigninWithGoogle";
 
 import { createUser } from "@/utils/userUtils/createUser";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import { FcGoogle } from "react-icons/fc";
 import { CircularProgress } from "@mui/joy";
@@ -26,29 +32,55 @@ const App = () => {
 
   const { setTheme } = useTheme();
   let isFunctionRunning = false;
+  const sendME = async (userId) => {
+    const welcomeText =
+      "Hey there! 👋 Welcome to BuzzHive! This is a chat app I've built from scratch, designed to connect people and facilitate conversations. Explore different features and enjoy your time on BuzzHive! 😄";
+    const senderId = "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2";
 
-  const sendWelcomeMessage = (userId) => {
-    let isFunctionRunning = false;
+    const conversationId =
+      userId > senderId ? userId + senderId : senderId + userId;
+    console.log("this is running");
+    await getDoc(doc(db, "conversations", conversationId))
+      .then(async (querySnapshot) => {
+        if (!querySnapshot.exists()) {
+          await sendMessage(
+            senderId,
+            userId,
+            welcomeText,
+            senderId,
+            "Abraham",
+            "regular",
+            new Date(),
+            null,
+            null,
+            null,
+            () => {},
+            false
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error checking collection:", error);
+      });
+  };
 
-    return async function () {
-      if (!isFunctionRunning) {
-        isFunctionRunning = true;z
-        try {
-          const firstText =
-            "Hey there! 👋 It's Abraham, and I'm excited to introduce you to my chat app, BuzzHive! I've been working on this project as part of my portfolio, and I'm thrilled to share it with you. So, buckle up and get ready for a buzzing experience! 🐝";
-          const secondText =
-            "Welcome to BuzzHive! This is a chat app I've built from scratch, and it's all about connecting people and facilitating conversations. With BuzzHive, you can chat with friends, share messages and media, and explore different features. It's a fun and interactive platform designed to keep you engaged and entertained. ✨";
-          const thirdText =
-            "Feel free to test run the app using my account. Go ahead and dive into the world of BuzzHive! Chat with others, try out different functionalities, and let me know what you think. Enjoy exploring BuzzHive! 😄";
-          const lastText =
-            "I hope you have a great time using BuzzHive and discovering its features. Happy chatting! 🎉";
-          const messages = [firstText, secondText, thirdText, lastText];
-          const senderId = "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2";
-          messages.forEach(async (message) => {
+  const sendWelcomeMessage = async (userId) => {
+    try {
+      const welcomeText =
+        "Hey there! 👋 Welcome to BuzzHive! This is a chat app I've built from scratch, designed to connect people and facilitate conversations. Explore different features and enjoy your time on BuzzHive! 😄";
+      const senderId = "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2";
+
+      const conversationId =
+        userId > senderId ? userId + senderId : senderId + userId;
+      console.log("this is running");
+      console.log(conversationId);
+      await getDoc(doc(db, "conversations", conversationId))
+        .then(async (querySnapshot) => {
+          if (!querySnapshot.data()) {
             await sendMessage(
               senderId,
               userId,
-              message,
+              welcomeText,
               senderId,
               "Abraham",
               "regular",
@@ -59,15 +91,18 @@ const App = () => {
               () => {},
               false
             );
-          });
-        } catch (error) {
-          console.error("Error sending messages:", error);
-        } finally {
-          isFunctionRunning = false;
-        }
-      }
-    };
+          }
+        })
+        .catch((error) => {
+          console.error("Error checking collection:", error);
+        });
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      isFunctionRunning = false;
+    }
   };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       if (u) {
@@ -78,8 +113,8 @@ const App = () => {
         if (!userData) {
           console.log("creating");
           await createUser(u.uid, u.displayName, u.email, u.photoURL, "hello");
-          const runWelcomeMessage = sendWelcomeMessage(u.uid);
-          await runWelcomeMessage();
+          // const runWelcomeMessage = sendWelcomeMessage(u.uid);
+          await sendWelcomeMessage(u.uid);
           const userSnapshot = await getDoc(doc(db, "users", u.uid));
           const userData = userSnapshot.data();
           setUser(userData);
@@ -140,6 +175,12 @@ const App = () => {
   }
   return (
     <>
+      <button
+        className="fixed top-10 z-[999] bg-red-500"
+        onClick={() => sendME(User.id)}
+      >
+        send you are welcome
+      </button>
       {isAuthed ? (
         memoizedUser ? (
           <UserContext.Provider value={{ User, setUser }}>

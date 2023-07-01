@@ -29,7 +29,8 @@ function VideoPlayer({ src, setvideoLengthFunc }) {
   };
 
   return (
-    <div className="media-container relative  rounded-t-lg ">
+    <div className="media-container relative flex justify-center items-center
+     dark:bg-black bg-white rounded-t-lg ">
       <video
         onClick={handlePlayPause}
         ref={videoRef}

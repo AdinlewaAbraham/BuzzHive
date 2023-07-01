@@ -90,14 +90,21 @@ const ContentContainer = () => {
 
   useEffect(() => {
     if (secondDivRef.current && allowScrollObject.allowScroll) {
+      console.log("Scroll to bottom")
       if (allowScrollObject.scrollTo === "bottom") {
-        secondDivRef.current?.scrollIntoView({
-          behavior: allowScrollObject.scrollBehaviour,
-        });
+        console.log("Scroll to bottom")
+        if (secondDivRef.current) {
+          secondDivRef.current?.scrollIntoView({
+            behavior: allowScrollObject.scrollBehaviour,
+          });
+        }
       } else if (allowScrollObject.scrollTo === "unreadId") {
+        
+        console.log("Scroll to bottom")
         const element = document.getElementById("unreadId");
-        element?.scrollIntoView();
-        console.log(element);
+        if (element) {
+          element?.scrollIntoView({ block: "center" });
+        }
       }
       setallowScrollObject({
         scrollTo: "",

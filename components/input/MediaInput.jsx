@@ -64,16 +64,16 @@ const MediaInput = ({
         exit={{ opacity: 0, y: -50 }}
       >
         {picVidmedia.type.startsWith("image/") ? (
-          <div className="">
+          <div className="flex justify-center rounded-t-lg dark:bg-black bg-white h-[calc(100vh-195px)] z-[999] ">
             <img
               src={URL.createObjectURL(picVidmedia)}
               alt="Downscaled media "
-              className=" rounded-t-lg "
+              className="  "
             />
           </div>
         ) : (
           <>
-            {/* dont want to render  this component (<VideoThumbnail/>) below because i only need the thumbnail */}
+            {/* dont want to render  this component (<VideoThumbnail/>) below because i only need the thumbnail file */}
             <div className="hidden">
               <VideoThumbnail
                 videoUrl={URL.createObjectURL(picVidmedia)}
@@ -92,7 +92,6 @@ const MediaInput = ({
         )}
 
         <div className="bg-primary flex items-center justify-between rounded-b-lg p-2 ">
-          <BsEmojiSmile />
           <input
             autoFocus
             type="text"

@@ -73,9 +73,9 @@ const PollComponent = ({ PollObject }) => {
           }}
         >
           <div
-            className={`  mr-2 flex h-6 w-6 items-center justify-center
+            className={`  mr-2 flex h-5 w-5 items-center justify-center
              rounded-full border border-black
-           bg-accent-blue ${
+         ${
              option.votes.some((vote) => vote.id === User.id) && "bg-blue-800"
            } p-1`}
           >

@@ -219,7 +219,7 @@ const MessageCard = ({
 
   if (chat.type == "unread") {
     return (
-      <div className="bg-red-500 text-center">you neva read this one boss</div>
+      <div className="bg-red-500 text-center" id="unreadId">you neva read this one boss</div>
     );
   }
 
@@ -752,7 +752,7 @@ const MessageCard = ({
             <i
               className={` md:transition-all md:duration-150 ${
                 chat.senderId === currentId &&
-                "ml-2 flex-row-reverse group-hover:ml-2 md:ml-0"
+                "ml-2 flex-row-reverse md:group-hover:ml-2 md:ml-0"
               }  ${chat.senderId !== currentId && " group-hover:mr-2 "} `}
             >
               <BsChevronDown size={10} />

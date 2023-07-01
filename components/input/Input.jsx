@@ -261,9 +261,9 @@ const Input = () => {
         </div>
         {showPollInput && (
           <motion.div
-            initial={{ opacity: 0,  }}
-            animate={{ opacity: 1,  }}
-            exit={{ opacity: 0, }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
             <PollInput setshowPollInputFunc={() => setshowPollInput(false)} />
           </motion.div>

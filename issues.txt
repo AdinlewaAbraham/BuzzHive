@@ -1,14 +1,11 @@
-fix not scrolling to the unread message when clicking on chat room(i think i am not filtering the message well) -----------
 fix random scrolls 
 fix poll component, video comp ui 
-fix mobile video input component and also check other mobile components 
 fix welcome message from been sent twice    
 make poll votes faster  
 scrool no working properly when user has unread messages
 fix when img is cleared it changes the state to downloading 
-fix image input for !regular sized img
 fix downscaling img loading state 
-send button not working for big picture(bedroom) pic
+send button not working for big picture(bedroom) pic -----------
 reacting to messages not working properly while uploading pic/vid
 fix unreadcount only counting regular messages 
 fix files with no name on chatcard 
@@ -26,10 +23,11 @@ fix userdisplayname spacing correct in groups
 fix poll not sent by you 
 find a way to make add users list in add participants unique 
 cant see who reacted to message
+fix loading state for about profile
+search not highlighting in polls
+setting overflow for mobile 
 
 add error bound indicators for errors 
-
-
 
 
 optimize pls 
