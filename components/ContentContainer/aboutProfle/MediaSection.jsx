@@ -5,6 +5,8 @@ import VideoComponent from "../videoComponent/VideoComponent";
 import { ImageList, ImageListItem } from "@mui/material";
 import InfiniteScroll from "react-infinite-scroller";
 import { useRef } from "react";
+import { CircularProgress } from "@mui/joy";
+
 
 const MediaSection = () => {
   const { ChatObject } = useContext(SelectedChannelContext);
@@ -19,7 +21,7 @@ const MediaSection = () => {
       const messages = JSON.parse(
         localStorage.getItem(ChatObject.activeChatId)
       );
-      const MediaMessages = messages.filter(
+      const MediaMessages = messages?.filter(
         (message) => message.type === "video" || message.type === "image"
       );
       setMediaMessages(MediaMessages);
@@ -59,7 +61,6 @@ const MediaSection = () => {
     );
     setLastMediaFile(newMediaMessages[newMediaMessages.length - 1]?.id);
     if (newMediaMessages.length < mediaChunkCount) {
-      console.log(newMediaMessages.length);
       setHasMore(false);
     }
     setRenderedMedia([...renderedMedia, ...newMediaMessages]);
@@ -70,7 +71,14 @@ const MediaSection = () => {
   return (
     <div className=" flex h-[350px] w-full overflow-y-auto ">
       {mediaMessages === null ? (
-        <>loading...</>
+        <div className="flex items-center justify-center w-full h-[350px] ">          
+          <i className="mr-1">
+            <CircularProgress size="sm" />
+          </i>
+          loading...
+        </div>
+      ) : JSON.stringify(mediaMessages) === "[]" ? (
+        <div className="flex justify-center items-center w-full h-[350px] ">there are no media files</div>
       ) : (
         <div
           className="scrollBar grid grid-cols-3 gap-2 overflow-x-hidden pr-1"
@@ -78,7 +86,7 @@ const MediaSection = () => {
           ref={scrollContainerRef}
         >
           {renderedMedia.map((message) => (
-            <div className="flex h-[200px] items-center justify-center object-contain overflow-hidden bg-secondary cursor-pointer">
+            <div className="bg-secondary flex h-[200px] cursor-pointer items-center justify-center overflow-hidden object-contain">
               {message.type === "image" ? (
                 <ImageComponent chat={message} />
               ) : (

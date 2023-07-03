@@ -6,7 +6,7 @@ import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { UserContext } from "../App";
 
 import { createUser } from "@/utils/userUtils/createUser";
-import {  faker } from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 
 import { deleteDB } from "idb";
 const SideBarIcon = ({ icon, text, clickevent }) => {
@@ -48,29 +48,23 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
   return (
     <div className="relative flex items-center justify-center md:mb-1 md:w-[5%] md:min-w-[70px] md:max-w-[70px]">
       <span
-        className={`rounded-sm duration-150 ease-out ${
-          IsMobile && ChatObject.activeChatId !== "" && "hidden"
-        } ${
-          selectedChannel === clickevent
-            ? ` opacity-1  right-[25%] md:bottom-[25%] ${
-                channels[prevSelectedChannel] > channels[clickevent] &&
-                "left-[25%] md:top-[25%]"
-              } w-[50%] md:h-[50%] `
+        className={`rounded-sm duration-150 ease-out ${IsMobile && ChatObject.activeChatId !== "" && "hidden"
+          } ${selectedChannel === clickevent
+            ? ` opacity-1  right-[25%] md:bottom-[25%] ${channels[prevSelectedChannel] > channels[clickevent] &&
+            "left-[25%] md:top-[25%]"
+            } w-[50%] md:h-[50%] `
             : " left-[25%] w-[65%] opacity-0 md:bottom-[25%] md:h-[80%]"
-        } ${
-          prevSelectedChannel === clickevent &&
-          `${
-            channels[selectedChannel] < channels[prevSelectedChannel]
-              ? `${IsMobile ? "" : "lineComingFromTop"} `
-              : `${IsMobile ? " " : "lineComingFromBottom"} `
+          } ${prevSelectedChannel === clickevent &&
+          `${channels[selectedChannel] < channels[prevSelectedChannel]
+            ? `${IsMobile ? "" : "lineComingFromTop"} `
+            : `${IsMobile ? " " : "lineComingFromBottom"} `
           } `
-        } absolute  bottom-0 z-[1] h-1 bg-accent-blue transition-[width] md:left-0 md:w-1 md:transition-[height]`}
+          } absolute  bottom-0 z-[1] h-1 bg-accent-blue transition-[width] md:left-0 md:w-1 md:transition-[height]`}
       ></span>
 
       <div
-        className={`sidebar-icon group flex items-center ${
-          selectedChannel === clickevent && "bg-hover-light dark:bg-hover-dark"
-        }`}
+        className={`sidebar-icon group flex items-center ${selectedChannel === clickevent && "bg-hover-light dark:bg-hover-dark"
+          }`}
         onClick={() => {
           if (selectedChannel !== clickevent) handleClick();
         }}
@@ -95,7 +89,7 @@ const SideBar = () => {
   async function clearIndexedDB() {
     try {
       await deleteDB("myDatabase");
-      console.log("IndexedDB cleared successfully.");
+
     } catch (error) {
       console.error("Failed to clear IndexedDB:", error);
     }
@@ -103,9 +97,9 @@ const SideBar = () => {
 
   const addUser = async () => {
     for (let i = 0; i < 40; i++) {
-      const fakeDisplayName =  faker.internet.userName()
+      const fakeDisplayName = faker.internet.userName()
       const fakeEmail = faker.internet.email()
-      const fakePhotoUrl =  faker.image.avatar();
+      const fakePhotoUrl = faker.image.avatar();
       const fakeBio = " faker.lorem.sentence();"
       createUser(faker.string.uuid(), fakeDisplayName, fakeEmail, fakePhotoUrl, fakeBio);
     }

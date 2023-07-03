@@ -4,7 +4,6 @@ import { doc, getDoc } from "firebase/firestore";
 import { sendMessage } from "../messagesUtils/sendMessage";
 
 const sendWelcomeMessage = async (userId) => {
-  console.log("i am running")
   const user1Id = userId;
   const user2Id = "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2";
   const q = doc(
@@ -45,7 +44,7 @@ const sendWelcomeMessage = async (userId) => {
     });
   } catch (error) {
     console.error("Error sending messages:", error);
-  } 
+  }
 };
 export const SigninWithGoogle = (setisSigningInFunc) => {
   const auth = getAuth();
@@ -55,7 +54,7 @@ export const SigninWithGoogle = (setisSigningInFunc) => {
       setisSigningInFunc(false);
     })
     .catch((err) => {
-      console.error(err)
+      console.error(err);
       setisSigningInFunc(false);
     });
 };

@@ -46,7 +46,7 @@ export const handlePicVidUpload = async (
   }
 
   if (blurredPixelatedBlob) {
-    console.log(blurredPixelatedBlob);
+    
     const blurredPixelatedRef = ref(
       storage,
       `${ChatObject.activeChatType}/${ChatObject.activeChatId}/${
@@ -76,12 +76,6 @@ export const handlePicVidUpload = async (
         getDownloadURL(blurredPixelatedRef).then(
           (blurredPixelatedDownloadURL) => {
             blurredPixelatedBlobDownloadURL = blurredPixelatedDownloadURL;
-            console.log(
-              "Blurred/pixelated file available at",
-              blurredPixelatedBlobDownloadURL,
-              " ",
-              blurredPixelatedDownloadURL
-            );
           }
         );
       });
@@ -114,7 +108,7 @@ export const handlePicVidUpload = async (
       progress: 0,
       thumbnail: new Blob([blurredPixelatedBlob], { type: "image/jpeg" }),
     };
-    console.log(blurredPixelatedBlob);
+    
     const message = {
       type: isImage ? "image" : "video",
       id: id,
@@ -159,10 +153,10 @@ export const handlePicVidUpload = async (
 
         switch (snapshot.state) {
           case "paused":
-            console.log("Upload is paused");
+            
             break;
           case "running":
-            console.log("Upload is running");
+            
             break;
         }
       },
@@ -210,7 +204,7 @@ export const handlePicVidUpload = async (
                 () => {},
                 null
               );
-          console.log("File available at", downloadURL);
+          
         });
       }
     );

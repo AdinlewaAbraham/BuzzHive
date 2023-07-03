@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import FileComponent from "../fileComponent/FileComponent";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
+import { CircularProgress } from "@mui/joy";
 
 const FileSection = () => {
   const { ChatObject } = useContext(SelectedChannelContext);
@@ -10,16 +11,16 @@ const FileSection = () => {
   const [locked, setLocked] = useState(false);
   const [lastFile, setLastFile] = useState(null);
 
-    const FileChunkCount = 20
+  const FileChunkCount = 20;
   useEffect(() => {
     const getFileMessages = () => {
       const messages = JSON.parse(
         localStorage.getItem(ChatObject.activeChatId)
       );
-      const fileMessages = messages.filter(
+      const fileMessages = messages?.filter(
         (message) => message.type === "file"
       );
-      console.log(fileMessages.length)
+
       setFileMessages(fileMessages);
       const firstRenderBatch = JSON.parse(JSON.stringify(fileMessages)).splice(
         0,
@@ -56,7 +57,6 @@ const FileSection = () => {
     );
     setLastFile(newFileMessages[newFileMessages.length - 1]?.id);
     if (newFileMessages.length < FileChunkCount) {
-      console.log(newFileMessages.length);
       setHasMore(false);
     }
     setRenderedFiles([...renderedFiles, ...newFileMessages]);
@@ -71,9 +71,18 @@ const FileSection = () => {
       ref={scrollContainerRef}
     >
       {fileMessages === null ? (
-        <>Loading</>
+        <div className="flex h-[350px] w-full items-center justify-center">
+          <i className="mr-1">
+            <CircularProgress size="sm" variant="plain" />
+          </i>
+          loading...
+        </div>
+      ) : JSON.stringify(renderedFiles) === "[]" ? (
+        <div className="flex h-[350px] w-full items-center justify-center ">
+          there are no media files
+        </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           {renderedFiles.map((message) => (
             <FileComponent chat={message} defaultColor />
           ))}

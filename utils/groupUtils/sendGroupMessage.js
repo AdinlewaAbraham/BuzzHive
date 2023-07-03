@@ -15,7 +15,7 @@ export const sendGroupMessage = async (
   dataObj,
   createdId,
   clearMessage,
-  isForwarded,
+  isForwarded
 ) => {
   clearMessage();
   const groupRef = doc(db, "groups", groupID);
@@ -33,7 +33,7 @@ export const sendGroupMessage = async (
     replyObject: replyObj || {},
     dataObject: dataObj || {},
     status: "sent",
-    isForwarded:isForwarded || false,
+    isForwarded: isForwarded || false,
   };
   const user = await getUser(senderId);
   const newMessage = {
@@ -45,6 +45,10 @@ export const sendGroupMessage = async (
     senderDisplayName: user.name,
     senderDisplayImg: user.photoUrl,
   };
+  if (type === "file") {
+    newMessage.fileName = dataObj?.name;
+  }
+
   try {
     await updateDoc(groupRef, { lastMessage: newMessage });
 

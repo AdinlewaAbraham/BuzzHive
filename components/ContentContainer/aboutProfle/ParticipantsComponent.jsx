@@ -62,7 +62,7 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
   }, []);
   const isCurrentUserAdmin = groupObject.admins.includes(User.id);
   const removeGroupMember = async (removeId) => {
-    setShowMenu(false)
+    setShowMenu(false);
     if (isCurrentUserAdmin && !isAdmin) {
       if (!groupObject.admins.includes(removeId)) {
         setParticipants((prevArr) =>
@@ -73,7 +73,7 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
     }
   };
   const makeGroupAdmin = async (adminId) => {
-    setShowMenu(false)
+    setShowMenu(false);
     if (isCurrentUserAdmin && !isAdmin) {
       const groupRef = doc(db, "groups", ChatObject.activeChatId);
       await updateDoc(groupRef, { admins: arrayUnion(adminId) });
@@ -95,9 +95,12 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
           />
           <div>
             <h4 className="flex items-center">
-              {user.name}<Badge id={user.id} /> {" "}
+              {user.name}
+              <Badge id={user.id} />{" "}
               {isAdmin && (
-                <span className="ml-3 rounded-md bg-green-700 text-white px-1">admin</span>
+                <span className="ml-3 rounded-md bg-green-700 px-1 text-white">
+                  admin
+                </span>
               )}
             </h4>
             <p className="text-sm text-muted-light dark:text-muted-dark">
@@ -147,7 +150,12 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
 const ParticipantsComponent = ({ groupObject }) => {
   if (!groupObject) {
     return (
-      <div className="flex h-[350px] w-full flex-col"> loading Members...</div>
+      <div className="flex h-[350px] w-full items-center justify-center">
+        <i className="mr-1">
+          <CircularProgress size="sm" variant="plain" />
+        </i>
+        loading Group Members...
+      </div>
     );
   }
   const { User } = useContext(UserContext);
@@ -167,7 +175,7 @@ const ParticipantsComponent = ({ groupObject }) => {
 
   const loadMoreUsers = async () => {
     setLoadingUsers(true);
-    console.log(locked);
+
     // if (locked) return;
     setLocked(true);
     const spliceIndex = participantsId.findIndex(
@@ -177,7 +185,7 @@ const ParticipantsComponent = ({ groupObject }) => {
       spliceIndex + 1,
       20
     ); //deep copy so it doesn't modify original
-    console.log(fetchIds);
+
     setlastParticipantId(fetchIds[fetchIds.length - 1]);
     if (fetchIds.length < 20) {
       sethasMore(false);
@@ -194,14 +202,12 @@ const ParticipantsComponent = ({ groupObject }) => {
     };
     const fetchedUsers = await fetchUsersWithIds(fetchIds);
 
-    console.log(fetchedUsers.length);
     setParticipants([...participants, ...fetchedUsers]);
     setLocked(false);
     setLoadingUsers(false);
   };
 
   const handleOnScroll = () => {
-    console.log("something");
     const container = scrollContainerRef.current;
     if (!container) return;
 
@@ -218,7 +224,10 @@ const ParticipantsComponent = ({ groupObject }) => {
       ref={scrollContainerRef}
     >
       {showAddParticipants && (
-        <AddParticipants setShowAddParticipants={setShowAddParticipants} groupObject={groupObject} />
+        <AddParticipants
+          setShowAddParticipants={setShowAddParticipants}
+          groupObject={groupObject}
+        />
       )}
       <div>
         {groupObject.admins.includes(User.id) && (

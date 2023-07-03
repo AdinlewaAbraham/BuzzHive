@@ -10,6 +10,7 @@ import { SigninWithGoogle } from "@/utils/userAuthentication/SigninWithGoogle";
 import { createUser } from "@/utils/userUtils/createUser";
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -31,90 +32,15 @@ const App = () => {
   const [isSigningIn, setisSigningIn] = useState(false);
 
   const { setTheme } = useTheme();
-  let isFunctionRunning = false;
-  const sendME = async (userId) => {
-    const welcomeText =
-      "Hey there! 👋 Welcome to BuzzHive! This is a chat app I've built from scratch, designed to connect people and facilitate conversations. Explore different features and enjoy your time on BuzzHive! 😄";
-    const senderId = "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2";
-
-    const conversationId =
-      userId > senderId ? userId + senderId : senderId + userId;
-    console.log("this is running");
-    await getDoc(doc(db, "conversations", conversationId))
-      .then(async (querySnapshot) => {
-        if (!querySnapshot.exists()) {
-          await sendMessage(
-            senderId,
-            userId,
-            welcomeText,
-            senderId,
-            "Abraham",
-            "regular",
-            new Date(),
-            null,
-            null,
-            null,
-            () => {},
-            false
-          );
-        }
-      })
-      .catch((error) => {
-        console.error("Error checking collection:", error);
-      });
-  };
-
-  const sendWelcomeMessage = async (userId) => {
-    try {
-      const welcomeText =
-        "Hey there! 👋 Welcome to BuzzHive! This is a chat app I've built from scratch, designed to connect people and facilitate conversations. Explore different features and enjoy your time on BuzzHive! 😄";
-      const senderId = "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2";
-
-      const conversationId =
-        userId > senderId ? userId + senderId : senderId + userId;
-      console.log("this is running");
-      console.log(conversationId);
-      await getDoc(doc(db, "conversations", conversationId))
-        .then(async (querySnapshot) => {
-          if (!querySnapshot.data()) {
-            await sendMessage(
-              senderId,
-              userId,
-              welcomeText,
-              senderId,
-              "Abraham",
-              "regular",
-              new Date(),
-              null,
-              null,
-              null,
-              () => {},
-              false
-            );
-          }
-        })
-        .catch((error) => {
-          console.error("Error checking collection:", error);
-        });
-    } catch (error) {
-      console.error("Error sending message:", error);
-    } finally {
-      isFunctionRunning = false;
-    }
-  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       if (u) {
-        isFunctionRunning = true;
         setIsAuthed(true);
         const userSnapshot = await getDoc(doc(db, "users", u.uid));
         const userData = userSnapshot.data();
         if (!userData) {
-          console.log("creating");
           await createUser(u.uid, u.displayName, u.email, u.photoURL, "hello");
-          // const runWelcomeMessage = sendWelcomeMessage(u.uid);
-          await sendWelcomeMessage(u.uid);
           const userSnapshot = await getDoc(doc(db, "users", u.uid));
           const userData = userSnapshot.data();
           setUser(userData);
@@ -144,7 +70,6 @@ const App = () => {
     }
     const q = doc(db, "users", User.id);
     const unsub = onSnapshot(q, async (doc) => {
-      console.log(doc.data());
       if (!doc.data()) return;
       setUser(doc.data());
       localStorage.setItem("user", JSON.stringify(doc.data()));
@@ -173,14 +98,9 @@ const App = () => {
   function setisSigningInFunc(state) {
     setisSigningIn(state);
   }
+  const senderId = "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2";
   return (
     <>
-      <button
-        className="fixed top-10 z-[999] bg-red-500"
-        onClick={() => sendME(User.id)}
-      >
-        send you are welcome
-      </button>
       {isAuthed ? (
         memoizedUser ? (
           <UserContext.Provider value={{ User, setUser }}>

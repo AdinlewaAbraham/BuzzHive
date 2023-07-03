@@ -41,15 +41,21 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
     return () => unsub();
   }, []);
   const handleSubmit = async (title) => {
-    if (toBeUpdated.trim() === "") return;
-    const objectKey = title === "Bio" ? "bio" : "name";
-    const userRef = doc(db, "users", User.id);
-    updateDoc(userRef, { [objectKey]: toBeUpdated });
-    if (objectKey === "name") {
-      updateDoc(userRef, { ["queryName"]: toBeUpdated.toLocaleLowerCase() });
+    try {
+      if (toBeUpdated.trim() === "") return;
+      const objectKey = title === "Bio" ? "bio" : "name";
+      const userRef = doc(db, "users", User.id);
+      updateDoc(userRef, { [objectKey]: toBeUpdated });
+      if (objectKey === "name") {
+        updateDoc(userRef, { ["queryName"]: toBeUpdated.toLocaleLowerCase() });
+      }
+    } catch (error) {
+     throw error
+    } finally {
+      setshowInput(false);
     }
-    setshowInput(false);
   };
+  
   return (
     <div className="mb-3">
       <h5 className="text-muted-light dark:text-muted-dark">{title}</h5>
@@ -127,7 +133,7 @@ const ProfileSettings = () => {
         setProgress(progress);
       },
       (error) => {
-        console.log("Upload error:", error);
+
       },
       async () => {
         try {
@@ -148,26 +154,26 @@ const ProfileSettings = () => {
             setDontShowText(false);
           }, 1000);
         } catch (error) {
-          console.log("Error getting download URL:", error);
+
         }
       }
     );
   };
   const { setSelectedChannel, setprevSelectedChannel, prevSelectedChannel } =
     useContext(SelectedChannelContext);
-    const removeImg =async()=>{
-      setshowMenu(false)
-      const userRef = doc(db, "users", User.id)
+  const removeImg = async () => {
+    setshowMenu(false)
+    const userRef = doc(db, "users", User.id)
 
-      setUser({...User, photoUrl: null})
+    setUser({ ...User, photoUrl: null })
 
-      await updateDoc(userRef, { ["photoUrl"]: null })
-      const profilePicRef = ref(storage, `users/profilePicture/${User.id}`);
-      await deleteObject(profilePicRef)
-        .then(() => true)
-        .catch(() => false);
-    }
-    
+    await updateDoc(userRef, { ["photoUrl"]: null })
+    const profilePicRef = ref(storage, `users/profilePicture/${User.id}`);
+    await deleteObject(profilePicRef)
+      .then(() => true)
+      .catch(() => false);
+  }
+
   return (
     <div className="px-2">
       <Goback
@@ -185,9 +191,8 @@ const ProfileSettings = () => {
       >
         <div className="flex w-full items-center justify-center">
           <div
-            className={`Menu relative  ${
-              !(User.photoUrl && invalidURL) && "bg-imgCover-light dark:bg-imgCover-dark"
-            } 
+            className={`Menu relative  ${!(User.photoUrl && invalidURL) && "bg-imgCover-light dark:bg-imgCover-dark"
+              } 
               ${isUploading && "scale-90"} 
               flex h-[100px] w-[100px] cursor-pointer items-center justify-center  rounded-full bg-inherit
               transition-transform duration-300 `}
@@ -206,9 +211,8 @@ const ProfileSettings = () => {
               </div>
             )}
             <div
-              className={` absolute inset-0 flex  items-center  ${
-                isUploading && "opacity-100"
-              }  justify-center rounded-full bg-gray-900 
+              className={` absolute inset-0 flex  items-center  ${isUploading && "opacity-100"
+                }  justify-center rounded-full bg-gray-900 
               dark:bg-opacity-50 bg-opacity-10 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
               onClick={() => {
                 !isUploading ? setshowMenu(true) : "open img";
@@ -293,7 +297,7 @@ const ProfileSettings = () => {
         </div>
 
         <div className="mb-7 text-center">
-          <h4 className="font-medium mt-2 flex items-center justify-center ">{User.name}<Badge id={User.id} /></h4> 
+          <h4 className="font-medium mt-2 flex items-center justify-center ">{User.name}<Badge id={User.id} /></h4>
           <p className="text-muted-light  dark:text-muted-dark">{User.bio}</p>
         </div>
         <section>

@@ -53,6 +53,8 @@ const ContentContainer = () => {
   const [searchedMessages, setsearchedMessages] = useState([]);
   const [currentSearchIndex, setcurrentSearchIndex] = useState(-1);
 
+  const [aboutProfleChatObject, setAboutProfleChatObject] = useState({})
+
   const [hasMoreTop, sethasMoreTop] = useState(true);
 
   const [showScrollTobottom, setshowScrollTobottom] = useState(false);
@@ -90,17 +92,13 @@ const ContentContainer = () => {
 
   useEffect(() => {
     if (secondDivRef.current && allowScrollObject.allowScroll) {
-      console.log("Scroll to bottom")
       if (allowScrollObject.scrollTo === "bottom") {
-        console.log("Scroll to bottom")
         if (secondDivRef.current) {
           secondDivRef.current?.scrollIntoView({
             behavior: allowScrollObject.scrollBehaviour,
           });
         }
       } else if (allowScrollObject.scrollTo === "unreadId") {
-        
-        console.log("Scroll to bottom")
         const element = document.getElementById("unreadId");
         if (element) {
           element?.scrollIntoView({ block: "center" });
@@ -179,6 +177,7 @@ const ContentContainer = () => {
       }
     }
   };
+  console.log(ChatObject)
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
@@ -186,7 +185,7 @@ const ContentContainer = () => {
           {showProfile && (
             <AboutProfile
               setshowProfile={setshowProfile}
-              ChatObject={ChatObject}
+              ChatObject={aboutProfleChatObject}
             />
           )}
           <div className="relative z-20 flex max-h-[66px] cursor-pointer  items-center justify-between bg-[#fcfcfc] px-[13px] dark:bg-[#1d232a] md:ml-[1px]">
@@ -205,6 +204,7 @@ const ContentContainer = () => {
               <div
                 className="flex h-full items-center"
                 onClick={() => {
+                  setAboutProfleChatObject(ChatObject)
                   setshowProfile(true);
                 }}
               >
@@ -421,6 +421,8 @@ const ContentContainer = () => {
                           (message) => message.id
                         )}
                         scrollContainerRef={scrollContainerRef}
+                        setshowProfile={setshowProfile}
+                        setAboutProfleChatObject={setAboutProfleChatObject}
                       />
                     ))}
                 </InfiniteScroll>

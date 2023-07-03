@@ -96,7 +96,9 @@ const ImageComponent = ({ chat }) => {
 
   const downloadImage = async (Url, type) => {
     if (!Url) return;
-    setisDownloading(true);
+    if (type === "image") {
+      setisDownloading(true);
+    }
     try {
       const response = await axios({
         url: Url,
@@ -125,6 +127,7 @@ const ImageComponent = ({ chat }) => {
       await tx.done;
     } catch (error) {
       console.error(error);
+      setisDownloading(false);
       throw error;
     }
   };
@@ -144,8 +147,9 @@ const ImageComponent = ({ chat }) => {
               ) : (
                 <img
                   src={URL.createObjectURL(blurredImageBlob)}
-                  className="object-cover"
+                  className="object-cover cursor-pointer"
                   width={300}
+                  onClick={() => downloadImage(downloadSRC, "image")}
                 />
               )}
             </>
@@ -184,7 +188,10 @@ const ImageComponent = ({ chat }) => {
                 text-[30px]  text-black dark:bg-black dark:text-white [&>i]:cursor-pointer"
               >
                 <i>
-                  <a href={URL.createObjectURL(imageBlob)} download={chat.dataObject.name}>
+                  <a
+                    href={URL.createObjectURL(imageBlob)}
+                    download={chat.dataObject.name}
+                  >
                     <MdOutlineFileDownload />
                   </a>
                 </i>

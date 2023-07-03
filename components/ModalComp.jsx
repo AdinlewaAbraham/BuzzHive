@@ -41,7 +41,7 @@ const ModalComp = ({
                 color="danger"
                 onClick={() => {
                   discardFunc();
-                  console.log("stuffing");
+
                 }}
               >
                 Yes Cancel

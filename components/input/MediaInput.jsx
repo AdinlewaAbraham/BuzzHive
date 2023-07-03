@@ -8,6 +8,7 @@ import { UserContext } from "../App";
 import VideoThumbnail from "react-video-thumbnail";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import { motion, AnimatePresence } from "framer-motion";
+import { CircularProgress } from "@mui/joy";
 
 const MediaInput = ({
   picVidmedia,
@@ -15,7 +16,9 @@ const MediaInput = ({
   setpicVidmediaToNull,
   setblurredPicVidmedia,
 }) => {
-  const { ChatObject, setChats, setallowScrollObject } = useContext(SelectedChannelContext);
+  const { ChatObject, setChats, setallowScrollObject } = useContext(
+    SelectedChannelContext
+  );
   const { User } = useContext(UserContext);
   const [mediaCaption, setmediaCaption] = useState("");
   const [ImageBase64, setImageBase64] = useState();
@@ -37,7 +40,7 @@ const MediaInput = ({
 
   useEffect(() => {
     if (isImage) return;
-    console.log("Loading");
+
     async function processImage() {
       if (!ImageBase64) return;
       const ImgFile = await base64toFile(ImageBase64, picVidmedia.name);
@@ -46,7 +49,7 @@ const MediaInput = ({
     }
     processImage();
 
-    return () => {};
+    return () => { };
   }, [ImageBase64, picVidmedia.name]);
 
   function setChatsFunc(state) {
@@ -55,6 +58,7 @@ const MediaInput = ({
   function setvideoLengthFunc(state) {
     setvideoLength(state);
   }
+
   return (
     <AnimatePresence>
       <motion.div
@@ -64,13 +68,22 @@ const MediaInput = ({
         exit={{ opacity: 0, y: -50 }}
       >
         {picVidmedia.type.startsWith("image/") ? (
-          <div className="flex justify-center rounded-t-lg dark:bg-black bg-white h-[calc(100vh-195px)] z-[999] ">
-            <img
-              src={URL.createObjectURL(picVidmedia)}
-              alt="Downscaled media "
-              className="  "
-            />
-          </div>
+          picVidmedia?.loading ? (
+            <div className="z-[999] flex h-[calc(100vh-195px)] items-center justify-center rounded-t-lg bg-white text-lg dark:bg-black ">
+              <i className="mr-2">
+                <CircularProgress size="md" variant="plain" />
+              </i>
+              Optimizing image for better performance...
+            </div>
+          ) : (
+            <div className="z-[999] flex h-[calc(100vh-195px)] justify-center rounded-t-lg bg-white dark:bg-black ">
+              <img
+                src={URL.createObjectURL(picVidmedia)}
+                alt="Downscaled media "
+                className="object-contain"
+              />
+            </div>
+          )
         ) : (
           <>
             {/* dont want to render  this component (<VideoThumbnail/>) below because i only need the thumbnail file */}

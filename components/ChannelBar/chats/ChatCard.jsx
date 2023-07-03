@@ -101,7 +101,7 @@ const ChatCard = ({
           return message.type !== "unread";
         });
         const index = filteredData.length - unReadCount;
-        console.log([...filteredData.slice(index)]);
+
         const modifiedArr = [
           ...filteredData.slice(0, index),
           unreadObj,
@@ -191,7 +191,6 @@ const ChatCard = ({
         if (change.type === "added") {
           if (localstorageMessages === null) return;
           if (!isMessageInLocalStorage(localstorageMessages, messageData)) {
-            [...localstorageMessages];
             localstorageMessages.push(messageData);
             const saveChats = localstorageMessages.sort(
               (a, b) => a.timestamp?.seconds - b.timestamp?.seconds
@@ -244,7 +243,17 @@ const ChatCard = ({
               if (User.isReadReceiptsOn) {
                 changeMessagesStatus(id, type, "seen")
                   .then(() => {
-                    setChats((prevMessages) => [...saveChats]);
+                    setChats((prevMessages) => {
+                      const firstMessageId = prevMessages[0]["id"];
+
+                      const firstMessageIndex = saveChats.findIndex(
+                        (message) => message.id === firstMessageId
+                      );
+
+                      if (firstMessageIndex === -1)
+                        return [...saveChats].splice(-30);
+                      return [...saveChats].splice(firstMessageIndex);
+                    });
                   })
                   .catch((error) => {
                     "Error updating message status:", error;
@@ -260,7 +269,6 @@ const ChatCard = ({
           }
         }
         if (change.type === "modified") {
-          "Modified message: ", change.doc.data();
           const modifiedMessage = change.doc.data();
           const localstorageMessages = JSON.parse(localStorage.getItem(id));
 
@@ -273,14 +281,31 @@ const ChatCard = ({
               localstorageMessages[index] = modifiedMessage;
               localStorage.setItem(id, JSON.stringify(localstorageMessages));
               if (id === ChatObject.activeChatId) {
-                setChats([...localstorageMessages]);
+                setChats((prevMessages) => {
+                  const firstMessage = prevMessages[0];
+                  const lastMessage = prevMessages[prevMessages.length - 1];
+
+                  const indexofFirstMessage = localstorageMessages.findIndex(
+                    (message) => message.id === firstMessage.id
+                  );
+                  const indexofLastMessage = localstorageMessages.findIndex(
+                    (message) => message.id === lastMessage.id
+                  );
+                  if (indexofFirstMessage === -1 || indexofLastMessage === -1) {
+                    return [...localstorageMessages].splice(-30);
+                  }
+
+                  const returnThis = [...localstorageMessages].splice(
+                    indexofFirstMessage,
+                    indexofLastMessage
+                  );
+                  return returnThis;
+                });
               }
-              "Modified message updated in local storage:", modifiedMessage;
             }
           }
         }
         if (change.type === "removed") {
-          "Removed message: ", change.doc.data();
           const removedMessage = change.doc.data();
           const localstorageMessages = JSON.parse(localStorage.getItem(id));
 
@@ -293,7 +318,26 @@ const ChatCard = ({
               localstorageMessages.splice(index, 1);
               localStorage.setItem(id, JSON.stringify(localstorageMessages));
               if (id === ChatObject.activeChatId) {
-                setChats([...localstorageMessages]);
+                setChats((prevMessages) => {
+                  const firstMessage = prevMessages[0];
+                  const lastMessage = prevMessages[prevMessages.length - 1];
+
+                  const indexofFirstMessage = localstorageMessages.findIndex(
+                    (message) => message.id === firstMessage.id
+                  );
+                  const indexofLastMessage = localstorageMessages.findIndex(
+                    (message) => message.id === lastMessage.id
+                  );
+
+                  if (indexofFirstMessage === -1 || indexofLastMessage === -1) {
+                    return [...localstorageMessages].splice(-30);
+                  }
+                  const returnThis = [...localstorageMessages].splice(
+                    indexofFirstMessage,
+                    indexofLastMessage
+                  );
+                  return returnThis;
+                });
               }
             }
           }
@@ -326,11 +370,10 @@ const ChatCard = ({
           })
         );
       });
-      console.log(index);
+
       if (index !== -1) {
         const startIndex = Math.max(index - 10, 0);
-        console.log(startIndex);
-        console.log(messages.slice(index).length);
+
         if (messages.length - startIndex > 30) {
           return messages.slice(startIndex, startIndex + 30);
         } else {
@@ -397,7 +440,7 @@ const ChatCard = ({
         handleChatClick();
       }}
     >
-      <div className=" flex h-[50px] w-[50px] items-center justify-center rounded-full bg-coverColor text-[#ffffff]">
+      <div className=" bg-coverColor flex h-[50px] w-[50px] items-center justify-center rounded-full text-[#ffffff]">
         {img && invalidURL ? (
           <img
             src={img}
@@ -440,14 +483,20 @@ const ChatCard = ({
               {(message.type === "pic/video" ||
                 message.type === "image" ||
                 message.type === "video") && (
-                <i className="mr-1 flex items-center">
-                  <HiOutlinePhotograph /> {message.text === "" && message.type}
-                </i>
+                <div className=" flex items-center truncate ">
+                  <i className="mr-1">
+                    <HiOutlinePhotograph />
+                  </i>
+                  {message.text === "" && message.type}
+                </div>
               )}
               {message.type === "file" && (
-                <i className="mr-1 flex items-center">
-                  <BsFileEarmark />
-                </i>
+                <div className=" flex items-center truncate">
+                  <i className="mr-1">
+                    <BsFileEarmark />
+                  </i>
+                  {message.text === "" && chat.fileName}
+                </div>
               )}
               {message.type === "poll" && (
                 <i className="mr-1 flex rotate-90 items-center">
@@ -462,7 +511,7 @@ const ChatCard = ({
             {unReadCount !== 0 && (
               <p
                 className="relative inline-block h-5 w-5 rounded-full bg-accent-blue 
-              p-2 text-center text-[12px] font-bold text-white "
+                p-2 text-center text-[12px] font-bold text-white "
               >
                 <span className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] transform">
                   {formatCount(unReadCount)}

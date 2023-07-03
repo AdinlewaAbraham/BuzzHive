@@ -101,8 +101,8 @@ const AddContact = () => {
     if (!container) return;
 
     let triggerHeight = container.scrollTop + container.offsetHeight;
-    console.log(triggerHeight);
-    console.log(container.scrollHeight);
+
+
     if (triggerHeight >= container.scrollHeight - 30 && hasMore) {
       addUsers();
     }
@@ -116,7 +116,7 @@ const AddContact = () => {
     maxHeight: `calc(100vh - 125px)`,
   };
   function goBack() {
-    console.log(prevSelectedChannel)
+
     setSelectedChannel(prevSelectedChannel || "chats");
     setprevSelectedChannel("addcontact");
   }
@@ -134,12 +134,12 @@ const AddContact = () => {
           onChange={(e) => {
             const newSearchQuery = e.target.value;
             setSearchQuery(newSearchQuery);
-            console.log(newSearchQuery)
+
             if (newSearchQuery === "") {
-              console.log(newSearchQuery)
+
               fetchUsers()
             } else {
-              console.log(newSearchQuery)
+
               fetchedUsersWithQuery(newSearchQuery);
             }
           }}

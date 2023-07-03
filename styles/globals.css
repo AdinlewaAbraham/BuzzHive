@@ -82,7 +82,7 @@ html {
 }
 
 .ImgParentComp:hover .ImgChildComp {
-  background-color: rgba(32 ,34, 37 , 0.2);
+  background-color: rgba(32, 34, 37, 0.2);
   opacity: 1;
 }
 
@@ -148,5 +148,3 @@ html {
   transform: scale(0.8);
   transition: opacity 300ms, transform 300ms;
 }
-
-

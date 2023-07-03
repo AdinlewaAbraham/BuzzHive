@@ -58,9 +58,8 @@ const Header = ({ title, isActive, onClick }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   return ChatObject.activeChatType === "group" || title !== "Participants" ? (
     <div
-      className={`pb-5 cursor-pointer w-full text-center ${
-        isActive ? "border-b-4  border-[#3B82F6]  " : "text-muted"
-      }`}
+      className={`pb-5 cursor-pointer w-full text-center ${isActive ? "border-b-4  border-[#3B82F6]  " : "text-muted"
+        }`}
       onClick={onClick}
     >
       {title}
@@ -186,7 +185,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
         setProgress(progress);
       },
       (error) => {
-        console.log("Upload error:", error);
+
       },
       async () => {
         try {
@@ -208,7 +207,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
             setDontShowText(false);
           }, 1000);
         } catch (error) {
-          console.log("Error getting download URL:", error);
+
         }
       }
     );
@@ -248,9 +247,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
         <div className="relative">
           <div className=" bg-primary mb-5 flex flex-col items-center justify-center py-10">
             <div
-              className={`Menu relative  ${
-                !(ChatObject.photoUrl && invalidURL) && "bg-imgCover-light dark:bg-imgCover-dark"
-              } 
+              className={`Menu relative  ${!(ChatObject.photoUrl && invalidURL) && "bg-imgCover-light dark:bg-imgCover-dark"
+                } 
               ${isUploading && "scale-90"} 
               flex h-[200px] w-[200px] cursor-pointer items-center justify-center  rounded-full bg-inherit
             transition-transform duration-300 `}
@@ -269,9 +267,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                 </div>
               )}
               <div
-                className={` absolute inset-0 flex  items-center  ${
-                  isUploading && "opacity-100"
-                }  justify-center rounded-full bg-gray-900
+                className={` absolute inset-0 flex  items-center  ${isUploading && "opacity-100"
+                  }  justify-center rounded-full bg-gray-900
                 dark:bg-opacity-50 bg-opacity-10 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
                 onClick={() => {
                   isAdmin && !isUploading ? setshowMenu(true) : "open img";
@@ -381,9 +378,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
         </div>
 
         <div
-          className={`  ${
-            ChatObject.activeChatType === "group" && "mb-5"
-          } flex flex-col items-center justify-around p-5  bg-primary`}
+          className={`  ${ChatObject.activeChatType === "group" && "mb-5"
+            } flex flex-col items-center justify-around p-5  bg-primary`}
         >
           <div className="flex w-full justify-around mb-1">
             {["Media", "Files", "Participants"].map((header) => (

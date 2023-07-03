@@ -41,7 +41,6 @@ export const useGetChats = (currentUserId) => {
     }
     JSON.parse(localStorage.getItem("user"));
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      activeId;
       const activeChatId = JSON.parse(sessionStorage.getItem("activeChatId")); // this is a retarded hack but it works
       const lastMessagesObject = JSON.parse(
         localStorage.getItem("user")
@@ -87,7 +86,6 @@ export const useGetChats = (currentUserId) => {
         } else {
           unReadmessagesCount = 0;
         }
-        console.log(lastMessage);
         const chat = {
           id: doc.id,
           senderId: conversation.senderId,
@@ -98,6 +96,7 @@ export const useGetChats = (currentUserId) => {
           lastMessage: lastMessage.text,
           lastMessageType: lastMessage.type,
           lastMessageStatus: lastMessage.status,
+          fileName: lastMessage?.fileName,
           timestamp: timestamp,
           type: "personal",
           unReadmessagesCount: unReadmessagesCount,
@@ -105,7 +104,6 @@ export const useGetChats = (currentUserId) => {
         chats.push(chat);
       }
       setreturnChats([...chats]);
-      ///////////////////////////////////////////
       setisPersonalChatLoading(false);
     });
 
@@ -147,6 +145,7 @@ export const useGetChats = (currentUserId) => {
           lastMessage: group.lastMessage.lastMessage,
           lastMessageType: group.lastMessage.type,
           lastMessageStatus: group.lastMessage.status,
+          fileName: group.lastMessage?.fileName,
           timestamp: group.lastMessage.timestamp,
           type: "group",
           unReadmessagesCount: unReadmessagesCount,
@@ -154,11 +153,8 @@ export const useGetChats = (currentUserId) => {
         groupChats.push(groupChat);
       }
 
-      ////////////////////////////////
 
       setreturnGroupChats([...groupChats]);
-
-      //////////////////////////////
       setisGroupChatsLoading(false);
     });
 

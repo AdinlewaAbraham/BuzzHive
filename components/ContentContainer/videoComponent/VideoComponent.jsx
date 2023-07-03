@@ -25,7 +25,6 @@ const VideoComponent = ({ chat }) => {
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
 
-  console.log(dataObject);
 
   const [blurredImgSRC, setblurredImgSRC] = useState(blurredSRC);
   const [videoSrc, setVideoSrc] = useState(null);

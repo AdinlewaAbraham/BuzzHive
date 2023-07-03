@@ -5,7 +5,6 @@ export const removeMember = async (arr, groupId) => {
   try {
     const groupRef = doc(db, "groups", groupId.toString());
     await updateDoc(groupRef, { members: arrayRemove(...arr) });
-    console.log("dobe")
   } catch (err) {
     console.error("Error removing members:", e);
   }

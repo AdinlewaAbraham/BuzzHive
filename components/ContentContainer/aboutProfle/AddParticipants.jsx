@@ -164,7 +164,7 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
     const updatedUsers = selectedUsers.filter((user) => user.id !== userId);
     setselectedUsers(updatedUsers);
   };
-  console.log(groupObject)
+
   const addUsersToGroup = async () => {
     if (addingUser) return;
     setAddingUser(true);
@@ -210,11 +210,10 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
   };
 
   const divStyles = {
-    maxHeight: `calc(100vh - 200px${
-      selectedUsers.length > 0
+    maxHeight: `calc(100vh - 200px${selectedUsers.length > 0
         ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
         : ""
-    })`,
+      })`,
     transition: "height ease-in-out 150ms",
   };
   return (
@@ -256,9 +255,8 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
                     {user.name}
                     <i
                       className={`text-danger absolute right-1 cursor-pointer p-1
-                      opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${
-                        !showAddGroupMenu && "group-hover:opacity-100  "
-                      } `}
+                      opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${!showAddGroupMenu && "group-hover:opacity-100  "
+                        } `}
                       onClick={() => handleRemoveUser(user.id)}
                     >
                       <GiCancel />
@@ -290,9 +288,8 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
         </div>
         {selectedUsers.length > 0 && (
           <button
-            className={` ${
-              addingUser && "cursor-wait"
-            } w-full rounded-lg bg-accent-blue py-2 mb-3`}
+            className={` ${addingUser && "cursor-wait"
+              } w-full rounded-lg bg-accent-blue py-2 mb-3`}
             onClick={() => addUsersToGroup()}
           >
             {addingUser ? (

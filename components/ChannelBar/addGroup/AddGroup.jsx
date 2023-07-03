@@ -48,13 +48,13 @@ const UserCard = (p) => {
           onError={() => setinvalidURL(false)}
         />
       ) : (
-        <i className="mr-2 flex h-[45px] w-[45px] items-center justify-center rounded-full bg-coverColor ">
+        <i className="bg-coverColor mr-2 flex h-[45px] w-[45px] items-center justify-center rounded-full ">
           <FaUserAlt size={22} />
         </i>
       )}
       <div className="flex items-center">
         <p className="">{p.name}</p>
-        <Badge id={p.id}/>
+        <Badge id={p.id} />
       </div>
       <div className="outlined-none ml-auto h-5 w-5 rounded-lg">
         <Checkbox isChecked={p.isSelected} />
@@ -135,7 +135,7 @@ const AddGroup = () => {
     return () => window.removeEventListener("resize", widthResizer);
   }, []);
   const divStyles = {
-    maxHeight: `calc(100vh - 125px${
+    maxHeight: `calc(100vh - 125px - 16px${
       selectedUsers.length > 0
         ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
         : ""
@@ -143,7 +143,7 @@ const AddGroup = () => {
     transition: "height ease-in-out 150ms",
   };
   const showAddGroupMenudivStyles = {
-    maxHeight: `calc(100vh - 80px${
+    maxHeight: `calc(100vh - 80px - 16px${
       selectedUsers.length > 0
         ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
         : ""
@@ -153,6 +153,7 @@ const AddGroup = () => {
 
   const createGroupFunc = async () => {
     if (!groupName) {
+      alert("Please provide a group name");
       return;
     }
     setcreatingGroupLoading(true);
@@ -174,7 +175,6 @@ const AddGroup = () => {
   };
   const filterUsersWithQuery = (SearchQuery) => {
     const filteredUsers = activeUsers.filter((user) => {
-      console.log(user);
       const lowercaseName = user.senderDisplayName.toLowerCase();
       const lowercaseSearchQuery = SearchQuery.toLowerCase();
       return lowercaseName.includes(lowercaseSearchQuery);
@@ -410,7 +410,7 @@ const AddGroup = () => {
                 />
               </div>
             </div>
-            <div className="  left-0 bottom-0 mt-auto flex w-full" >
+            <div className="  left-0 bottom-0 mt-auto flex w-full">
               <button
                 className={`mr-1 flex w-1/2 items-center justify-center rounded-lg bg-accent-blue py-2 ${
                   creatingGroupLoading && "cursor-wait"

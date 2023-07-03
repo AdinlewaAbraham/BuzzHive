@@ -15,12 +15,11 @@ export async function sendMessage(
   fileObj,
   createdId,
   clearMessage,
-  isForwarded,
+  isForwarded
 ) {
   clearMessage();
   const customId = uuidv4();
 
-  console.log(customId);
   const message = {
     type: type,
     id: createdId || customId,
@@ -32,7 +31,7 @@ export async function sendMessage(
     replyObject: replyObj || {},
     dataObject: fileObj || {},
     status: user1Id === user2Id ? "seen" : "sent",
-    isForwarded:isForwarded || false,
+    isForwarded: isForwarded || false,
   };
 
   try {
@@ -40,9 +39,17 @@ export async function sendMessage(
     const conversationId =
       user1Id > user2Id ? user1Id + user2Id : user2Id + user1Id;
     const newConversationRef = doc(conversationsRef, conversationId);
+    const lastMessage = {
+      text: messageText,
+      type: type,
+      status: user1Id === user2Id ? "seen" : "sent",
+    };
+    if (type === "file") {
+      lastMessage.fileName = fileObj?.name;
+    }
     const newConversationData = {
       participants: [user1Id, user2Id],
-      lastMessage: { text: messageText, type: type, status: user1Id === user2Id ? "seen" :"sent" },
+      lastMessage,
       senderId: senderId,
       senderDisplayName: senderDisplayName,
       timestamp: time,

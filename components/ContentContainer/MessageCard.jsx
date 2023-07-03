@@ -54,6 +54,8 @@ const MessageCard = ({
   activeIndexId,
   searchedMessages,
   scrollContainerRef,
+  setshowProfile,
+  setAboutProfleChatObject,
 }) => {
   const [animationParent] = useAutoAnimate();
 
@@ -71,7 +73,7 @@ const MessageCard = ({
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [emojiAnchor, setemojiAnchor] = useState(null);
-  const [SamePrevSender, setSamePrevSender] = useState(false);
+  const [SamePrevSender, setSamePrevSender] = useState(true);// --------------------------------------
   const [referenceElement, setReferenceElement] = useState(null);
   const [popperElement, setPopperElement] = useState(null);
   const [arrowElement, setArrowElement] = useState(null);
@@ -158,7 +160,6 @@ const MessageCard = ({
   useLayoutEffect(() => {
     if (!selectedUserHeight.current) return;
     setHeight(selectedUserHeight.current.clientHeight);
-    console.log(selectedUserHeight.current.clientHeight);
   }, [selectedUsers]);
 
   const handleEmojiReaction = async (emoji) => {
@@ -219,7 +220,9 @@ const MessageCard = ({
 
   if (chat.type == "unread") {
     return (
-      <div className="bg-red-500 text-center" id="unreadId">you neva read this one boss</div>
+      <div className="bg-red-500 text-center" id="unreadId">
+        you neva read this one boss
+      </div>
     );
   }
 
@@ -250,7 +253,10 @@ const MessageCard = ({
     {
       icon: <MdOutlineContentCopy />,
       label: "Copy",
-      action: () => "Copy clicked",
+      action: () => {
+        console.log(chat.text);
+        navigator.clipboard.writeText(chat.text);
+      },
     },
   ];
 
@@ -298,9 +304,7 @@ const MessageCard = ({
       const deleteFilePromise = deleteObject(storageFileRef);
       const deleteDocPromise = deleteDoc(docRef);
 
-      await Promise.all([deleteDocPromise, deleteFilePromise])
-        .then(() => console.log("done"))
-        .catch((err) => console.error(err));
+      await Promise.all([deleteDocPromise, deleteFilePromise]);
     } else {
       await deleteDoc(docRef);
     }
@@ -357,6 +361,19 @@ const MessageCard = ({
     setisforwarding(false);
   };
 
+  const handleShowUserProfile = () => {
+    const user1Id = User.id;
+    const user2Id = chat.senderId;
+
+    setAboutProfleChatObject({
+      activeChatId: user1Id > user2Id ? user1Id + user2Id : user2Id + user1Id,
+      activeChatType: "personal",
+      otherUserId: user2Id,
+      photoUrl: chat.senderDisplayImg,
+      displayName: chat.senderDisplayName,
+    });
+    setshowProfile(true);
+  };
   return (
     <div
       ref={messageRef}
@@ -365,20 +382,24 @@ const MessageCard = ({
       } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
-      onClick={() => {
-        console.log(chat.type);
-      }}
     >
       {ChatObject.activeChatType === "group" &&
         chat.senderId !== User.id &&
         !SamePrevSender && (
-          <Img
-            src={chat.senderDisplayImg}
-            styles=" w-[30px] h-[30px] rounded-full mr-2 bg-[#dfe5e7] dark:bg-gray-500"
-            type="personnal"
-            personalSize="40"
-            imgStyles=" rounded-full "
-          />
+          <div
+            onClick={() => {
+              handleShowUserProfile();
+            }}
+            className="cursor-pointer"
+          >
+            <Img
+              src={chat.senderDisplayImg}
+              styles=" w-[30px] h-[30px] rounded-full mr-2 bg-[#dfe5e7] dark:bg-gray-500 "
+              type="personnal"
+              personalSize="40"
+              imgStyles=" rounded-full "
+            />
+          </div>
         )}
       <div
         id={`${chat.id}_mainCard`}
@@ -428,11 +449,16 @@ const MessageCard = ({
               className={`text-muted text-[11px] ${
                 (chat.type === "pic/video" ||
                   chat.type === "image" ||
-                  chat.type === "video"|| chat.type === "reply") &&
+                  chat.type === "video" ||
+                  chat.type === "reply") &&
                 "mb-1 "
-              } font-medium flex items-center`}
+              } flex cursor-pointer items-center font-medium transition-colors duration-300 hover:text-white `}
+              onClick={() => {
+                handleShowUserProfile();
+              }}
             >
-              {chat.senderDisplayName} <Badge id={chat.senderId} styles=" ml-[4px]"/>
+              {chat.senderDisplayName}{" "}
+              <Badge id={chat.senderId} styles=" ml-[4px]" />
             </p>
           )}
         {chat.isForwarded && (
@@ -510,7 +536,13 @@ const MessageCard = ({
             </>
           </div>
         )}
-        {chat.type === "poll" && <PollComponent PollObject={chat} />}
+        {chat.type === "poll" && (
+          <PollComponent
+            PollObject={chat}
+            searchText={searchText}
+            searchedMessages={searchedMessages}
+          />
+        )}
         <div
           className={`items- flex w-full flex-col ${
             chat.senderId !== User.id && "justify-end"
@@ -519,7 +551,7 @@ const MessageCard = ({
               chat.type === "image" ||
               chat.type === "video") &&
             !chat.text &&
-            "absolute bottom-3 right-4 z-30"
+            "absolute bottom-3 right-4 z-10"
           }`}
         >
           <p
@@ -569,7 +601,6 @@ const MessageCard = ({
         {chat.reactions?.length > 0 && (
           <div
             ref={animationParent}
-            onClick={() => {}}
             className={`absolute bottom-[-20px] right-0 flex cursor-pointer
             items-center  rounded-lg bg-light-primary p-[5px] dark:bg-dark-primary`}
           >
@@ -752,7 +783,7 @@ const MessageCard = ({
             <i
               className={` md:transition-all md:duration-150 ${
                 chat.senderId === currentId &&
-                "ml-2 flex-row-reverse md:group-hover:ml-2 md:ml-0"
+                "ml-2 flex-row-reverse md:ml-0 md:group-hover:ml-2"
               }  ${chat.senderId !== currentId && " group-hover:mr-2 "} `}
             >
               <BsChevronDown size={10} />

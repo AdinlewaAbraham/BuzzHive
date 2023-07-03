@@ -26,7 +26,7 @@ export const createGroup = async (
       await profileUploadTask;
       photoUrl = await getDownloadURL(profileUploadRef);
     }
-    console.log(photoUrl);
+
     const newGroup = {
       id: newGroupRef.id,
       name: groupName,
@@ -44,7 +44,8 @@ export const createGroup = async (
     const time = new Date();
     const messageText = `${username} created ${groupName}!`;
     await sendGroupMessage(
-      creator,null,
+      creator,
+      null,
       newGroupRef.id,
       messageText,
       username,

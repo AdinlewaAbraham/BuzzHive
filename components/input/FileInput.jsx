@@ -45,6 +45,8 @@ export const RenderFileType = ({ type, size }) => {
 
     case "audio/mpeg":
     case "audio/mp3":
+    case "audio/flac":
+    case "audio/wav":
       fileType = <FaFileAudio size={size} />;
       break;
 
@@ -89,7 +91,9 @@ export const RenderFileType = ({ type, size }) => {
 
 const FileInput = ({ file, setfile }) => {
   const { User } = useContext(UserContext);
-  const { ChatObject, setChats, Chats, setallowScrollObject } = useContext(SelectedChannelContext);
+  const { ChatObject, setChats, Chats, setallowScrollObject } = useContext(
+    SelectedChannelContext
+  );
   const [fileCaption, setfileCaption] = useState("");
 
   function setChatsFunc(chats) {

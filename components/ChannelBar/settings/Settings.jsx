@@ -214,7 +214,7 @@ const Settings = () => {
     if (!User) {
       return;
     }
-    console.log("stop");
+
     const q = doc(db, "users", User.id);
     const unsub = onSnapshot(q, async (doc) => {
       if (!doc.data()) return;
@@ -294,7 +294,7 @@ const Settings = () => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -20, opacity: 0 }}
-        className="scrollBar h-[calc(100vh-70px-66px)] overflow-scroll md:h-[calc(100vh-66px)]"
+        className="scrollBar h-[calc(100vh-70px-16px-66px)] overflow-scroll md:h-[calc(100vh-16px-66px)]"
       >
         <div className="flex flex-col">
           <h2 className="mb-4 text-xl font-medium">Account</h2>
@@ -332,12 +332,8 @@ const Settings = () => {
                 disCardFunc: () => {
                   const auth = getAuth();
                   signOut(auth)
-                    .then(() => {
-                      console.log("Sign-out successful.");
-                    })
-                    .catch((error) => {
-                      console.log(error);
-                    });
+                    .then(() => {})
+                    .catch((error) => {});
                 },
               });
               setshowModal(true);
@@ -380,7 +376,7 @@ const Settings = () => {
                   icon: <BsSun />,
                 },
               ]}
-              selectedMenuText={User.darkMode ? "Dark" : "Light"}
+              selectedMenuText={theme === "dark" ? "Dark" : "Light"}
             />
           </div>
         </div>

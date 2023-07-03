@@ -116,8 +116,8 @@ const FileComponent = ({ chat, defaultColor }) => {
 
   const openFile = () => {
     const fileURL = URL.createObjectURL(fileBlob);
-    console.log(fileBlob);
-    console.log(chat);
+
+
     window.open(fileURL, "_blank");
   };
   const saveFileToComputer = async () => {
@@ -137,7 +137,7 @@ const FileComponent = ({ chat, defaultColor }) => {
 
       await writableStream.close();
 
-      console.log("File saved successfully!");
+
     } catch (error) {
       console.error("Error saving file:", error);
     }
@@ -150,20 +150,19 @@ const FileComponent = ({ chat, defaultColor }) => {
   const { baseName, extName } = getFileExtension(chat.dataObject.name);
   return (
     <div
-      className={`truncate ${chat.senderId === User.id && !defaultColor ? "bg-blue-400":"dark:bg-gray-500 bg-light-secondary" } rounded-lg p-2 ${
-        chat.text !== "" && "mb-2"
-      }`}
+      className={`truncate ${chat.senderId === User.id && !defaultColor ? "bg-blue-400" : "dark:bg-gray-500 bg-light-secondary"} rounded-lg p-2 ${chat.text !== "" && "mb-2"
+        }`}
     >
       <div className="mb-4 flex">
         <div className="mr-2 flex h-[50px] items-center justify-center rounded-full text-[40px] text-white">
           {chat.dataObject.status === "uploading" ||
-          chat.status === "pending" ? (
+            chat.status === "pending" ? (
             <UploadCircularAnimation
               progress={chat.dataObject.progress}
               size={"md"}
             />
           ) : isDownloaded ? (
-            <i onclick={() => {}}>
+            <i onclick={() => { }}>
               <RenderFileType type={chat.dataObject.type} />
             </i>
           ) : isDownloading ? (
@@ -192,10 +191,9 @@ const FileComponent = ({ chat, defaultColor }) => {
       </div>
       <div
         className={`[&>div>button]:py-1 [&>div>button]:w-full [&>div>button]:rounded-lg 
-          ${chat.senderId === User.id && !defaultColor ? "[&>div>button]:bg-blue-300":"dark:[&>div>button]:bg-[#252d35] [&>div>button]:bg-light-primary" } ${
-         (isDownloading || chat.dataObject.status === "uploading") &&
-         "[&>div>button]:hover:cursor-not-allowed"
-       }`}
+          ${chat.senderId === User.id && !defaultColor ? "[&>div>button]:bg-blue-300" : "dark:[&>div>button]:bg-[#252d35] [&>div>button]:bg-light-primary"} ${(isDownloading || chat.dataObject.status === "uploading") &&
+          "[&>div>button]:hover:cursor-not-allowed"
+          }`}
       >
         {isDownloaded ? (
           <div className="flex w-full">

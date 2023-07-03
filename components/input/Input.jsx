@@ -342,6 +342,8 @@ const Input = () => {
                           return;
                         }
                         if (e.target.files[0].type.startsWith("image")) {
+                          setpicVidmedia({type: "image/prop", loading: true})
+                          setshowMediaPicker(false)
                           const blob = await downScalePicVid(
                             e.target.files[0],
                             0.7,
