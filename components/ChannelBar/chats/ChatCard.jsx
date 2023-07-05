@@ -250,8 +250,10 @@ const ChatCard = ({
                         (message) => message.id === firstMessageId
                       );
 
-                      if (firstMessageIndex === -1)
+                      if (firstMessageIndex === -1) {
                         return [...saveChats].splice(-30);
+                      }
+                      console.log(firstMessageIndex);
                       return [...saveChats].splice(firstMessageIndex);
                     });
                   })
@@ -297,7 +299,7 @@ const ChatCard = ({
 
                   const returnThis = [...localstorageMessages].splice(
                     indexofFirstMessage,
-                    indexofLastMessage
+                    indexofLastMessage + 1
                   );
                   return returnThis;
                 });
@@ -334,7 +336,7 @@ const ChatCard = ({
                   }
                   const returnThis = [...localstorageMessages].splice(
                     indexofFirstMessage,
-                    indexofLastMessage
+                    indexofLastMessage + 1
                   );
                   return returnThis;
                 });
