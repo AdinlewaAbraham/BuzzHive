@@ -143,7 +143,7 @@ const MediaPlayer = ({ VideoSRC, setvideoPlayer, messageText, fileName }) => {
               value={currentTime}
               step={0.1}
               onChange={handleSeek}
-              className="h-1 w-full cursor-pointer "
+              className="h-2 w-full cursor-pointer "
             />
             <div className="flex w-full items-center justify-between">
               <button onClick={togglePlay} className=" text-[35px]">

@@ -15,7 +15,7 @@ const MediaSection = () => {
   const [hasMore, setHasMore] = useState(true);
   const [locked, setLocked] = useState(false);
   const [lastMediaFile, setLastMediaFile] = useState(null);
-  const mediaChunkCount = 5;
+  const mediaChunkCount = 9;
   useEffect(() => {
     const getMediaMessages = () => {
       const messages = JSON.parse(

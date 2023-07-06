@@ -4,7 +4,7 @@ import { FaUserAlt } from "react-icons/fa";
 const Img = (p) => {
   const [invalidURL, setinvalidURL] = useState(true);
   return (
-    <div className={` bg-coverColor ${p.styles} [&>i]:flex [&>i]:items-center [&>i]:h-full [&>i]:justify-center `}>
+    <div className={` ${!(p.src && invalidURL) && "bg-coverColor" } ${p.styles} [&>i]:flex [&>i]:items-center [&>i]:h-full [&>i]:justify-center `}>
       {p.src && invalidURL ? (
         <img
           src={p.src}

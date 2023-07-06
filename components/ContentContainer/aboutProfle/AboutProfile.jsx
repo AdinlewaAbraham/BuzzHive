@@ -21,7 +21,6 @@ import { UserContext } from "../../App";
 import { MdGroup } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
 import { MdOutlineModeEditOutline } from "react-icons/md";
-import { MdClose } from "react-icons/md";
 import ParticipantsComponent from "./ParticipantsComponent";
 import FileSection from "./FileSection";
 import MediaSection from "./MediaSection";
@@ -41,14 +40,15 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import Badge from "@/components/Badge";
+import { MdClose, MdOutlineFileDownload } from "react-icons/md";
 
 const Menu = ({ icon, header, context }) => {
   return (
     <div className="my-3 flex items-center">
       <i className="text-muted"> {icon}</i>
       <div className="ml-3">
-        <h4>{header}</h4>
-        <p className="text-muted text-sm">{context}</p>
+        <p className="text-muted text-sm">{header}</p>
+        <h4>{context}</h4>
       </div>
     </div>
   );
@@ -58,18 +58,23 @@ const Header = ({ title, isActive, onClick }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   return ChatObject.activeChatType === "group" || title !== "Participants" ? (
     <div
-      className={`pb-5 cursor-pointer w-full text-center ${isActive ? "border-b-4  border-[#3B82F6]  " : "text-muted"
+      className={`relative w-full cursor-pointer select-none pb-5 text-center ${!isActive && "text-muted"
         }`}
       onClick={onClick}
     >
+      {isActive && (
+        <span className="absolute bottom-0 left-0 h-1 w-full rounded-sm bg-accent-blue "></span>
+      )}
       {title}
     </div>
-  ) : false;
+  ) : (
+    false
+  );
 };
 
-const AboutProfile = ({ setshowProfile, ChatObject }) => {
+const AboutProfile = ({ setshowProfile }) => {
   const [profile, setprofile] = useState();
-  const { setChatObject } = useContext(SelectedChannelContext);
+  const { setChatObject, ChatObject } = useContext(SelectedChannelContext);
 
   const [activeComponent, setActiveComponent] = useState("Media");
   const [prevComponent, setPrevComponent] = useState(null);
@@ -84,6 +89,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
   const [isUploading, setisUploading] = useState(false);
   const [dontShowText, setDontShowText] = useState(false);
   const [showCheckMark, setShowCheckMark] = useState(false);
+
+  const [fullScreenMode, setFullScreenMode] = useState(false);
 
   const { User } = useContext(UserContext);
   useEffect(() => {
@@ -162,13 +169,12 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
       displayName: "",
     });
   };
-
   const handleImageChange = async (file, dataObject) => {
     setProgress(0);
-    setChatObject((prevState) => ({
-      ...prevState,
+    setChatObject({
+      ...dataObject,
       photoUrl: URL.createObjectURL(file),
-    }));
+    });
     setinvalidURL(true);
     setisUploading(true);
     const storage = getStorage();
@@ -184,9 +190,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setProgress(progress);
       },
-      (error) => {
-
-      },
+      (error) => { },
       async () => {
         try {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
@@ -206,9 +210,7 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
           setTimeout(() => {
             setDontShowText(false);
           }, 1000);
-        } catch (error) {
-
-        }
+        } catch (error) { }
       }
     );
   };
@@ -247,7 +249,8 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
         <div className="relative">
           <div className=" bg-primary mb-5 flex flex-col items-center justify-center py-10">
             <div
-              className={`Menu relative  ${!(ChatObject.photoUrl && invalidURL) && "bg-imgCover-light dark:bg-imgCover-dark"
+              className={`Menu relative  ${!(ChatObject.photoUrl && invalidURL) &&
+                "bg-imgCover-light dark:bg-imgCover-dark"
                 } 
               ${isUploading && "scale-90"} 
               flex h-[200px] w-[200px] cursor-pointer items-center justify-center  rounded-full bg-inherit
@@ -266,12 +269,17 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                   />
                 </div>
               )}
+
               <div
                 className={` absolute inset-0 flex  items-center  ${isUploading && "opacity-100"
                   }  justify-center rounded-full bg-gray-900
-                dark:bg-opacity-50 bg-opacity-10 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
+                bg-opacity-10 opacity-0 transition-opacity duration-150  hover:opacity-100 dark:bg-opacity-50`}
                 onClick={() => {
-                  isAdmin && !isUploading ? setshowMenu(true) : "open img";
+                  isAdmin && !isUploading
+                    ? setshowMenu(true)
+                    : ChatObject.photoUrl && invalidURL
+                      ? setFullScreenMode(true)
+                      : false;
                 }}
               >
                 <AnimatePresence>
@@ -322,11 +330,12 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -10, opacity: 0 }}
-                    className="Menu bg-secondary  hover:[&>li]:bg-hover-light dark:hover:[&>li]:bg-hover-dark
-                     [&>li]: [&>li]: [&>li]: [&>li]: absolute bottom-[-140px]
-                              rounded-lg p-2 [&>li]:rounded-lg [&>li]:p-2
+                    className="Menu bg-secondary  [&>li]: [&>li]:
+                     [&>li]: [&>li]: absolute bottom-[-140px] rounded-lg p-2
+                              [&>li]:rounded-lg [&>li]:p-2 hover:[&>li]:bg-hover-light dark:hover:[&>li]:bg-hover-dark
                               "
                   >
+                    
                     <li
                       onClick={() => {
                         removeImg();
@@ -334,7 +343,11 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                     >
                       Remove image
                     </li>
-                    <li>View image</li>
+                    {ChatObject.photoUrl && invalidURL && (
+                      <li onClick={() => setFullScreenMode(true)}>
+                        View image
+                      </li>
+                    )}
                     <li className="relative">
                       Change image
                       <label className="absolute inset-0 flex h-full w-full cursor-pointer items-center justify-center ">
@@ -353,17 +366,43 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
                 )}
               </AnimatePresence>
             </div>
-            <h3 className="mt-2 text-lg font-medium flex items-center justify-center">
+            <AnimatePresence>
+              {fullScreenMode && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[99] flex items-center justify-center bg-white dark:bg-black"
+                >
+                  <div
+                    className="absolute top-4 right-4  flex h-[66px] items-center justify-end rounded-lg bg-white px-4
+                    text-[30px]  text-black dark:bg-black dark:text-white [&>i]:cursor-pointer"
+                  >
+                    <i
+                      onClick={() => setFullScreenMode(false)}
+                    >
+                      <MdClose />
+                    </i>
+                  </div>
+                  <img
+                    src={ChatObject.photoUrl}
+                    alt=""
+                    className="h-full w-full object-contain"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <h3 className="mt-2 flex items-center justify-center text-lg font-medium">
               {ChatObject.displayName} <Badge id={ChatObject.otherUserId} />
             </h3>
             {ChatObject.activeChatType === "group" && (
               <p className="text-muted text-sm">
-                Group <span className="text-xs">&#x25CF;</span>{" "}
+                Group ·&nbsp;
                 {profile?.members?.length} participants{" "}
               </p>
             )}
           </div>
-          <div className="mb-5 p-5 bg-primary">
+          <div className="bg-primary mb-5 p-5">
             <Menu
               icon={<BiAt />}
               header="username"
@@ -379,9 +418,9 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
 
         <div
           className={`  ${ChatObject.activeChatType === "group" && "mb-5"
-            } flex flex-col items-center justify-around p-5  bg-primary`}
+            } bg-primary flex flex-col items-center justify-around  p-5`}
         >
-          <div className="flex w-full justify-around mb-1">
+          <div className="mb-3 flex w-full justify-around">
             {["Media", "Files", "Participants"].map((header) => (
               <Header
                 title={header}
@@ -395,11 +434,11 @@ const AboutProfile = ({ setshowProfile, ChatObject }) => {
         {ChatObject.activeChatType === "group" && (
           <div
             onClick={() => setShowModal(true)}
-            className="mb-3  flex w-full cursor-pointer items-center p-5 text-red-500  bg-primary"
+            className="bg-primary  mb-3 flex w-full cursor-pointer items-center p-5  text-red-400"
           >
             {ChatObject.activeChatType === "group" && (
               <>
-                <i className="mr-1">
+                <i className="mr-1 text-[20px]">
                   <BiLogOut />
                 </i>{" "}
                 Exit group

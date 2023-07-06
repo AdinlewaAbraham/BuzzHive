@@ -1,12 +1,8 @@
-fix poll component, video comp ui    
-reacting to messages not working properly while uploading pic/vid 
-fix unreadcount only counting regular messages 
-cant send multple media files at the same time  
-cant see who reacted to message 
-fix loading general state for about profile 
+cant see who reacted to message -----------
 setting overflow for mobile 
-fix message initail state to have bent border -----------
-make about profile better  
+adding participants ux   
+fix unread message indicator style dfrom just red 
+
 
 add error bound indicators for errors 
 
@@ -14,8 +10,3 @@ add error bound indicators for errors
 optimize stuff 
 make initial query sort messages so i dont sort messages over and over again    
 
-
-
-
-clean up stuff 
-use <img/>

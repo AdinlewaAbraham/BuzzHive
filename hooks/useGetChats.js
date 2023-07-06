@@ -68,20 +68,16 @@ export const useGetChats = (currentUserId) => {
             lastMessageTimestamp.seconds,
             lastMessageTimestamp.nanoseconds
           );
-          qT;
           const unReadMessagesQuery = query(
             collection(db, "conversations", doc.id, "messages"),
             where("timestamp", ">", qT),
             orderBy("timestamp", "desc")
           );
           const unReadMessagequerySnapshot = await getDocs(unReadMessagesQuery);
+          
           const unreadCount = unReadMessagequerySnapshot.docs.filter(
             (message) => message.data().senderId !== currentUserId
           ).length;
-          const unreadCount2 = unReadMessagequerySnapshot.docs.filter(
-            (message) => message.data().senderId !== currentUserId
-          );
-          const shir = unreadCount2.map((i)=>i.data())
           unReadmessagesCount = activeChatId == doc.id ? 0 : unreadCount;
         } else {
           unReadmessagesCount = 0;
@@ -99,7 +95,7 @@ export const useGetChats = (currentUserId) => {
           fileName: lastMessage?.fileName,
           timestamp: timestamp,
           type: "personal",
-          unReadmessagesCount: unReadmessagesCount,
+          unReadmessagesCount,
         };
         chats.push(chat);
       }
@@ -148,7 +144,7 @@ export const useGetChats = (currentUserId) => {
           fileName: group.lastMessage?.fileName,
           timestamp: group.lastMessage.timestamp,
           type: "group",
-          unReadmessagesCount: unReadmessagesCount,
+          unReadmessagesCount,
         };
         groupChats.push(groupChat);
       }

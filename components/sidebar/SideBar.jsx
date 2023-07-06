@@ -57,7 +57,7 @@ const SideBarIcon = ({ icon, text, clickevent }) => {
           } ${prevSelectedChannel === clickevent &&
           `${channels[selectedChannel] < channels[prevSelectedChannel]
             ? `${IsMobile ? "" : "lineComingFromTop"} `
-            : `${IsMobile ? " " : "lineComingFromBottom"} `
+            : `${IsMobile ? "" : "lineComingFromBottom"} `
           } `
           } absolute  bottom-0 z-[1] h-1 bg-accent-blue transition-[width] md:left-0 md:w-1 md:transition-[height]`}
       ></span>

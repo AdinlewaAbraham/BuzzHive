@@ -9,6 +9,7 @@ import VideoThumbnail from "react-video-thumbnail";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import { motion, AnimatePresence } from "framer-motion";
 import { CircularProgress } from "@mui/joy";
+import { Timestamp } from "firebase/firestore";
 
 const MediaInput = ({
   picVidmedia,
@@ -49,7 +50,7 @@ const MediaInput = ({
     }
     processImage();
 
-    return () => { };
+    return () => {};
   }, [ImageBase64, picVidmedia.name]);
 
   function setChatsFunc(state) {
@@ -122,7 +123,7 @@ const MediaInput = ({
               let seconds = Math.floor(currentTime / 1000);
               let nanoseconds = (currentTime % 1000) * 10 ** 6;
 
-              let time = { seconds: seconds, nanoseconds: nanoseconds };
+              let time = new Timestamp(seconds, nanoseconds);
               setallowScrollObject({
                 scrollTo: "bottom",
                 scrollBehaviour: "smooth",

@@ -123,6 +123,11 @@ const ContentContainer = () => {
     setshowProfile(false);
   }, [ChatObject.activeChatId]);
 
+  useEffect(() => {
+   sessionStorage.setItem("activeChats", JSON.stringify(sortedChats))
+  }, [sortedChats])
+  
+
   useMemo(() => {
     if (Chats == []) return;
     if (Chats) {
@@ -177,7 +182,6 @@ const ContentContainer = () => {
       }
     }
   };
-  console.log(ChatObject)
   return (
     showChats && (
       <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
@@ -225,7 +229,7 @@ const ContentContainer = () => {
                         <img
                           src={ChatObject.photoUrl}
                           alt="profile pic"
-                          className={`h-full rounded-full object-cover`}
+                          className={`h-[40px] w-[40px] rounded-full object-cover`}
                           onError={() => setinvalidURL(false)}
                         />
                       ) : ChatObject.activeChatType === "group" ? (

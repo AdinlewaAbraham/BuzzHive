@@ -5,6 +5,7 @@ import { sendMessage } from "./sendMessage";
 import { sendGroupMessage } from "../groupUtils/sendGroupMessage";
 import { useContext } from "react";
 import { openDB } from "idb";
+import { Timestamp } from "firebase/firestore";
 
 export const handleFileUpload = async (
   file,
@@ -17,7 +18,10 @@ export const handleFileUpload = async (
 ) => {
   const currentTime = new Date().getTime();
 
-  const time = new Date()
+  const seconds = Math.floor(currentTime / 1000);
+  const nanoseconds = (currentTime % 1000) * 10 ** 6;
+
+  const time = new Timestamp(seconds, nanoseconds)
   try {
     if (!file) {
       return;
@@ -71,24 +75,20 @@ export const handleFileUpload = async (
       const newAcctiveChatId = JSON.parse(
         sessionStorage.getItem("activeChatId")
       );
+
+      const activeChats = JSON.parse(sessionStorage.getItem("activeChats"));
+
       if (sendingFromChatRoomId === newAcctiveChatId) {
-        const messageIndex = Chats.findIndex((chat) => chat.id === id);
+        const messageIndex = activeChats.findIndex((chat) => chat.id === id);
+        const updatedMessage = {
+          ...message,
+          dataObject: { ...message.dataObject, progress: progress },
+        };
         if (messageIndex === -1) {
-          setChatsFunc([
-            ...Chats,
-            {
-              ...message,
-              dataObject: { ...message.dataObject, progress: progress },
-            },
-          ]);
+          setChatsFunc([...activeChats, updatedMessage]);
         } else {
-          setChatsFunc([
-            ...Chats,
-            {
-              ...message,
-              dataObject: { ...message.dataObject, progress: progress },
-            },
-          ]);
+          activeChats[messageIndex] = updatedMessage
+          setChatsFunc(activeChats);
         }
       }
 
@@ -107,7 +107,7 @@ export const handleFileUpload = async (
       name: file.name,
       size: file.size,
       type: file.type,
-      filePath: snapshot.ref.fullPath
+      filePath: snapshot.ref.fullPath,
     };
 
     if (ChatObject.activeChatType == "group") {

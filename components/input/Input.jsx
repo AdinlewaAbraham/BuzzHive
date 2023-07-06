@@ -59,6 +59,7 @@ const Input = () => {
     let nanoseconds = (currentTime % 1000) * 10 ** 6;
 
     let timestamp = { seconds: seconds, nanoseconds: nanoseconds };
+    
     const messageObj = {
       text: message,
       senderId: senderid,

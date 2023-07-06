@@ -23,11 +23,14 @@ import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import AddParticipants from "./AddParticipants";
 import { CircularProgress } from "@mui/joy";
 import Badge from "@/components/Badge";
+import { motion, AnimatePresence } from "framer-motion";
+import AddUserPopUp from "@/components/ChannelBar/addContact/AddUserPopUp";
 
 const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
   const { User } = useContext(UserContext);
   const { ChatObject } = useContext(SelectedChannelContext);
   const [showMenu, setShowMenu] = useState(false);
+  const [showUserPopup, setShowUserPopup] = useState(false);
   const referenceElement = useRef(null);
   const popperElement = useRef(null);
   const { styles, attributes } = usePopper(
@@ -60,6 +63,20 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
     window.addEventListener("click", handleClick);
     return () => window.removeEventListener("click", handleClick);
   }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (!event.target.closest(".clickEvent")) {
+        setShowUserPopup(false);
+      }
+    }
+
+    window.addEventListener("click", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   const isCurrentUserAdmin = groupObject.admins.includes(User.id);
   const removeGroupMember = async (removeId) => {
     setShowMenu(false);
@@ -81,9 +98,38 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
   };
   return (
     <>
+      <AnimatePresence>
+        {showUserPopup && (
+          <motion.div
+            className="Poll-input fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="clickEvent max-w-[500px] rounded-lg bg-light-secondary dark:bg-dark-secondary"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+            >
+              <AddUserPopUp
+                setShowUserPopupTofalse={() => {
+                  setShowUserPopup(false);
+                }}
+                user={user}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div
         key={user.id}
-        className=" hover:bg-hover flex cursor-pointer items-center justify-between truncate rounded-xl  px-4 py-3"
+        className="clickEvent hover:bg-hover flex cursor-pointer items-center justify-between truncate rounded-xl  px-4 py-3"
+        onClick={() => {
+          if (user.id !== User.id) {
+            setShowUserPopup(true);
+          }
+        }}
       >
         <div className="flex items-center ">
           <Img
@@ -96,7 +142,7 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
           <div>
             <h4 className="flex items-center">
               {user.name}
-              <Badge id={user.id} />{" "}
+              <Badge id={user.id} />
               {isAdmin && (
                 <span className="ml-3 rounded-md bg-green-700 px-1 text-white">
                   admin
@@ -176,7 +222,6 @@ const ParticipantsComponent = ({ groupObject }) => {
   const loadMoreUsers = async () => {
     setLoadingUsers(true);
 
-    // if (locked) return;
     setLocked(true);
     const spliceIndex = participantsId.findIndex(
       (participantId) => participantId === lastParticipantId
@@ -242,7 +287,7 @@ const ParticipantsComponent = ({ groupObject }) => {
           </div>
         )}
         {JSON.stringify(participants) === "[]" ? (
-          <div className="flex h-full items-center justify-center">
+          <div className="flex h-full items-center justify-center [&>span]:mr-1">
             <CircularProgress size="sm" variant="plain" />
             Users Loading...
           </div>

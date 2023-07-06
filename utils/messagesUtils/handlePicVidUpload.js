@@ -46,7 +46,6 @@ export const handlePicVidUpload = async (
   }
 
   if (blurredPixelatedBlob) {
-    
     const blurredPixelatedRef = ref(
       storage,
       `${ChatObject.activeChatType}/${ChatObject.activeChatId}/${
@@ -108,7 +107,7 @@ export const handlePicVidUpload = async (
       progress: 0,
       thumbnail: new Blob([blurredPixelatedBlob], { type: "image/jpeg" }),
     };
-    
+
     const message = {
       type: isImage ? "image" : "video",
       id: id,
@@ -130,40 +129,33 @@ export const handlePicVidUpload = async (
         const newAcctiveChatId = JSON.parse(
           sessionStorage.getItem("activeChatId")
         );
+        const activeChats = JSON.parse(sessionStorage.getItem("activeChats"));
+
         if (ChatObject.activeChatId === newAcctiveChatId) {
-          const messageIndex = Chats.findIndex((chat) => chat.id === id);
+          const messageIndex = activeChats.findIndex((chat) => chat.id === id);
+
+          const updatedMessage = {
+            ...message,
+            dataObject: { ...message.dataObject, progress: progress },
+          };
           if (messageIndex === -1) {
-            setChatsFunc([
-              ...Chats,
-              {
-                ...message,
-                dataObject: { ...message.dataObject, progress: progress },
-              },
-            ]);
+            setChatsFunc([...activeChats, updatedMessage]);
           } else {
-            setChatsFunc([
-              ...Chats,
-              {
-                ...message,
-                dataObject: { ...message.dataObject, progress: progress },
-              },
-            ]);
+            activeChats[messageIndex] = updatedMessage
+            setChatsFunc(activeChats);
           }
         }
 
         switch (snapshot.state) {
           case "paused":
-            
             break;
           case "running":
-            
             break;
         }
       },
       (error) => {},
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-
           const picORvideoObj = {
             downloadURL: downloadURL,
             blurredPixelatedBlobDownloadURL: blurredPixelatedBlobDownloadURL
@@ -173,7 +165,7 @@ export const handlePicVidUpload = async (
             size: downscaledBlob.size,
             type: downscaledBlob.type,
             length: isImage ? null : videoLength,
-            filePath: uploadTask.snapshot.ref.fullPath
+            filePath: uploadTask.snapshot.ref.fullPath,
           };
           ChatObject.activeChatType == "group"
             ? sendGroupMessage(
@@ -204,7 +196,6 @@ export const handlePicVidUpload = async (
                 () => {},
                 null
               );
-          
         });
       }
     );

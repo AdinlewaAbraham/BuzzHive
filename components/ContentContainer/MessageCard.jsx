@@ -47,6 +47,7 @@ import { ref, deleteObject } from "firebase/storage";
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapse } from "@mui/material";
 import Badge from "../Badge";
+import EmojiReactionsBoard from "./EmojiReactionsBoard";
 
 const MessageCard = ({
   chat,
@@ -70,10 +71,10 @@ const MessageCard = ({
 
   const currentId = User.id;
   const timestamp = chat.timestamp;
-
+  const [emojiVotesAnchor, setEmojiVotesAnchor] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [emojiAnchor, setemojiAnchor] = useState(null);
-  const [SamePrevSender, setSamePrevSender] = useState(true);// --------------------------------------
+  const [SamePrevSender, setSamePrevSender] = useState(true);
   const [referenceElement, setReferenceElement] = useState(null);
   const [popperElement, setPopperElement] = useState(null);
   const [arrowElement, setArrowElement] = useState(null);
@@ -100,7 +101,7 @@ const MessageCard = ({
     ],
     placement: "auto",
   });
-
+  const emojiVotesOpen = Boolean(emojiVotesAnchor);
   const Open = Boolean(anchorEl);
 
   const messageRef = useRef(null);
@@ -333,7 +334,7 @@ const MessageCard = ({
               chat.replyObject,
               chat.dataObject,
               null,
-              () => {},
+              () => { },
               true
             );
           } else {
@@ -348,7 +349,7 @@ const MessageCard = ({
               chat.replyObject,
               chat.dataObject,
               null,
-              () => {},
+              () => { },
               true
             );
           }
@@ -377,9 +378,8 @@ const MessageCard = ({
   return (
     <div
       ref={messageRef}
-      className={`group my-2 flex  justify-start px-5  ${
-        chat.senderId === currentId ? " flex-row-reverse" : " "
-      } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
+      className={`group my-2 flex  justify-start px-5  ${chat.senderId === currentId ? " flex-row-reverse" : " "
+        } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
     >
@@ -405,54 +405,45 @@ const MessageCard = ({
         id={`${chat.id}_mainCard`}
         ref={setReferenceElement}
         className={`messageDiv relative box-border max-w-[80%] break-words rounded-lg p-2 text-left 
-        ${
-          SamePrevSender &&
+        ${SamePrevSender &&
           chat.senderId !== User.id &&
           ChatObject.activeChatType === "group" &&
           "ml-[38px]"
-        }
-        ${
-          !SamePrevSender &&
-          ` ${
-            chat.senderId !== User.id ? "rounded-tl-none" : "rounded-tr-none"
+          }
+        ${!SamePrevSender &&
+          ` ${chat.senderId !== User.id ? "rounded-tl-none" : "rounded-tr-none"
           } `
-        }
-        ${
-          activeIndexId === chat.id &&
-          `${
-            chat.senderId === User.id
-              ? "pulse-bg-user"
-              : ` ${
-                  theme === "dark" || theme === "system"
-                    ? "pulse-bg-notUser-dark"
-                    : "pulse-bg-notUser-light"
-                }  `
+          }
+        ${activeIndexId === chat.id &&
+          `${chat.senderId === User.id
+            ? "pulse-bg-user"
+            : ` ${theme === "dark" || theme === "system"
+              ? "pulse-bg-notUser-dark"
+              : "pulse-bg-notUser-light"
+            }  `
           }`
-        }  ${
-          chat.senderId === User.id
+          }  ${chat.senderId === User.id
             ? "ml-2   bg-accent-blue text-right text-white"
             : "mr-2  bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
-        } ${
-          (chat.type === "pic/video" ||
+          } ${(chat.type === "pic/video" ||
             chat.type === "image" ||
             chat.type === "video" ||
             chat.type === "file" ||
             chat.type === "poll") &&
           "w-[300px]"
-        }
+          }
           `}
       >
         {chat.senderId !== User.id &&
           ChatObject.activeChatType === "group" &&
           !SamePrevSender && (
             <p
-              className={`text-muted text-[11px] ${
-                (chat.type === "pic/video" ||
-                  chat.type === "image" ||
-                  chat.type === "video" ||
-                  chat.type === "reply") &&
+              className={`text-muted text-[11px] ${(chat.type === "pic/video" ||
+                chat.type === "image" ||
+                chat.type === "video" ||
+                chat.type === "reply") &&
                 "mb-1 "
-              } flex cursor-pointer items-center font-medium transition-colors duration-300 hover:text-white `}
+                } flex cursor-pointer items-center font-medium transition-colors duration-300 hover:text-white `}
               onClick={() => {
                 handleShowUserProfile();
               }}
@@ -472,11 +463,10 @@ const MessageCard = ({
         {!SamePrevSender && (
           <span
             className={`absolute top-0 
-          ${
-            chat.senderId !== User.id
-              ? "left-[-7px] text-[#ffffff] dark:text-[#252d35]"
-              : "right-[-7px] scale-x-[-1] text-accent-blue"
-          } 
+          ${chat.senderId !== User.id
+                ? "left-[-7px] text-[#ffffff] dark:text-[#252d35]"
+                : "right-[-7px] scale-x-[-1] text-accent-blue"
+              } 
            `}
           >
             <svg width="7" height="10" viewBox="0 0 7 10" className="">
@@ -491,11 +481,10 @@ const MessageCard = ({
         {chat.type == "reply" && (
           <div
             className={`max-h-[80px] truncate rounded-lg p-2 text-start 
-             ${
-               chat.senderId === User.id
-                 ? "bg-blue-400"
-                 : "bg-light-secondary dark:bg-gray-500"
-             } `}
+             ${chat.senderId === User.id
+                ? "bg-blue-400"
+                : "bg-light-secondary dark:bg-gray-500"
+              } `}
             onClick={() => {
               const scrollToElement = document.getElementById(
                 `${chat.replyObject.replyTextId}_mainCard`
@@ -504,8 +493,8 @@ const MessageCard = ({
                 chat.replyObject.replyUserId === User.id
                   ? "pulse-bg-user"
                   : theme === "light"
-                  ? "pulse-bg-notUser-light"
-                  : "pulse-bg-notUser-dark";
+                    ? "pulse-bg-notUser-light"
+                    : "pulse-bg-notUser-dark";
               if (scrollToElement) {
                 scrollToElement.scrollIntoView({
                   behavior: "smooth",
@@ -526,16 +515,16 @@ const MessageCard = ({
         {(chat.type === "pic/video" ||
           chat.type === "image" ||
           chat.type === "video") && (
-          <div>
-            <>
-              {chat.dataObject.type.startsWith("image") ? (
-                <ImageComponent chat={chat} />
-              ) : (
-                <VideoComponent chat={chat} />
-              )}
-            </>
-          </div>
-        )}
+            <div>
+              <>
+                {chat.dataObject.type.startsWith("image") ? (
+                  <ImageComponent chat={chat} />
+                ) : (
+                  <VideoComponent chat={chat} />
+                )}
+              </>
+            </div>
+          )}
         {chat.type === "poll" && (
           <PollComponent
             PollObject={chat}
@@ -544,20 +533,17 @@ const MessageCard = ({
           />
         )}
         <div
-          className={`items- flex w-full flex-col ${
-            chat.senderId !== User.id && "justify-end"
-          } ${
-            (chat.type === "pic/video" ||
+          className={`items- flex w-full flex-col ${chat.senderId !== User.id && "justify-end"
+            } ${(chat.type === "pic/video" ||
               chat.type === "image" ||
               chat.type === "video") &&
             !chat.text &&
             "absolute bottom-3 right-4 z-10"
-          }`}
+            }`}
         >
           <p
-            className={`max-w-[400px] break-words text-start ${
-              chat.type === "poll" && "hidden"
-            }`}
+            className={`max-w-[400px] break-words text-start ${chat.type === "poll" && "hidden"
+              }`}
           >
             {chat.text?.split(" ").map((word, index) => (
               <span
@@ -580,9 +566,8 @@ const MessageCard = ({
           <div className="ml-3 flex w-full items-center justify-end text-end">
             <div className={`ml-auto flex items-center justify-end`}>
               <div
-                className={`text-muted mt-1 text-xs ${
-                  chat.senderId !== User.id && "mr-3"
-                } `}
+                className={`text-muted mt-1 text-xs ${chat.senderId !== User.id && "mr-3"
+                  } `}
               >
                 {formatTimeForMessages(chat.timestamp)}
               </div>
@@ -597,12 +582,37 @@ const MessageCard = ({
             </div>
           </div>
         </div>
-
+        {emojiVotesOpen && (
+          <Menu
+            anchorEl={emojiVotesAnchor}
+            variant="plain"
+            open={emojiVotesOpen}
+            onClose={() => setEmojiVotesAnchor(null)}
+            placement={
+              chat.senderId === currentId ? "bottom-end" : "bottom-start"
+            }
+            sx={{
+              backgroundColor:
+                theme === "dark" || theme === "system" ? "#1d232a" : "#fcfcfc",
+              boxShadow: "none",
+              ".MuiOutlinedInput-notchedOutline": { border: 0 },
+              padding: "7px",
+              overflow: "hidden",
+            }}
+          >
+            <MenuItem className="h-[500px] w-full hidden hover:bg-inherit hover:bg-primary " >
+              <div>
+                <EmojiReactionsBoard chat={chat} />
+              </div>
+            </MenuItem>
+          </Menu>
+        )}
         {chat.reactions?.length > 0 && (
           <div
             ref={animationParent}
-            className={`absolute bottom-[-20px] right-0 flex cursor-pointer
+            className={`absolute bottom-[-20px] right-0 flex cursor-pointer select-none
             items-center  rounded-lg bg-light-primary p-[5px] dark:bg-dark-primary`}
+            onClick={(e) => setEmojiVotesAnchor(e.target)}
           >
             {[...new Set(chat.reactions.map(({ emoji }) => emoji))]
               .slice(-3)
@@ -618,9 +628,8 @@ const MessageCard = ({
       </div>
 
       <div
-        className={` flex items-center ${
-          chat.senderId === currentId ? "left-0 " : "right-0 "
-        }`}
+        className={` flex items-center ${chat.senderId === currentId ? "left-0 " : "right-0 "
+          }`}
       >
         <div className="relative">
           {showReactEmojiTray && (
@@ -657,9 +666,8 @@ const MessageCard = ({
               <div ref={selectedUserHeight}>
                 <ul
                   ref={animationParent}
-                  className={`${
-                    selectedUsers.length === 0 && "hidden h-0"
-                  }  scrollBar mb-2 flex max-h-[116px]
+                  className={`${selectedUsers.length === 0 && "hidden h-0"
+                    }  scrollBar mb-2 flex max-h-[116px]
                    flex-wrap items-center overflow-y-auto rounded-lg bg-light-secondary 
                     py-1 dark:bg-dark-secondary `}
                 >
@@ -690,9 +698,8 @@ const MessageCard = ({
               />
               {selectedUsers.length > 0 && (
                 <button
-                  className={` ${
-                    isforwarding && "cursor-wait"
-                  } mb-4 w-full rounded-lg bg-accent-blue py-2`}
+                  className={` ${isforwarding && "cursor-wait"
+                    } mb-4 w-full rounded-lg bg-accent-blue py-2`}
                   onClick={() => {
                     if (isforwarding) return;
                     handleMessageForward();
@@ -770,9 +777,8 @@ const MessageCard = ({
             </div>
           )}
           <div
-            className={` relative ${
-              chat.status === "pending" && "hidden"
-            }  flex cursor-pointer items-center justify-center
+            className={` relative ${chat.status === "pending" && "hidden"
+              }  flex cursor-pointer items-center justify-center
              rounded-r-full rounded-l-full bg-light-primary px-1 py-[6px] text-muted-light group-hover:opacity-100
              dark:bg-dark-primary dark:text-muted-dark md:opacity-0
               ${chat.senderId === currentId && "flex-row-reverse"}`}
@@ -781,10 +787,9 @@ const MessageCard = ({
             }}
           >
             <i
-              className={` md:transition-all md:duration-150 ${
-                chat.senderId === currentId &&
+              className={` md:transition-all md:duration-150 ${chat.senderId === currentId &&
                 "ml-2 flex-row-reverse md:ml-0 md:group-hover:ml-2"
-              }  ${chat.senderId !== currentId && " group-hover:mr-2 "} `}
+                }  ${chat.senderId !== currentId && " group-hover:mr-2 "} `}
             >
               <BsChevronDown size={10} />
             </i>
@@ -809,6 +814,7 @@ const MessageCard = ({
           overflow: "hidden",
         }}
       >
+
         <MenuItem
           className="hover:dark:light-primary flex cursor-default border-none py-2 text-black
                  hover:bg-hover-light dark:text-white hover:dark:bg-dark-primary  "
@@ -818,10 +824,9 @@ const MessageCard = ({
             <div
               key={emoji}
               className={`mr-1 cursor-pointer rounded-lg p-1 hover:dark:bg-hover-dark
-               hover:dark:text-white ${
-                 chat.reactions?.find((reaction) => reaction.id === User.id)
-                   ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
-               } `}
+               hover:dark:text-white ${chat.reactions?.find((reaction) => reaction.id === User.id)
+                  ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
+                } `}
               onClick={() => handleEmojiReaction(emoji)}
             >
               <Emoji unified={emoji} size="23" />

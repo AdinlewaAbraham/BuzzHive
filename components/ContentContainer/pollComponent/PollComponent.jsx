@@ -4,6 +4,7 @@ import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { UserContext } from "../../App";
 import { modifyPollVote } from "@/utils/messagesUtils/modifyPollVote";
 import { motion } from "framer-motion";
+import { TbCircleCheckFilled } from "react-icons/tb";
 
 const POllOption = ({
   option,
@@ -23,15 +24,7 @@ const POllOption = ({
       }}
     >
       <div
-        className={`
-    pollCheckbox
-    mr-2
-    flex
-    h-5
-    w-5
-    items-center
-    justify-center
-    rounded-full
+        className={`pollCheckbox mr-2 flex h-5 w-5 items-center justify-center rounded-full
     ${!isVotedFor && "border border-[#aaa]"}
   
     ${
@@ -85,7 +78,7 @@ const POllOption = ({
             fill="currentColor"
             rx="2"
             ry="2"
-            className={` 
+            className={`
             ${
               PollObject.senderId === User.id
                 ? "text-blue-300"
@@ -101,6 +94,7 @@ const POllOption = ({
             rx="2"
             ry="2"
             className={`
+            transition-[width] duration-300
             ${
               PollObject.senderId === User.id
                 ? "text-blue-800"
@@ -113,7 +107,7 @@ const POllOption = ({
   );
 };
 
-const PollComponent = ({ PollObject, searchText , searchedMessages}) => {
+const PollComponent = ({ PollObject, searchText, searchedMessages }) => {
   const { ChatObject, setChats, Chats } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
   const { options, question, allowMultipleAnswers } = PollObject.dataObject;
@@ -176,7 +170,6 @@ const PollComponent = ({ PollObject, searchText , searchedMessages}) => {
 
   return (
     <div className="text-left ">
-
       <h3 className="max-w-[300px]  whitespace-normal break-words ">
         {question?.split(" ").map((word, index) => (
           <span
@@ -196,8 +189,18 @@ const PollComponent = ({ PollObject, searchText , searchedMessages}) => {
         ))}
       </h3>
 
-      <p className="text-muted">
-        {allowMultipleAnswers ? "select one or more" : "select one"}
+      <p className="text-muted flex items-center text-sm ">
+        <i className={` flex items-center`}>
+          <TbCircleCheckFilled />
+          {allowMultipleAnswers && (
+            <i className="translate-x-[-6px] ">
+              <TbCircleCheckFilled />
+            </i>
+          )}
+        </i>
+        <p className={`${!allowMultipleAnswers && "ml-1 "} `}>
+          {allowMultipleAnswers ? "select one or more" : "select one"}
+        </p>
       </p>
       {options.map((option) => (
         <POllOption

@@ -227,7 +227,7 @@ const VideoComponent = ({ chat }) => {
               )}
               {dataObject.status === "uploading" ||
                 (isDownloaded && (
-                  <div className="text-muted absolute bottom-0 left-2 mb-[4px] flex items-center text-xs">
+                  <div className="text-muted absolute bottom-0 left-2 mb-[4px] flex items-center text-[13px]">
                     <i className="mr-1">
                       <BsCameraVideo />
                     </i>
