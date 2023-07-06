@@ -17,10 +17,7 @@ export const handleFileUpload = async (
 ) => {
   const currentTime = new Date().getTime();
 
-  const seconds = Math.floor(currentTime / 1000);
-  const nanoseconds = (currentTime % 1000) * 10 ** 6;
-
-  const time = { seconds: seconds, nanoseconds: nanoseconds };
+  const time = new Date()
   try {
     if (!file) {
       return;
