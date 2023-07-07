@@ -192,8 +192,8 @@ const ContentContainer = () => {
               ChatObject={aboutProfleChatObject}
             />
           )}
-          <div className="relative z-20 flex max-h-[66px] cursor-pointer  items-center justify-between bg-[#fcfcfc] px-[13px] dark:bg-[#1d232a] md:ml-[1px]">
-            <div className="flex h-full items-center p-[13px]">
+          <div className="relative z-20 flex max-h-[66px] cursor-pointer  items-center justify-between bg-primary px-[13px] md:ml-[1px]">
+          <div className="flex h-full items-center p-[13px]">
               {IsMobile && (
                 <div
                   className="mr-[15px]"
@@ -375,7 +375,7 @@ const ContentContainer = () => {
               <>{/* empty state component */}</>
             ) : (
               <div
-                className="scrollBar w-full overflow-y-auto"
+                className="scrollBar w-full overflow-y-auto overflow-x-hidden"
                 onScroll={handleScroll}
                 ref={scrollContainerRef}
                 id="scrollContainer"

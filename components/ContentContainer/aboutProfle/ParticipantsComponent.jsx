@@ -125,9 +125,11 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
       <div
         key={user.id}
         className="clickEvent hover:bg-hover flex cursor-pointer items-center justify-between truncate rounded-xl  px-4 py-3"
-        onClick={() => {
+        onClick={(e) => {
           if (user.id !== User.id) {
-            setShowUserPopup(true);
+            if (!e.target.closest(".dontClose")){
+              setShowUserPopup(true);
+            }
           }
         }}
       >
@@ -156,7 +158,7 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
         </div>
         {isCurrentUserAdmin && !isAdmin && (
           <i
-            className="dontClose"
+            className="dontClose p-2 rounded-full hover:bg-coverColor"
             onClick={(e) => setShowMenu(true)}
             ref={referenceElement}
           >
@@ -205,7 +207,8 @@ const ParticipantsComponent = ({ groupObject }) => {
     );
   }
   const { User } = useContext(UserContext);
-  const participantsId = groupObject.members;
+  const duplicatedIds = [...groupObject.admins, ...groupObject.members];
+  const participantsId = [...new Set(duplicatedIds)];
   const [participants, setParticipants] = useState([]);
   const [lastParticipantId, setlastParticipantId] = useState(null);
   const [locked, setLocked] = useState(false);
@@ -289,7 +292,7 @@ const ParticipantsComponent = ({ groupObject }) => {
         {JSON.stringify(participants) === "[]" ? (
           <div className="flex h-full items-center justify-center [&>span]:mr-1">
             <CircularProgress size="sm" variant="plain" />
-            Users Loading...
+            fetching Group Members...
           </div>
         ) : (
           <>

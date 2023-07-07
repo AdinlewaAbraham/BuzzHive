@@ -21,6 +21,7 @@ const MediaSection = () => {
       const messages = JSON.parse(
         localStorage.getItem(ChatObject.activeChatId)
       );
+      if (!messages) return ()=>{}
       const MediaMessages = messages?.filter(
         (message) => message.type === "video" || message.type === "image"
       );

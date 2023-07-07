@@ -1,8 +1,4 @@
-cant see who reacted to message -----------
-setting overflow for mobile 
-adding participants ux   
-fix unread message indicator style dfrom just red 
-
+fix unread message indicator style dfrom just red -----------
 
 add error bound indicators for errors 
 

@@ -24,6 +24,7 @@ import { CircularProgress } from "@mui/joy";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import Goback from "@/components/ChannelBar/Goback";
 import Badge from "@/components/Badge";
+import Img from "@/components/Img";
 const UserCard = (p) => {
   const [invalidURL, setinvalidURL] = useState(true);
   return (
@@ -40,7 +41,7 @@ const UserCard = (p) => {
           onError={() => setinvalidURL(false)}
         />
       ) : (
-        <i className="mr-2 flex h-[45px] w-[45px] items-center justify-center rounded-full bg-coverColor ">
+        <i className="bg-coverColor mr-2 flex h-[45px] w-[45px] items-center justify-center rounded-full ">
           <FaUserAlt size={22} />
         </i>
       )}
@@ -71,6 +72,8 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
   const { ChatObject } = useContext(SelectedChannelContext);
   const ref = useRef(null);
   const scrollContainerRef = useRef(null);
+
+  const [addedUsers, setAddedUsers] = useState(false);
 
   let data = localStorage.getItem(`${User.id}_userChats`);
 
@@ -172,7 +175,10 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
     const groupRef = doc(db, "groups", ChatObject.activeChatId);
     await updateDoc(groupRef, { members: arrayUnion(...userid) });
 
-    setAddingUser(false);
+    setAddedUsers(true);
+    setTimeout(() => {
+      setShowAddParticipants(false);
+    }, 1000);
   };
   const addUsers = async () => {
     if (addUsersLoading) return;
@@ -210,10 +216,11 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
   };
 
   const divStyles = {
-    maxHeight: `calc(100vh - 200px${selectedUsers.length > 0
+    maxHeight: `calc(100vh - 200px${
+      selectedUsers.length > 0
         ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
         : ""
-      })`,
+    })`,
     transition: "height ease-in-out 150ms",
   };
   return (
@@ -247,16 +254,19 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
                     className="parent-div text-bold group relative m-1 flex items-center whitespace-nowrap
                      rounded-lg bg-accent-blue px-2 py-1 text-center text-[12px] font-semibold"
                   >
-                    <img
-                      className="mr-1 h-5 rounded-full"
+                    <Img
                       src={user.photoUrl}
-                      alt=""
+                      type="personal"
+                      personalSize={50}
+                      styles="rounded-full w-5 h-5 select-none mr-1"
+                      imgStyles="rounded-full w-5 h-5"
                     />
                     {user.name}
                     <i
                       className={`text-danger absolute right-1 cursor-pointer p-1
-                      opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${!showAddGroupMenu && "group-hover:opacity-100  "
-                        } `}
+                      opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${
+                        !showAddGroupMenu && "group-hover:opacity-100  "
+                      } `}
                       onClick={() => handleRemoveUser(user.id)}
                     >
                       <GiCancel />
@@ -267,7 +277,7 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
             </div>
           </motion.div>
         )}
-        <div className="flex w-full items-center justify-center mb-3">
+        <div className="mb-3 flex w-full items-center justify-center">
           <input
             type="text"
             className=" bg-secondary w-[90%]  rounded-lg px-3 py-2 
@@ -288,13 +298,42 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
         </div>
         {selectedUsers.length > 0 && (
           <button
-            className={` ${addingUser && "cursor-wait"
-              } w-full rounded-lg bg-accent-blue py-2 mb-3`}
+            className={` ${
+              addingUser && "cursor-wait"
+            } mb-3 w-full rounded-lg bg-accent-blue py-2`}
             onClick={() => addUsersToGroup()}
           >
             {addingUser ? (
               <div className="flex items-center justify-center [&>span]:mr-1">
-                <CircularProgress size="sm" variant="plain" /> Adding users...
+                {addedUsers ? (
+                  <>
+                    {" "}
+                    Successfully added {selectedUsers.length} user
+                    {selectedUsers > 1 && "s"}.{" "}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="17"
+                      height="17"
+                      className="ml-1"
+                    >
+                      <motion.path
+                        fill="none"
+                        strokeWidth="3"
+                        stroke="#fff"
+                        d="M1 14.5l6.857 6.857L23.5 4"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 0.8 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                      />
+                    </svg>
+                  </>
+                ) : (
+                  <>
+                    <CircularProgress size="sm" variant="plain" /> Adding
+                    users...
+                  </>
+                )}
               </div>
             ) : (
               <>Add {selectedUsers.length} Users to group</>

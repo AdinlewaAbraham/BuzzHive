@@ -15,6 +15,8 @@
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@faker-js/faker": "^8.0.2",
+    "@floating-ui/react": "^0.24.5",
+    "@floating-ui/react-dom": "^2.0.1",
     "@fluentui/react": "^8.109.2",
     "@fluentui/react-cards": "^0.205.83",
     "@formkit/auto-animate": "^1.0.0-beta.6",

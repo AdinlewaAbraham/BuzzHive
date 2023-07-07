@@ -112,9 +112,6 @@ const AddContact = () => {
     fetchUsers();
   }, []);
 
-  const divStyles = {
-    maxHeight: `calc(100vh - 125px)`,
-  };
   function goBack() {
 
     setSelectedChannel(prevSelectedChannel || "chats");
@@ -167,10 +164,9 @@ const AddContact = () => {
           ))
         ) : (
           <div
-            style={divStyles}
             ref={scrollContainerRef}
             onScroll={handleOnScroll}
-            className={`scrollBar  relative mt-[10px]
+            className={`scrollBar  relative mt-[10px] h-[calc(100vh-211px)] md:h-[calc(100vh-141px)]
             overflow-y-auto 
            `}
           >

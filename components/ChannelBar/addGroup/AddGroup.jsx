@@ -31,6 +31,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Checkbox from "@/components/Checkbox";
 import { MdVerified } from "react-icons/md";
 import Badge from "@/components/Badge";
+import Img from "@/components/Img";
 
 const UserCard = (p) => {
   const [invalidURL, setinvalidURL] = useState(true);
@@ -138,7 +139,7 @@ const AddGroup = () => {
     maxHeight: `calc(100vh - 125px - 16px${
       selectedUsers.length > 0
         ? ` - ${height}px - ${IsMobile ? "130px" : "60px"}`
-        : ""
+        : ` - ${IsMobile ? "66px" : "0px"}`
     })`,
     transition: "height ease-in-out 150ms",
   };
@@ -252,7 +253,7 @@ const AddGroup = () => {
 
     let triggerHeight = container.scrollTop + container.offsetHeight;
     if (triggerHeight >= container.scrollHeight - 20 && hasMore) {
-      addUsers();
+      // addUsers();
     }
   };
 
@@ -308,11 +309,14 @@ const AddGroup = () => {
                   className="parent-div text-bold group relative m-1 flex items-center whitespace-nowrap
                 rounded-lg bg-accent-blue px-2 py-1 text-center text-[12px] font-semibold"
                 >
-                  <img
-                    className="mr-1 h-5 rounded-full"
+                  <Img
                     src={user.photoUrl}
-                    alt=""
+                    styles="rounded-full h-5 w-5 mr-1"
+                    imgStyles="rounded-full h-5 w-5 "
+                    personalSize="50"
+                    type="personnal"
                   />
+
                   {user.name}
                   <i
                     className={`text-danger absolute right-1 cursor-pointer p-1
@@ -366,10 +370,18 @@ const AddGroup = () => {
                   )}
                   <input
                     disabled={creatingGroupLoading}
-                    onChange={(e) => setprofilePic(e.target.files[0])}
+                    onChange={(e) => {
+                      if (e.target.files[0].size > 20971520) {
+                        alert("Selected file exceeds the 20MB limit.");
+                        e.target.value = null;
+                        return;
+                      }
+                      setprofilePic(e.target.files[0]);
+                    }}
                     id="dropzone-file"
                     type="file"
                     className="hidden"
+                    accept="image/png, image/jpeg"
                   />
 
                   <p className=" text-[15px]">

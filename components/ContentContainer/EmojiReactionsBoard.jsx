@@ -9,6 +9,7 @@ import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
 import { faker } from "@faker-js/faker";
 import { topEmojiUnified } from "@/utils/emojis";
+import Badge from "../Badge";
 
 const EmojiReactionsBoard = ({ chat }) => {
     const { reactions } = chat;
@@ -33,6 +34,7 @@ const EmojiReactionsBoard = ({ chat }) => {
     const groupedReactionsArrayKeys = Object.keys(groupedReactions);
 
     useEffect(() => {
+        sethasMore(true)
         if (selectedEmojiTray === "all") {
             const splicedUsersThatReacted = JSON.parse(
                 JSON.stringify(reactions)
@@ -96,16 +98,15 @@ const EmojiReactionsBoard = ({ chat }) => {
     };
     return (
         <div
-            className="h-[300px] text-black dark:text-white "
-            onClick={() => console.log(chat.id)}
+            className="h-[300px] w-[300px] text-black dark:text-white p-2 "
         >
-            {/* <button onClick={spamWithEmojis}>spam with emojis</button> */}
             <ul
-                className="[&>li]: scrollBar mb-2 flex h-[40px] 
-            max-w-[250px] overflow-x-auto overflow-y-hidden [&>li]:mr-3 [&>li]:cursor-pointer "
+                className="[&>li]: scrollBar mb-2 flex 
+            w-full py-2 overflow-x-auto overflow-y-hidden [&>li]:mr-3 [&>li]:cursor-pointer "
+            id="emojiBoard"
             >
                 <li
-                    className={` min-w-max ${selectedEmojiTray === "all" && "border-b-2 border-accent-blue"
+                    className={` min-w-max ${selectedEmojiTray === "all" && "border-b-4 border-accent-blue"
                         } `}
                     onClick={() => setSelectedEmojiTray("all")}
                 >
@@ -113,7 +114,7 @@ const EmojiReactionsBoard = ({ chat }) => {
                 </li>
                 {groupedReactionsArrayKeys.map((key) => (
                     <li
-                        className={` min-w-max ${selectedEmojiTray === key && "border-b-2 border-accent-blue"
+                        className={` min-w-max ${selectedEmojiTray === key && "border-b-4 border-accent-blue"
                             } flex `}
                         onClick={() => setSelectedEmojiTray(key)}
                     >
@@ -124,12 +125,13 @@ const EmojiReactionsBoard = ({ chat }) => {
             </ul>
             <AnimatePresence>
                 <div
-                    className="scrollBar h-[calc(100%-40px)] overflow-auto"
+                    className="scrollBar h-[calc(100%-60px)] overflow-auto"
                     ref={scrollContainerRef}
                     onScroll={handleOnScroll}
+                    id="emojiBoard"
                 >
                     {renderUsers.map((user) => (
-                        <div key={user.id} className="flex items-center justify-between">
+                        <div key={user.id} className="flex items-center justify-between p-2 ">
                             <div className="flex items-center">
                                 <Img
                                     src={user.displayImg}
@@ -138,8 +140,9 @@ const EmojiReactionsBoard = ({ chat }) => {
                                     styles="rounded-full w-[40px] h-[40px] select-none"
                                     imgStyles="rounded-full w-[40px] h-[40px]"
                                 />
-                                <div className="truncate">
+                                <div className="truncate ml-1 flex items-center">
                                     <p className="truncate">{user.name}</p>
+                                    <Badge id={user.id} />
                                 </div>
                             </div>
                             <Emoji unified={user.emoji} size={20} />
@@ -147,7 +150,6 @@ const EmojiReactionsBoard = ({ chat }) => {
                     ))}
                 </div>
             </AnimatePresence>
-            <div>{ }</div>
         </div>
     );
 };

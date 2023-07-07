@@ -188,6 +188,7 @@ const ProfileSettings = () => {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -20, opacity: 0 }}
         transition={{ duration: 0.2 }}
+        className="overflow-y-auto scrollBar md:h-[calc(100vh-100px)] h-[calc(100vh-150px)] "
       >
         <div className="flex w-full items-center justify-center">
           <div

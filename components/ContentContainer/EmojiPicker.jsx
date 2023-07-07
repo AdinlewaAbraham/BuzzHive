@@ -5,10 +5,8 @@ import Menu from "@mui/joy/Menu";
 
 const EmojiPicker = ({
   setshowReactEmojiTray,
-  message,
   addEmojiToLastUsedEmojiTray,
   handleEmojiReaction,
-  anchor,
 }) => {
   useEffect(() => {
     const event = window.addEventListener("click", (e) => {
@@ -20,7 +18,7 @@ const EmojiPicker = ({
     return () => event;
   }, []);
   return (
-        <div className="emoji-picker scrollBar z-50 grid max-h-full  auto-cols-min grid-cols-6 gap-[2px] overflow-y-auto rounded-lg bg-light-primary p-2 dark:bg-dark-primary">
+        <div className="emoji-picker scrollBar z-50 grid h-[300px] max-h-full  auto-cols-min grid-cols-6 gap-[2px] overflow-y-auto rounded-lg bg-light-primary p-2 dark:bg-dark-primary">
           {topEmojiUnified.map((emoji) => (
             <div
               key={emoji}

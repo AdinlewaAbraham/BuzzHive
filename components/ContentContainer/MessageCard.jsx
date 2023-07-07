@@ -22,8 +22,6 @@ import { MdOutlineContentCopy } from "react-icons/md";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { BiTimeFive } from "react-icons/bi";
 import FileComponent from "./fileComponent/FileComponent";
-import Menu from "@mui/joy/Menu";
-import MenuItem from "@mui/joy/MenuItem";
 import { useTheme } from "next-themes";
 import { HiReply } from "react-icons/hi";
 import {
@@ -71,8 +69,8 @@ const MessageCard = ({
 
   const currentId = User.id;
   const timestamp = chat.timestamp;
-  const [emojiVotesAnchor, setEmojiVotesAnchor] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [showEmojiReactions, setshowEmojiReactions] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [emojiAnchor, setemojiAnchor] = useState(null);
   const [SamePrevSender, setSamePrevSender] = useState(true);
   const [referenceElement, setReferenceElement] = useState(null);
@@ -84,27 +82,55 @@ const MessageCard = ({
   const [Height, setHeight] = useState(0);
   const [isforwarding, setisforwarding] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    modifiers: [
-      {
-        name: "offset",
-        options: {
-          offset: [0, 10],
+  const [emojiReactionBoardRef, setemojiReactionBoardRef] = useState(null);
+  const [emojiReactionBoardPopperRef, setemojiReactionBoardPopperRef] =
+    useState(null);
+
+  const { styles: popperStyles1, attributes: popperAttributes1 } = usePopper(
+    referenceElement,
+    popperElement,
+    {
+      modifiers: [
+        {
+          name: "offset",
+          options: {
+            offset: [0, 10],
+          },
         },
-      },
-      {
-        name: "arrow",
-        options: {
-          element: arrowElement,
+        {
+          name: "arrow",
+          options: {
+            element: arrowElement,
+          },
         },
-      },
-    ],
-    placement: "auto",
-  });
-  const emojiVotesOpen = Boolean(emojiVotesAnchor);
-  const Open = Boolean(anchorEl);
+      ],
+      placement: "auto",
+    }
+  );
+  const { styles: popperStyles2, attributes: popperAttributes2 } = usePopper(
+    emojiReactionBoardRef,
+    emojiReactionBoardPopperRef,
+    {
+      modifiers: [
+        {
+          name: "offset",
+          options: {
+            offset: [0, 10],
+          },
+        },
+        {
+          name: "arrow",
+          options: {
+            element: arrowElement,
+          },
+        },
+      ],
+      placement: "auto",
+    }
+  );
 
   const messageRef = useRef(null);
+
   useEffect(() => {
     const getContacts = () => {
       const contacts = JSON?.parse(
@@ -128,34 +154,22 @@ const MessageCard = ({
       setSamePrevSender(false);
     }
   }, [Chats, chat, setSamePrevSender]);
-  useEffect(() => {
-    const mainElement = document.getElementById("scrollContainer");
-
-    const handleWheel = (event) => {
-      if (
-        (Open || showReactEmojiTray || forwardMessageModal) &&
-        !event.target.closest("#emojiBoard") &&
-        !event.target.closest("#scrollContacts")
-      ) {
-        event.preventDefault();
-      }
-    };
-
-    mainElement.addEventListener("wheel", handleWheel, { passive: false });
-
-    return () => {
-      mainElement.removeEventListener("wheel", handleWheel);
-    };
-  }, [Open, showReactEmojiTray, setPopperElement, forwardMessageModal]);
 
   useEffect(() => {
-    const event = window.addEventListener("click", (e) => {
+    const clickFunction = (e) => {
       if (!e.target.closest(".clickEvent")) {
         setforwardMessageModal(false);
       }
-    });
+      if (!e.target.closest(".showEmojiReactionsBoard")) {
+        setshowEmojiReactions(false);
+      }
+      if (!e.target.closest(".MenuLists")) {
+        setShowMenu(false);
+      }
+    };
+    window.addEventListener("click", clickFunction);
 
-    return () => event;
+    return () => window.removeEventListener("click", clickFunction);
   }, []);
   const selectedUserHeight = useRef(null);
   useLayoutEffect(() => {
@@ -263,7 +277,7 @@ const MessageCard = ({
 
   const handleMenuItemClick = (item) => {
     item.action();
-    setAnchorEl(null);
+    setShowMenu(null);
   };
 
   if (chat.type === "announcement") {
@@ -286,7 +300,7 @@ const MessageCard = ({
     );
   }
   const handleMessageDelete = async () => {
-    setAnchorEl(null);
+    setShowMenu(null);
     if (User.id !== chat.senderId) return;
     const docRef = doc(
       db,
@@ -312,8 +326,7 @@ const MessageCard = ({
   };
 
   const divStyles = {
-    maxHeight: `calc(100vh - 285px - ${Height}px
-      )`,
+    maxHeight: `calc(100vh - 285px - ${Height}px - ${selectedUsers.length > 0 ? 120 : 0}px)`,
     transition: "height ease-in-out 150ms",
   };
   const handleMessageForward = async () => {
@@ -334,7 +347,7 @@ const MessageCard = ({
               chat.replyObject,
               chat.dataObject,
               null,
-              () => { },
+              () => {},
               true
             );
           } else {
@@ -349,7 +362,7 @@ const MessageCard = ({
               chat.replyObject,
               chat.dataObject,
               null,
-              () => { },
+              () => {},
               true
             );
           }
@@ -375,11 +388,13 @@ const MessageCard = ({
     });
     setshowProfile(true);
   };
+  const isActivePopup = showMenu || forwardMessageModal || showReactEmojiTray;
   return (
     <div
       ref={messageRef}
-      className={`group my-2 flex  justify-start px-5  ${chat.senderId === currentId ? " flex-row-reverse" : " "
-        } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
+      className={`group my-2 flex  justify-start px-5  ${
+        chat.senderId === currentId ? " flex-row-reverse" : " "
+      } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
       id={chat.id}
     >
@@ -403,52 +418,60 @@ const MessageCard = ({
         )}
       <div
         id={`${chat.id}_mainCard`}
-        ref={setReferenceElement}
         className={`messageDiv relative box-border max-w-[80%] break-words rounded-lg p-2 text-left 
-        ${SamePrevSender &&
+        ${
+          SamePrevSender &&
           chat.senderId !== User.id &&
           ChatObject.activeChatType === "group" &&
           "ml-[38px]"
-          }
-        ${!SamePrevSender &&
-          ` ${chat.senderId !== User.id ? "rounded-tl-none" : "rounded-tr-none"
+        }
+        ${
+          !SamePrevSender &&
+          ` ${
+            chat.senderId !== User.id ? "rounded-tl-none" : "rounded-tr-none"
           } `
-          }
-        ${activeIndexId === chat.id &&
-          `${chat.senderId === User.id
-            ? "pulse-bg-user"
-            : ` ${theme === "dark" || theme === "system"
-              ? "pulse-bg-notUser-dark"
-              : "pulse-bg-notUser-light"
-            }  `
+        }
+        ${
+          activeIndexId === chat.id &&
+          `${
+            chat.senderId === User.id
+              ? "pulse-bg-user"
+              : ` ${
+                  theme === "dark" || theme === "system"
+                    ? "pulse-bg-notUser-dark"
+                    : "pulse-bg-notUser-light"
+                }  `
           }`
-          }  ${chat.senderId === User.id
+        }  ${
+          chat.senderId === User.id
             ? "ml-2   bg-accent-blue text-right text-white"
             : "mr-2  bg-[#ffffff] text-left text-black dark:bg-[#252d35] dark:text-white"
-          } ${(chat.type === "pic/video" ||
+        } ${
+          (chat.type === "pic/video" ||
             chat.type === "image" ||
             chat.type === "video" ||
             chat.type === "file" ||
             chat.type === "poll") &&
           "w-[300px]"
-          }
+        }
           `}
       >
         {chat.senderId !== User.id &&
           ChatObject.activeChatType === "group" &&
           !SamePrevSender && (
             <p
-              className={`text-muted text-[11px] ${(chat.type === "pic/video" ||
-                chat.type === "image" ||
-                chat.type === "video" ||
-                chat.type === "reply") &&
+              className={`text-muted text-[11px] ${
+                (chat.type === "pic/video" ||
+                  chat.type === "image" ||
+                  chat.type === "video" ||
+                  chat.type === "reply") &&
                 "mb-1 "
-                } flex cursor-pointer items-center font-medium transition-colors duration-300 hover:text-white `}
+              } flex cursor-pointer items-center font-medium transition-colors duration-300 hover:text-white `}
               onClick={() => {
                 handleShowUserProfile();
               }}
             >
-              {chat.senderDisplayName}{" "}
+              {chat.senderDisplayName}
               <Badge id={chat.senderId} styles=" ml-[4px]" />
             </p>
           )}
@@ -463,10 +486,11 @@ const MessageCard = ({
         {!SamePrevSender && (
           <span
             className={`absolute top-0 
-          ${chat.senderId !== User.id
-                ? "left-[-7px] text-[#ffffff] dark:text-[#252d35]"
-                : "right-[-7px] scale-x-[-1] text-accent-blue"
-              } 
+          ${
+            chat.senderId !== User.id
+              ? "left-[-7px] text-[#ffffff] dark:text-[#252d35]"
+              : "right-[-7px] scale-x-[-1] text-accent-blue"
+          } 
            `}
           >
             <svg width="7" height="10" viewBox="0 0 7 10" className="">
@@ -481,10 +505,11 @@ const MessageCard = ({
         {chat.type == "reply" && (
           <div
             className={`max-h-[80px] truncate rounded-lg p-2 text-start 
-             ${chat.senderId === User.id
-                ? "bg-blue-400"
-                : "bg-light-secondary dark:bg-gray-500"
-              } `}
+             ${
+               chat.senderId === User.id
+                 ? "bg-blue-400"
+                 : "bg-light-secondary dark:bg-gray-500"
+             } `}
             onClick={() => {
               const scrollToElement = document.getElementById(
                 `${chat.replyObject.replyTextId}_mainCard`
@@ -493,8 +518,8 @@ const MessageCard = ({
                 chat.replyObject.replyUserId === User.id
                   ? "pulse-bg-user"
                   : theme === "light"
-                    ? "pulse-bg-notUser-light"
-                    : "pulse-bg-notUser-dark";
+                  ? "pulse-bg-notUser-light"
+                  : "pulse-bg-notUser-dark";
               if (scrollToElement) {
                 scrollToElement.scrollIntoView({
                   behavior: "smooth",
@@ -515,16 +540,16 @@ const MessageCard = ({
         {(chat.type === "pic/video" ||
           chat.type === "image" ||
           chat.type === "video") && (
-            <div>
-              <>
-                {chat.dataObject.type.startsWith("image") ? (
-                  <ImageComponent chat={chat} />
-                ) : (
-                  <VideoComponent chat={chat} />
-                )}
-              </>
-            </div>
-          )}
+          <div>
+            <>
+              {chat.dataObject.type.startsWith("image") ? (
+                <ImageComponent chat={chat} />
+              ) : (
+                <VideoComponent chat={chat} />
+              )}
+            </>
+          </div>
+        )}
         {chat.type === "poll" && (
           <PollComponent
             PollObject={chat}
@@ -533,17 +558,20 @@ const MessageCard = ({
           />
         )}
         <div
-          className={`items- flex w-full flex-col ${chat.senderId !== User.id && "justify-end"
-            } ${(chat.type === "pic/video" ||
+          className={`items- flex w-full flex-col ${
+            chat.senderId !== User.id && "justify-end"
+          } ${
+            (chat.type === "pic/video" ||
               chat.type === "image" ||
               chat.type === "video") &&
             !chat.text &&
             "absolute bottom-3 right-4 z-10"
-            }`}
+          }`}
         >
           <p
-            className={`max-w-[400px] break-words text-start ${chat.type === "poll" && "hidden"
-              }`}
+            className={`max-w-[400px] break-words text-start ${
+              chat.type === "poll" && "hidden"
+            }`}
           >
             {chat.text?.split(" ").map((word, index) => (
               <span
@@ -566,8 +594,9 @@ const MessageCard = ({
           <div className="ml-3 flex w-full items-center justify-end text-end">
             <div className={`ml-auto flex items-center justify-end`}>
               <div
-                className={`text-muted mt-1 text-xs ${chat.senderId !== User.id && "mr-3"
-                  } `}
+                className={`text-muted mt-1 text-xs ${
+                  chat.senderId !== User.id && "mr-3"
+                } `}
               >
                 {formatTimeForMessages(chat.timestamp)}
               </div>
@@ -582,293 +611,310 @@ const MessageCard = ({
             </div>
           </div>
         </div>
-        {emojiVotesOpen && (
-          <Menu
-            anchorEl={emojiVotesAnchor}
-            variant="plain"
-            open={emojiVotesOpen}
-            onClose={() => setEmojiVotesAnchor(null)}
-            placement={
-              chat.senderId === currentId ? "bottom-end" : "bottom-start"
-            }
-            sx={{
-              backgroundColor:
-                theme === "dark" || theme === "system" ? "#1d232a" : "#fcfcfc",
-              boxShadow: "none",
-              ".MuiOutlinedInput-notchedOutline": { border: 0 },
-              padding: "7px",
-              overflow: "hidden",
-            }}
+        {showEmojiReactions && (
+          <div
+            className="bg-primary showEmojiReactionsBoard absolute top-0 left-0
+             z-40 rounded-lg "
+            ref={setemojiReactionBoardPopperRef}
+            style={popperStyles2.popper}
+            {...popperAttributes2.popper}
           >
-            <MenuItem className="h-[500px] w-full hidden hover:bg-inherit hover:bg-primary " >
-              <div>
-                <EmojiReactionsBoard chat={chat} />
-              </div>
-            </MenuItem>
-          </Menu>
+            <EmojiReactionsBoard chat={chat} />
+          </div>
         )}
         {chat.reactions?.length > 0 && (
           <div
-            ref={animationParent}
-            className={`absolute bottom-[-20px] right-0 flex cursor-pointer select-none
+            ref={setemojiReactionBoardRef}
+            className={`showEmojiReactionsBoard absolute bottom-[-20px] right-0  cursor-pointer select-none
             items-center  rounded-lg bg-light-primary p-[5px] dark:bg-dark-primary`}
-            onClick={(e) => setEmojiVotesAnchor(e.target)}
+            onClick={(e) => setshowEmojiReactions(true)}
           >
-            {[...new Set(chat.reactions.map(({ emoji }) => emoji))]
-              .slice(-3)
-              .reverse()
-              .map((emoji) => (
-                <Emoji unified={emoji} size="15" key={emoji} />
-              ))}
-            <span className="text-muted ml-1 text-[10px] ">
-              {formatCount(chat.reactions?.length)}
-            </span>
+            <div ref={animationParent} className="flex">
+              {[...new Set(chat.reactions.map(({ emoji }) => emoji))]
+                .slice(-3)
+                .reverse()
+                .map((emoji) => (
+                  <Emoji unified={emoji} size="15" key={emoji} />
+                ))}
+              <span className="text-muted ml-1 text-[10px] ">
+                {formatCount(chat.reactions?.length)}
+              </span>
+            </div>
           </div>
         )}
       </div>
 
       <div
-        className={` flex items-center ${chat.senderId === currentId ? "left-0 " : "right-0 "
-          }`}
+        className={` flex items-center ${
+          chat.senderId === currentId ? "left-0 " : "right-0 "
+        }`}
       >
         <div className="relative">
-          {showReactEmojiTray && (
-            <div
-              id="emojiBoard"
-              className="absolute bottom-0 right-0 z-[100] h-[300px] w-[280px]"
-              ref={setPopperElement}
-              style={styles.popper}
-              {...attributes.popper}
-            >
-              <EmojiPicker
-                setshowReactEmojiTray={setshowReactEmojiTray}
-                message={chat}
-                addEmojiToLastUsedEmojiTray={addEmojiToLastUsedEmojiTray}
-                handleEmojiReaction={handleEmojiReaction}
-                anchor={emojiAnchor}
-              />
-            </div>
-          )}
-          {forwardMessageModal && (
-            <div
-              className="clickEvent bg-primary z-[100] w-[280px] rounded-lg p-3"
-              ref={setPopperElement}
-              style={styles.popper}
-              {...attributes.popper}
-            >
-              <h1 className="mb-2 flex items-center justify-start text-lg font-medium">
-                Forward message
-              </h1>
-              <p className="text-muted mb-2 text-sm">
-                Select up to 5 contacts{" "}
-              </p>
-
-              <div ref={selectedUserHeight}>
-                <ul
-                  ref={animationParent}
-                  className={`${selectedUsers.length === 0 && "hidden h-0"
-                    }  scrollBar mb-2 flex max-h-[116px]
-                   flex-wrap items-center overflow-y-auto rounded-lg bg-light-secondary 
-                    py-1 dark:bg-dark-secondary `}
-                >
-                  {selectedUsers.map((user) => (
-                    <li
-                      key={user.id}
-                      id={user.id}
-                      className="parent-div text-bold relative m-1 flex items-center whitespace-nowrap
-                    rounded-lg bg-accent-blue px-2 py-1 text-center text-[12px] font-semibold "
-                    >
-                      <img
-                        className="mr-1 h-5 rounded-full"
-                        src={user.senderDisplayImg}
-                        alt=""
-                      />
-                      {user.senderDisplayName}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <input
-                type="text"
-                className=" mb-2 w-full rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light
-                outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {selectedUsers.length > 0 && (
-                <button
-                  className={` ${isforwarding && "cursor-wait"
-                    } mb-4 w-full rounded-lg bg-accent-blue py-2`}
-                  onClick={() => {
-                    if (isforwarding) return;
-                    handleMessageForward();
-                  }}
-                >
-                  {isforwarding ? (
-                    <div className="flex items-center justify-center">
-                      <i className="mr-1">
-                        <CircularProgress variant="plain" size="sm" />
-                      </i>
-                      Forwarding...
-                    </div>
-                  ) : (
-                    <>
-                      Forward to {selectedUsers.length} contact
-                      {selectedUsers.length === 1 ? "" : "s"}
-                    </>
-                  )}
-                </button>
-              )}
-              <div
-                style={divStyles}
-                className="scrollBar overflow-auto"
-                id="scrollContacts"
+          <AnimatePresence>
+            {showReactEmojiTray && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, height: 0 }}
+                id="emojiBoard"
+                className="z-[100] w-[280px] overflow-hidden "
+                ref={setPopperElement}
+                style={popperStyles1.popper}
+                {...popperAttributes1.popper}
               >
-                {[...contacts]
-                  .filter((contact) =>
-                    contact.senderDisplayName
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase())
-                  )
-                  .map((contact) => (
-                    <div
-                      className="hover:bg-hover flex cursor-pointer items-center justify-between rounded-lg px-2 py-2"
-                      onClick={() => {
-                        if (selectedUsers.length >= 5) return;
-                        const index = selectedUsers.findIndex(
-                          (user) =>
-                            user.otherParticipant === contact.otherParticipant
-                        );
+                <EmojiPicker
+                  setshowReactEmojiTray={setshowReactEmojiTray}
+                  addEmojiToLastUsedEmojiTray={addEmojiToLastUsedEmojiTray}
+                  handleEmojiReaction={handleEmojiReaction}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-                        if (index === -1) {
-                          setselectedUsers([...selectedUsers, contact]);
-                        } else {
-                          const updatedUsers = selectedUsers.filter(
-                            (user) =>
-                              user.otherParticipant !== contact.otherParticipant
-                          );
-                          setselectedUsers(updatedUsers);
-                        }
+          <AnimatePresence>
+            {forwardMessageModal && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, height: 0 }}
+                className="clickEvent bg-primary z-[30] w-[280px] overflow-y-hidden rounded-lg p-3"
+                ref={setPopperElement}
+                style={popperStyles1.popper}
+                {...popperAttributes1.popper}
+              >
+                <div className="min-h-[250px]">
+                  <h1 className="mb-2 flex items-center justify-start text-lg font-medium">
+                    Forward message
+                  </h1>
+                  <p className="text-muted mb-2 text-sm">
+                    Select up to 5 contacts{" "}
+                  </p>
+
+                  <div ref={selectedUserHeight}>
+                    <ul
+                      ref={animationParent}
+                      className={`${
+                        selectedUsers.length === 0 && "hidden h-0"
+                      }  scrollBar mb-2 flex max-h-[116px]
+                         flex-wrap items-center overflow-y-auto rounded-lg bg-light-secondary 
+                         p-1 dark:bg-dark-secondary `}
+                    >
+                      {selectedUsers.map((user) => (
+                        <li
+                          key={user.id}
+                          id={user.id}
+                          className="parent-div text-bold relative m-1 flex items-center whitespace-nowrap
+                          rounded-lg bg-accent-blue px-1 py-0.5 text-center text-[12px] font-semibold "
+                        >
+                          <Img
+                            src={user.senderDisplayImg}
+                            styles="rounded-full h-5 w-5 "
+                            imgStyles="rounded-full h-5 w-5 "
+                            personalSize="50"
+                            type="personnal"
+                          />
+                          {user.senderDisplayName}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <input
+                    type="text"
+                    className=" mb-2 w-full rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light
+                outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  {selectedUsers.length > 0 && (
+                    <button
+                      className={` ${
+                        isforwarding && "cursor-wait"
+                      } mb-4 w-full rounded-lg bg-accent-blue py-2`}
+                      onClick={() => {
+                        if (isforwarding) return;
+                        handleMessageForward();
                       }}
                     >
-                      <div className="flex items-center">
-                        <Img
-                          src={contact.senderDisplayImg}
-                          styles="w-[35px] h-[35px] rounded-full mr-1"
-                          imgStyles="rounded-full "
-                          type={contact.type}
-                          groupSize="70"
-                          personalSize="45"
-                        />
-                        {contact.senderDisplayName}
-                      </div>
-                      <input
-                        type="checkbox"
-                        name=""
-                        id=""
-                        checked={selectedUsers.some(
-                          (c) => c.otherParticipant === contact.otherParticipant
-                        )}
-                      />
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
+                      {isforwarding ? (
+                        <div className="flex items-center justify-center">
+                          <i className="mr-1">
+                            <CircularProgress variant="plain" size="sm" />
+                          </i>
+                          Forwarding...
+                        </div>
+                      ) : (
+                        <>
+                          Forward to {selectedUsers.length} contact
+                          {selectedUsers.length === 1 ? "" : "s"}
+                        </>
+                      )}
+                    </button>
+                  )}
+                  <div
+                    style={divStyles}
+                    className="scrollBar overflow-auto"
+                    id="scrollContacts"
+                  >
+                    {[...contacts]
+                      .filter((contact) =>
+                        contact.senderDisplayName
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase())
+                      )
+                      .map((contact) => (
+                        <div
+                          className="hover:bg-hover flex cursor-pointer items-center justify-between rounded-lg px-2 py-2"
+                          onClick={() => {
+                            const index = selectedUsers.findIndex(
+                              (user) =>
+                                user.otherParticipant ===
+                                contact.otherParticipant
+                            );
+
+                            if (index === -1) {
+                            if (selectedUsers.length >= 5) return;
+                              setselectedUsers([...selectedUsers, contact]);
+                            } else {
+                              const updatedUsers = selectedUsers.filter(
+                                (user) =>
+                                  user.otherParticipant !==
+                                  contact.otherParticipant
+                              );
+                              setselectedUsers(updatedUsers);
+                            }
+                          }}
+                        >
+                          <div className="flex items-center">
+                            <Img
+                              src={contact.senderDisplayImg}
+                              styles="w-[35px] h-[35px] rounded-full mr-1"
+                              imgStyles="rounded-full "
+                              type={contact.type}
+                              groupSize="70"
+                              personalSize="45"
+                            />
+                            {contact.senderDisplayName}
+                          </div>
+                          <input
+                            type="checkbox"
+                            name=""
+                            id=""
+                            checked={selectedUsers.some(
+                              (c) =>
+                                c.otherParticipant === contact.otherParticipant
+                            )}
+                          />
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div
-            className={` relative ${chat.status === "pending" && "hidden"
-              }  flex cursor-pointer items-center justify-center
+            className={`MenuLists relative ${
+              chat.status === "pending" && "hidden"
+            }  flex cursor-pointer items-center justify-center
              rounded-r-full rounded-l-full bg-light-primary px-1 py-[6px] text-muted-light group-hover:opacity-100
              dark:bg-dark-primary dark:text-muted-dark md:opacity-0
+             ${isActivePopup && "md:opacity-100"}
+            
               ${chat.senderId === currentId && "flex-row-reverse"}`}
             onClick={(e) => {
-              setAnchorEl(e.currentTarget);
+              setShowMenu(e.currentTarget);
             }}
+            ref={setReferenceElement}
           >
             <i
-              className={` md:transition-all md:duration-150 ${chat.senderId === currentId &&
-                "ml-2 flex-row-reverse md:ml-0 md:group-hover:ml-2"
-                }  ${chat.senderId !== currentId && " group-hover:mr-2 "} `}
+              className={` md:transition-all md:duration-150 ${
+                chat.senderId === currentId
+                  ? `ml-2 flex-row-reverse md:ml-0 md:group-hover:ml-2 ${
+                      isActivePopup && "md:ml-2"
+                    }`
+                  : ` group-hover:mr-2 ${isActivePopup && "md:mr-2"}`
+              }  `}
             >
               <BsChevronDown size={10} />
             </i>
-            <i className="transition-opacity duration-150 group-hover:opacity-100 md:opacity-0">
+            <i
+              className={`transition-opacity duration-150 
+            group-hover:opacity-100 md:opacity-0  ${
+              isActivePopup && "md:opacity-100"
+            }`}
+            >
               <BsEmojiSmile />
             </i>
           </div>
         </div>
       </div>
-      <Menu
-        anchorEl={anchorEl}
-        variant="plain"
-        open={Open}
-        onClose={() => setAnchorEl(null)}
-        placement={chat.senderId === currentId ? "bottom-end" : "bottom-start"}
-        sx={{
-          backgroundColor:
-            theme === "dark" || theme === "system" ? "#1d232a" : "#fcfcfc",
-          boxShadow: "none",
-          ".MuiOutlinedInput-notchedOutline": { border: 0 },
-          padding: "7px",
-          overflow: "hidden",
-        }}
-      >
-
-        <MenuItem
-          className="hover:dark:light-primary flex cursor-default border-none py-2 text-black
+      <AnimatePresence>
+        {showMenu && (
+          <motion.ul
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, height: 0 }}
+            className="MenuLists bg-primary  z-50 overflow-y-hidden rounded-lg p-2 [&>li]:flex [&>li]:items-center"
+            ref={setPopperElement}
+            style={popperStyles1.popper}
+            {...popperAttributes1.popper}
+          >
+            <li
+              className="hover:dark:light-primary flex cursor-default border-none p-2 text-black
                  hover:bg-hover-light dark:text-white hover:dark:bg-dark-primary  "
-          sx={{ borderRadius: "8px" }}
-        >
-          {User.lastUsedEmojiTray?.map((emoji) => (
-            <div
-              key={emoji}
-              className={`mr-1 cursor-pointer rounded-lg p-1 hover:dark:bg-hover-dark
-               hover:dark:text-white ${chat.reactions?.find((reaction) => reaction.id === User.id)
-                  ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
-                } `}
-              onClick={() => handleEmojiReaction(emoji)}
             >
-              <Emoji unified={emoji} size="23" />
-            </div>
-          ))}
-          <i
-            onClick={(e) => {
-              setAnchorEl(null);
-              setshowReactEmojiTray(true);
-              setemojiAnchor(e.currentTarget);
-            }}
-            className="emoji-picker hover:dark:light-primary cursor-pointer rounded-lg p-1
-              text-black hover:bg-hover-light dark:text-white hover:dark:bg-hover-dark hover:dark:text-white "
-          >
-            <AiOutlinePlus size="23" />
-          </i>
-        </MenuItem>
-        {menuItems.map((item) => (
-          <MenuItem
-            key={item.label}
-            onClick={() => {
-              handleMenuItemClick(item);
-            }}
-            sx={{ borderRadius: "8px" }}
-            className="clickEvent cursor-pointer rounded-lg px-4 py-2  text-black hover:bg-hover-light
+              {User.lastUsedEmojiTray?.map((emoji) => (
+                <div
+                  key={emoji}
+                  className={`mr-1 cursor-pointer rounded-lg p-1 hover:dark:bg-hover-dark
+               hover:dark:text-white ${
+                 chat.reactions?.find((reaction) => reaction.id === User.id)
+                   ?.emoji === emoji && "bg-hover-light dark:bg-hover-dark"
+               } `}
+                  onClick={() => handleEmojiReaction(emoji)}
+                >
+                  <Emoji unified={emoji} size="23" />
+                </div>
+              ))}
+              <i
+                onClick={(e) => {
+                  setShowMenu(null);
+                  setshowReactEmojiTray(true);
+                  setemojiAnchor(e.currentTarget);
+                }}
+                className="emoji-picker hover:dark:light-primary cursor-pointer rounded-lg p-1
+                   text-black hover:bg-hover-light dark:text-white hover:dark:bg-hover-dark hover:dark:text-white "
+              >
+                <AiOutlinePlus size="23" />
+              </i>
+            </li>
+            {menuItems.map((item) => (
+              <li
+                key={item.label}
+                onClick={() => {
+                  handleMenuItemClick(item);
+                }}
+                className="clickEvent cursor-pointer rounded-lg p-2  text-black hover:bg-hover-light
                  dark:text-white hover:dark:bg-hover-dark hover:dark:text-white"
-          >
-            {item.icon} <p className="ml-2">{item.label}</p>
-          </MenuItem>
-        ))}
-        {chat.senderId === User.id && (
-          <MenuItem
-            sx={{ borderRadius: "8px" }}
-            className="clickEvent cursor-pointer rounded-lg px-4 py-2  text-black hover:bg-hover-light
+              >
+                {item.icon} <p className="ml-2">{item.label}</p>
+              </li>
+            ))}
+            {chat.senderId === User.id && (
+              <li
+                sx={{ borderRadius: "8px" }}
+                className="clickEvent cursor-pointer rounded-lg p-2  text-black hover:bg-hover-light
                  dark:text-white hover:dark:bg-hover-dark hover:dark:text-white"
-            onClick={handleMessageDelete}
-          >
-            <RiDeleteBinLine />
-            <p className="ml-2"> Delete</p>
-          </MenuItem>
+                onClick={handleMessageDelete}
+              >
+                <RiDeleteBinLine />
+                <p className="ml-2"> Delete</p>
+              </li>
+            )}
+          </motion.ul>
         )}
-      </Menu>
+      </AnimatePresence>
     </div>
   );
 };
