@@ -9,7 +9,9 @@ import Checkbox from "../Checkbox";
 import { motion } from "framer-motion";
 
 const PollInput = ({ setshowPollInputFunc }) => {
-  const { ChatObject, setChats, setallowScrollObject } = useContext(SelectedChannelContext);
+  const { ChatObject, setChats, setallowScrollObject } = useContext(
+    SelectedChannelContext
+  );
   const [inputs, setInputs] = useState([
     { id: "1", value: "" },
     { id: "2", value: "" },
@@ -180,9 +182,14 @@ const PollInput = ({ setshowPollInputFunc }) => {
 
   return (
     <>
-      <div className="fixed inset-0" ref={targetDivRef}></div>
-      <div className="detectMe  bg-primary absolute bottom-[65px] left-2 z-10 flex w-[50%] min-w-[300px] flex-col rounded-lg p-4 shadow-lg">
-        <h1 className="mb-2 text-lg font-semibold">Create a poll</h1>
+      <div className="fixed inset-0 z-20" ref={targetDivRef}></div>
+      <motion.div
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        exit={{ opacity: 0, height: 0 }}
+        className="detectMe bg-primary absolute bottom-[65px] left-2 z-30 flex w-[50%] min-w-[300px] flex-col overflow-hidden rounded-lg p-4 shadow-lg"
+      >
+        <h1 className="mb-2 text-xl font-semibold">Create a poll</h1>
         <p className="mb-1">Question</p>
         <input
           autoFocus
@@ -194,8 +201,8 @@ const PollInput = ({ setshowPollInputFunc }) => {
         />
         <p className="mb-1">Options</p>
         <div
-          className={`bg-secondary scrollBar max-h-[calc(100vh-365px)] rounded-lg px-1
-         ${height < 32 * inputs.length + 32 && "overflow-y-scroll"} `}
+          className={`bg-secondary scrollBar max-h-[calc(100vh-365px)] rounded-lg px-1 overflow-x-hidden
+         ${height < (32 * inputs.length) + 64 ? "overflow-y-scroll":"overflow-y-hidden"} `}
         >
           <ul ref={animationParent} className="">
             {inputs.map((input, index) => (
@@ -251,7 +258,7 @@ const PollInput = ({ setshowPollInputFunc }) => {
         <div className="mt-5 flex items-center justify-between">
           <div
             onClick={() => setallowMultipleAnswers(!allowMultipleAnswers)}
-            className="flex items-center group cursor-pointer"
+            className="group flex cursor-pointer items-center"
           >
             <div className="relative">
               <div className="absolute inset-0"></div>
@@ -266,7 +273,7 @@ const PollInput = ({ setshowPollInputFunc }) => {
             <AiOutlineSend />
           </div>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 };

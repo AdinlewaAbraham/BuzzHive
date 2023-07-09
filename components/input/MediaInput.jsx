@@ -61,12 +61,12 @@ const MediaInput = ({
   }
 
   return (
-    <AnimatePresence>
+    
       <motion.div
-        className="media-container absolute bottom-[65px] left-2 z-10 w-[80%] min-w-[300px] "
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -50 }}
+        className="media-container absolute bottom-[65px] left-2 z-30 w-[80%] min-w-[300px] overflow-hidden"
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        exit={{ opacity: 0, height: 0 }}
       >
         {picVidmedia.type.startsWith("image/") ? (
           picVidmedia?.loading ? (
@@ -147,7 +147,7 @@ const MediaInput = ({
           </div>
         </div>
       </motion.div>
-    </AnimatePresence>
+    
   );
 };
 

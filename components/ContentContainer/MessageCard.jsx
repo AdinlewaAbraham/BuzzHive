@@ -234,9 +234,14 @@ const MessageCard = ({
   };
 
   if (chat.type == "unread") {
+    const count = JSON.parse(
+      sessionStorage.getItem("activeChatRoomUnreadMessageCount")
+    );
     return (
-      <div className="bg-red-500 text-center" id="unreadId">
-        you neva read this one boss
+      <div className="flex w-full items-center justify-center" id="unreadId">
+        <div className="my-2 flex justify-center rounded-lg dark:bg-black bg-white p-2 text-center">
+          {`Unread Messages`}
+        </div>
       </div>
     );
   }
@@ -326,7 +331,9 @@ const MessageCard = ({
   };
 
   const divStyles = {
-    maxHeight: `calc(100vh - 285px - ${Height}px - ${selectedUsers.length > 0 ? 120 : 0}px)`,
+    maxHeight: `calc(100vh - 285px - ${Height}px - ${
+      selectedUsers.length > 0 ? 120 : 0
+    }px)`,
     transition: "height ease-in-out 150ms",
   };
   const handleMessageForward = async () => {
@@ -773,7 +780,7 @@ const MessageCard = ({
                             );
 
                             if (index === -1) {
-                            if (selectedUsers.length >= 5) return;
+                              if (selectedUsers.length >= 5) return;
                               setselectedUsers([...selectedUsers, contact]);
                             } else {
                               const updatedUsers = selectedUsers.filter(

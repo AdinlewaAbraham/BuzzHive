@@ -59,7 +59,7 @@ const Input = () => {
     let nanoseconds = (currentTime % 1000) * 10 ** 6;
 
     let timestamp = { seconds: seconds, nanoseconds: nanoseconds };
-    
+
     const messageObj = {
       text: message,
       senderId: senderid,
@@ -244,31 +244,31 @@ const Input = () => {
         </div>
       )}
       {(file || picVidmedia || showPollInput || showSendContact) && (
-        <div className="fixed inset-0 "></div>
+        <div className="fixed inset-0 z-20 "></div>
       )}
       <div className="flex items-center justify-between bg-[#fcfcfc] px-[4px] py-[8px] dark:bg-[#1d232a] md:ml-[1px]">
         <div className="detectMe">
-          {picVidmedia && (
-            <MediaInput
-              blurredPicVidmedia={blurredPicVidmedia}
-              picVidmedia={picVidmedia}
-              setblurredPicVidmedia={setblurredPicVidmedia}
-              setpicVidmediaToNull={() => {
-                setpicVidmedia(null);
-              }}
-            />
-          )}
-          {file && <FileInput file={file} setfile={setfile} />}
+          <AnimatePresence>
+            {picVidmedia && (
+              <MediaInput
+                blurredPicVidmedia={blurredPicVidmedia}
+                picVidmedia={picVidmedia}
+                setblurredPicVidmedia={setblurredPicVidmedia}
+                setpicVidmediaToNull={() => {
+                  setpicVidmedia(null);
+                }}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {file && <FileInput file={file} setfile={setfile} />}
+          </AnimatePresence>
         </div>
-        {showPollInput && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
+        <AnimatePresence>
+          {showPollInput && (
             <PollInput setshowPollInputFunc={() => setshowPollInput(false)} />
-          </motion.div>
-        )}
+          )}
+        </AnimatePresence>
         <div className="relative flex">
           <div
             key={"showMediaPicker"}
@@ -294,15 +294,15 @@ const Input = () => {
           <AnimatePresence>
             {showMediaPicker && (
               <motion.div
-                className="detectMe MediaPicker absolute bottom-[52px] z-[99]  w-[160px] rounded-lg
-               bg-light-primary px-1 py-2
-                text-[15px] dark:bg-dark-primary  [&>div>div>svg]:mr-2 [&>div>div]:flex
-               [&>div>div]:items-center [&>div>div]:py-1 [&>div>div]:px-2 
-               [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md hover:[&>div]:bg-hover-light
-                dark:hover:[&>div]:bg-hover-dark"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
+                className="detectMe MediaPicker absolute bottom-[52px] z-[99]  w-[160px] overflow-hidden
+               rounded-lg bg-light-primary px-1
+                py-2 text-[15px]  dark:bg-dark-primary [&>div>div>svg]:mr-2
+               [&>div>div]:flex [&>div>div]:items-center [&>div>div]:py-1 
+               [&>div>div]:px-2 [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md
+                hover:[&>div]:bg-hover-light dark:hover:[&>div]:bg-hover-dark"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
               >
                 <div className="file-input px-0 py-0">
                   <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
@@ -343,8 +343,8 @@ const Input = () => {
                           return;
                         }
                         if (e.target.files[0].type.startsWith("image")) {
-                          setpicVidmedia({type: "image/prop", loading: true})
-                          setshowMediaPicker(false)
+                          setpicVidmedia({ type: "image/prop", loading: true });
+                          setshowMediaPicker(false);
                           const blob = await downScalePicVid(
                             e.target.files[0],
                             0.7,

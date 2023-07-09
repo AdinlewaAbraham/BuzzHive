@@ -5,22 +5,13 @@ import ContentContainer from "./ContentContainer/ContentContainer";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import { SelectedChannelProvider } from "@/context/SelectedChannelContext ";
-import { SigninWithGoogle } from "@/utils/userAuthentication/SigninWithGoogle";
 
 import { createUser } from "@/utils/userUtils/createUser";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  onSnapshot,
-} from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "@/utils/firebaseUtils/firebase";
-import { FcGoogle } from "react-icons/fc";
 import { CircularProgress } from "@mui/joy";
 import { useTheme } from "next-themes";
-import { sendMessage } from "@/utils/messagesUtils/sendMessage";
+import LoginPage from "./login/LoginPage";
 
 export const UserContext = createContext();
 
@@ -29,7 +20,6 @@ const App = () => {
   const auth = getAuth();
 
   const [isAuthed, setIsAuthed] = useState(false);
-  const [isSigningIn, setisSigningIn] = useState(false);
 
   const { setTheme } = useTheme();
 
@@ -95,10 +85,6 @@ const App = () => {
 
   const memoizedUser = useMemo(() => User, [User]);
 
-  function setisSigningInFunc(state) {
-    setisSigningIn(state);
-  }
-  const senderId = "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2";
   return (
     <>
       {isAuthed ? (
@@ -114,42 +100,16 @@ const App = () => {
           </UserContext.Provider>
         ) : (
           <div className="flex h-screen items-center justify-center">
-            <div className="rounded-lg bg-accent-blue px-2 py-4">
-              <div className="flex items-center justify-center">
-                <i className="mr-1 flex items-center">
-                  <CircularProgress size="sm" variant="plain" />
-                </i>
-                loading user...
-              </div>
+            <div className="flex items-center justify-center rounded-lg bg-accent-blue px-2 py-4">
+              <i className="mr-1 flex items-center">
+                <CircularProgress size="sm" variant="plain" />
+              </i>
+              loading user...
             </div>
           </div>
         )
       ) : (
-        <div className="flex h-screen items-center justify-center">
-          <div className="rounded-lg bg-accent-blue px-2 py-4">
-            {!isSigningIn ? (
-              <button
-                className="flex items-center justify-center"
-                onClick={() => {
-                  setisSigningIn(true);
-                  SigninWithGoogle(setisSigningInFunc);
-                }}
-              >
-                <i className="mr-1 flex items-center">
-                  <FcGoogle size={25} />
-                </i>
-                Sign in with Google
-              </button>
-            ) : (
-              <div className="flex items-center justify-center">
-                <i className="mr-2 flex items-center">
-                  <CircularProgress size="sm" variant="plain" />
-                </i>
-                logging in...
-              </div>
-            )}
-          </div>
-        </div>
+        <LoginPage />
       )}
     </>
   );

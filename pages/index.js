@@ -1,9 +1,12 @@
 import App from "../components/App.jsx";
+import ErrorBoundary from "@/components/errorBoundary/ErrorBoundary.jsx";
 
 export default function Home() {
   return (
     <>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </>
   );
 }

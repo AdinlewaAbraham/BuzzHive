@@ -77,7 +77,7 @@ const ChatCard = ({
       return;
     }
     const userRef = doc(db, "users", User.id);
-
+     sessionStorage.setItem("activeChatRoomUnreadMessageCount", JSON.stringify(unReadCount))
     if (unReadCount === 0) {
       const data = JSON.parse(localStorage.getItem(id));
       if (data) {

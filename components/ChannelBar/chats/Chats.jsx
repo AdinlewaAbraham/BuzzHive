@@ -10,6 +10,7 @@ import { UserContext } from "../../App";
 import { HiUserAdd } from "react-icons/hi";
 import { motion } from "framer-motion";
 import { CircularProgress } from "@mui/joy";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const Chats = () => {
   const { User } = useContext(UserContext);
@@ -19,6 +20,7 @@ const Chats = () => {
   const [Loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [animationParent] = useAutoAnimate({ duration: 150 });
 
   const chats = whatToReturn;
   const { setSelectedChannel } = useContext(SelectedChannelContext);
@@ -154,6 +156,7 @@ const Chats = () => {
           <>
             {sortedChats.length !== 0 ? (
               <div
+              ref={animationParent}
                 className="scrollBar  mt-6 flex h-[calc(100vh-190px)] flex-col items-center overflow-y-auto overflow-x-hidden
                pt-[2px] pr-[2px] md:h-[calc(100vh-120px)] "
               >
