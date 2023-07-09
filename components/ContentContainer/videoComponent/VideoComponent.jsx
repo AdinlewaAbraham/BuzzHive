@@ -33,6 +33,7 @@ const VideoComponent = ({ chat }) => {
   const [loadingThumbnail, setloadingThumbnail] = useState(true);
   const [isDownloading, setisDownloading] = useState(false);
   const [DownloadProgress, setDownloadProgress] = useState(0);
+  const [imageError, setImageError] = useState(false);
 
   async function initializeDB() {
     const db = await openDB("myvideosDatabase", 1, {
@@ -135,8 +136,10 @@ const VideoComponent = ({ chat }) => {
     }
   };
 
-  const [imageError, setImageError] = useState(false);
-
+  useEffect(() => {
+    console.log(chat.dataObject.imgHeight || 300)
+  }, [chat])
+  
   return (
     <div key={messageId}>
       <AnimatePresence>
@@ -151,7 +154,7 @@ const VideoComponent = ({ chat }) => {
       </AnimatePresence>
       <div className=" flex items-center justify-center">
         <div
-          className="relative z-[2] flex items-center justify-center"
+          className={`relative z-[2] flex items-center justify-center h-[${chat.dataObject.imgHeight || 300}px]`}
           onClick={() => {
             if (isDownloaded) {
               playvideo();
@@ -165,7 +168,7 @@ const VideoComponent = ({ chat }) => {
               animation="wave"
               variant="rectangular"
               width={285}
-              height={150}
+              height={'100%'}
             />
           ) : (
             <>
@@ -181,6 +184,7 @@ const VideoComponent = ({ chat }) => {
                   <img
                     src={blurredImgSRC}
                     width={300}
+                    height={'100%'}
                     onError={() => setImageError(true)}
                   />
                 </div>

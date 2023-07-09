@@ -261,6 +261,7 @@ const AddGroup = () => {
     fetchUsers();
   }, []);
   function goBack() {
+    if (creatingGroupLoading) return;
     if (showAddGroupMenu) {
       setshowAddGroupMenu(false);
       return;
@@ -275,6 +276,7 @@ const AddGroup = () => {
   function cancelCreateGroup() {
     setOpen(true);
   }
+  console.log(activeUsers)
   return (
     <div className="relative h-full min-h-[430px]">
       <ModalComp
@@ -519,7 +521,7 @@ const AddGroup = () => {
                     Active chats
                   </h2>
                   <div>
-                    {activeUsers
+                    {activeUsers.filter((user)=>user.otherParticipant !== User.id)
                       .slice()
                       .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds)
                       .map((user) => {

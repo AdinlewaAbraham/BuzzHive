@@ -12,7 +12,8 @@ export const handlePicVidUpload = async (
   User,
   time,
   setChatsFunc,
-  videoLength
+  videoLength,
+  imgHeight
 ) => {
   if (!downscaledBlob) return;
   const id = uuidv4();
@@ -141,7 +142,7 @@ export const handlePicVidUpload = async (
           if (messageIndex === -1) {
             setChatsFunc([...activeChats, updatedMessage]);
           } else {
-            activeChats[messageIndex] = updatedMessage
+            activeChats[messageIndex] = updatedMessage;
             setChatsFunc(activeChats);
           }
         }
@@ -166,6 +167,7 @@ export const handlePicVidUpload = async (
             type: downscaledBlob.type,
             length: isImage ? null : videoLength,
             filePath: uploadTask.snapshot.ref.fullPath,
+            imgHeight,
           };
           ChatObject.activeChatType == "group"
             ? sendGroupMessage(

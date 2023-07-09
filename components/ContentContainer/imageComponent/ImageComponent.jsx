@@ -136,23 +136,24 @@ const ImageComponent = ({ chat }) => {
       <div className="relative flex h-full items-center justify-center">
         <div className="">
           {!imageBlob || chat.dataObject.status === "uploading" ? (
-            <>
+            <div className={`h-[${chat.dataObject.imgHeight || 300}px]`}>
               {!blurredImageBlob ? (
                 <Skeleton
                   animation="wave"
                   variant="rectangular"
                   width={285}
-                  height={240}
+                  height={'100%'}
                 />
               ) : (
                 <img
                   src={URL.createObjectURL(blurredImageBlob)}
                   className="object-cover cursor-pointer"
                   width={300}
+                  height={'100%'}
                   onClick={() => downloadImage(downloadSRC, "image")}
                 />
               )}
-            </>
+            </div>
           ) : (
             <>
               {!imageBlob ? (
@@ -164,6 +165,7 @@ const ImageComponent = ({ chat }) => {
                   alt="Preview"
                   className="Image cursor-pointer object-cover"
                   width={300}
+                  height={chat.dataObject.imgHeight || 300}
                 />
               )}
             </>
@@ -204,7 +206,7 @@ const ImageComponent = ({ chat }) => {
                 src={URL.createObjectURL(imageBlob)}
                 alt="Preview"
                 className={` Image
-                min-h-max  object-contain
+                h-full object-contain
                transition-all duration-500`}
               />
             </motion.div>

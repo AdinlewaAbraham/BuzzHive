@@ -1,5 +1,3 @@
-import SelectedChannelContext from "@/context/SelectedChannelContext ";
-
 export const downScalePicVid = async (file, qualityScale, pixelScale, blurRadius) => {
   if (!file) return;
   const isImage = file.type.startsWith("image/");
