@@ -289,6 +289,7 @@ const AboutProfile = ({ setshowProfile }) => {
                       viewBox="0 0 24 24"
                       width="80"
                       height="80"
+                      className="translate-x-1 translate-y-[-7px] "  
                     >
                       <motion.path
                         fill="none"

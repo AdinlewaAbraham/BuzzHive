@@ -226,6 +226,7 @@ const ProfileSettings = () => {
                     viewBox="0 0 24 24"
                     width="40"
                     height="40"
+                    className="translate-x-[3px] translate-y-[-3px]"
                   >
                     <motion.path
                       fill="none"

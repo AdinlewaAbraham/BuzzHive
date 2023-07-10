@@ -74,7 +74,7 @@ const MediaSection = () => {
       {mediaMessages === null ? (
         <div className="flex items-center justify-center w-full h-[350px] ">          
           <i className="mr-1">
-            <CircularProgress size="sm" />
+            <CircularProgress size="sm" variant="plain" />
           </i>
           loading...
         </div>

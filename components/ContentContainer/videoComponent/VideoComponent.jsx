@@ -154,7 +154,8 @@ const VideoComponent = ({ chat }) => {
       </AnimatePresence>
       <div className=" flex items-center justify-center">
         <div
-          className={`relative z-[2] flex items-center justify-center h-[${chat.dataObject.imgHeight || 300}px]`}
+          className={`relative z-[2] flex items-center justify-center overflow-hidden `}
+          style={{height: chat.dataObject.imgHeight}}
           onClick={() => {
             if (isDownloaded) {
               playvideo();

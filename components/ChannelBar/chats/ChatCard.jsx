@@ -44,6 +44,7 @@ const ChatCard = ({
   chat,
 }) => {
   const {
+    Chats,
     setChats,
     ChatObject,
     setChatObject,
@@ -56,6 +57,7 @@ const ChatCard = ({
   const [currentChatId, setcurrentChatId] = useState();
 
   const activeChatIdRef = useRef(ChatObject.activeChatId);
+
   useEffect(() => {
     sessionStorage.setItem(
       "activeChatId",
@@ -67,17 +69,20 @@ const ChatCard = ({
   useEffect(() => {
     setcurrentChatId(activeChatIdRef.current);
   }, [activeChatIdRef.current]);
-  const getStoredChats = () => {
+  function getStoredChats() {
     const storedData = localStorage.getItem(`${User.id}_userChats`);
     return storedData ? JSON.parse(storedData) : null;
-  };
+  }
 
   const handleChatClick = async () => {
     if (ChatObject.activeChatId === id) {
       return;
     }
     const userRef = doc(db, "users", User.id);
-     sessionStorage.setItem("activeChatRoomUnreadMessageCount", JSON.stringify(unReadCount))
+    sessionStorage.setItem(
+      "activeChatRoomUnreadMessageCount",
+      JSON.stringify(unReadCount)
+    );
     if (unReadCount === 0) {
       const data = JSON.parse(localStorage.getItem(id));
       if (data) {

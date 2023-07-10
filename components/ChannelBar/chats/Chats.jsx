@@ -20,7 +20,7 @@ const Chats = () => {
   const [Loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [animationParent] = useAutoAnimate({ duration: 150 });
+  const [animationParent] = useAutoAnimate({ duration: 300 });
 
   const chats = whatToReturn;
   const { setSelectedChannel } = useContext(SelectedChannelContext);

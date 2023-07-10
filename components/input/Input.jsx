@@ -67,6 +67,11 @@ const Input = () => {
       reactions: [],
       status: "pending",
       id: "propId",
+      type: "regular",
+      senderDisplayName: User.name,
+      senderId: User.id,
+
+
     };
     setallowScrollObject({
       scrollTo: "bottom",

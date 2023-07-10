@@ -1,11 +1,8 @@
-look into checkmark for changing pf 
-look into chats animation duration 
 make chats update locally for sending messages
 when clicking on user profile in groups  it does not open the correct profile 
 reply ui
 make img fit in MediaSection
 
 
-optimize stuff 
+optimize stuff    
 make initial query sort messages so i dont sort messages over and over again    
-
