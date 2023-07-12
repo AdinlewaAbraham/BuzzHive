@@ -128,7 +128,6 @@ const ImageComponent = ({ chat }) => {
     } catch (error) {
       console.error(error);
       setisDownloading(false);
-      throw error;
     }
   };
   return (
@@ -138,21 +137,20 @@ const ImageComponent = ({ chat }) => {
           {!imageBlob || chat.dataObject.status === "uploading" ? (
             <div
               className={` overflow-hidden`}
-              style={{ height: chat.dataObject.imgHeight }}
             >
               {!blurredImageBlob ? (
                 <Skeleton
                   animation="wave"
                   variant="rectangular"
                   width={285}
-                  height={"100%"}
+                  height={chat.dataObject.imgHeight || 300}
                 />
               ) : (
                 <img
                   src={URL.createObjectURL(blurredImageBlob)}
                   className="cursor-pointer object-cover"
                   width={300}
-                  height={"100%"}
+                  height={chat.dataObject.imgHeight || 300}
                   onClick={() => downloadImage(downloadSRC, "image")}
                 />
               )}

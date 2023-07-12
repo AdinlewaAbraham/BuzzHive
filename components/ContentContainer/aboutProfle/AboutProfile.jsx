@@ -54,8 +54,7 @@ const Menu = ({ icon, header, context }) => {
   );
 };
 
-const Header = ({ title, isActive, onClick }) => {
-  const { ChatObject } = useContext(SelectedChannelContext);
+const Header = ({ title, isActive, onClick,ChatObject }) => {
   return ChatObject.activeChatType === "group" || title !== "Participants" ? (
     <div
       className={`relative w-full cursor-pointer select-none pb-5 text-center ${!isActive && "text-muted"
@@ -72,9 +71,9 @@ const Header = ({ title, isActive, onClick }) => {
   );
 };
 
-const AboutProfile = ({ setshowProfile }) => {
+const AboutProfile = ({ setshowProfile,ChatObject }) => {
   const [profile, setprofile] = useState();
-  const { setChatObject, ChatObject } = useContext(SelectedChannelContext);
+  const { setChatObject } = useContext(SelectedChannelContext);
 
   const [activeComponent, setActiveComponent] = useState("Media");
   const [prevComponent, setPrevComponent] = useState(null);
@@ -110,9 +109,9 @@ const AboutProfile = ({ setshowProfile }) => {
   const renderComponent = () => {
     switch (activeComponent) {
       case "Media":
-        return <MediaSection />;
+        return <MediaSection ChatObject={ChatObject} />;
       case "Files":
-        return <FileSection />;
+        return <FileSection ChatObject={ChatObject} />;
       case "Participants":
         return (
           <ParticipantsComponent
@@ -427,6 +426,7 @@ const AboutProfile = ({ setshowProfile }) => {
                 title={header}
                 isActive={activeComponent === header}
                 onClick={() => handleHeaderClick(header)}
+                ChatObject={ChatObject}
               />
             ))}
           </div>

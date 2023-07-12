@@ -21,7 +21,7 @@ import PollInput from "./PollInput";
 import FileInput from "./FileInput";
 import { Timestamp } from "firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
-const Input = () => {
+const Input = ({ setReplyDivHeight }) => {
   const { User } = useContext(UserContext);
   const {
     ChatObject,
@@ -70,8 +70,6 @@ const Input = () => {
       type: "regular",
       senderDisplayName: User.name,
       senderId: User.id,
-
-
     };
     setallowScrollObject({
       scrollTo: "bottom",
@@ -125,8 +123,7 @@ const Input = () => {
   useEffect(() => {
     if (elementRef.current) {
       const height = elementRef.current.offsetHeight;
-      "Element height:", height;
-      setreplyDivHeight(height);
+      setReplyDivHeight(height);
     }
   }, [ReplyObject]);
   const popupRef = useRef(null);
@@ -168,7 +165,7 @@ const Input = () => {
     showPopup,
   ]);
   return (
-    <>
+    <div className="overflow-hidden">
       <AnimatePresence>
         {showPopup && (
           <motion.div
@@ -223,31 +220,36 @@ const Input = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      {ReplyObject.ReplyTextId && (
-        <div
-          className="ml-[1px] max-h-[90px] truncate px-10 py-2 dark:bg-[#1d232a]"
-          ref={elementRef}
-        >
-          <div className="flex items-center justify-between rounded-lg bg-gray-500 p-1 ">
-            <div>
-              <p>{ReplyObject.displayName}</p>
-              <p>{ReplyObject.ReplyText}</p>
+      <AnimatePresence>
+        {ReplyObject.ReplyTextId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="ml-[1px] max-h-[90px] overflow-hidden truncate px-10 py-2 dark:bg-[#1d232a]"
+            ref={elementRef}
+          >
+            <div className="flex items-center justify-between rounded-lg bg-gray-500 p-1 ">
+              <div>
+                <p>{ReplyObject.displayName}</p>
+                <p>{ReplyObject.ReplyText}</p>
+              </div>
+              <div
+                className="cursor-pointer"
+                onClick={() => {
+                  setReplyObject({
+                    ReplyText: "",
+                    ReplyTextId: "",
+                    displayName: "",
+                  });
+                }}
+              >
+                <ImCross />
+              </div>
             </div>
-            <div
-              className="cursor-pointer"
-              onClick={() => {
-                setReplyObject({
-                  ReplyText: "",
-                  ReplyTextId: "",
-                  displayName: "",
-                });
-              }}
-            >
-              <ImCross />
-            </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {(file || picVidmedia || showPollInput || showSendContact) && (
         <div className="fixed inset-0 z-20 "></div>
       )}
@@ -413,7 +415,7 @@ const Input = () => {
           <AiOutlineSend />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

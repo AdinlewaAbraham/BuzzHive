@@ -37,12 +37,12 @@ const ContentContainer = () => {
     showChats,
     setshowChats,
     ReplyObject,
-    replyDivHeight,
     allowScrollObject,
     setallowScrollObject,
   } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
 
+  const [replyDivHeight, setReplyDivHeight] = useState(50);
   const [sortedChats, setSortedChats] = useState([]);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [showProfile, setshowProfile] = useState(false);
@@ -53,7 +53,7 @@ const ContentContainer = () => {
   const [searchedMessages, setsearchedMessages] = useState([]);
   const [currentSearchIndex, setcurrentSearchIndex] = useState(-1);
 
-  const [aboutProfleChatObject, setAboutProfleChatObject] = useState({})
+  const [aboutProfleChatObject, setAboutProfleChatObject] = useState({});
 
   const [hasMoreTop, sethasMoreTop] = useState(true);
 
@@ -117,6 +117,9 @@ const ContentContainer = () => {
       setactiveIndexId(searchedMessages[currentSearchIndex].id);
     }
   }, [currentSearchIndex]);
+  useEffect(() => {
+    console.log(aboutProfleChatObject);
+  }, [aboutProfleChatObject]);
 
   useEffect(() => {
     sethasMoreTop(true);
@@ -124,9 +127,8 @@ const ContentContainer = () => {
   }, [ChatObject.activeChatId]);
 
   useEffect(() => {
-   sessionStorage.setItem("activeChats", JSON.stringify(sortedChats))
-  }, [sortedChats])
-  
+    sessionStorage.setItem("activeChats", JSON.stringify(sortedChats));
+  }, [sortedChats]);
 
   useMemo(() => {
     if (Chats == []) return;
@@ -144,12 +146,6 @@ const ContentContainer = () => {
     );
   }
 
-  const mainContentStyle = {
-    overflowY: "auto",
-    height: `calc(100vh - 123px${
-      ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
-    })`,
-  };
   const handleSearch = (event) => {
     setSearchText(event.target.value);
     const searchText = event.target.value.toLowerCase();
@@ -184,16 +180,18 @@ const ContentContainer = () => {
   };
   return (
     showChats && (
-      <div className={`flex-1 ${IsMobile ? "fixed inset-0" : ""}`}>
-        <div className=" inset relative flex-col overflow-y-auto  bg-[#E0E0E0] dark:bg-[#12171d] md:flex ">
+      <div
+        className={`flex-1 overflow-hidden ${IsMobile ? "fixed inset-0" : ""}`}
+      >
+        <div className=" inset relative flex-col overflow-hidden  bg-[#E0E0E0] dark:bg-[#12171d] md:flex ">
           {showProfile && (
             <AboutProfile
               setshowProfile={setshowProfile}
               ChatObject={aboutProfleChatObject}
             />
           )}
-          <div className="relative z-20 flex max-h-[66px] cursor-pointer  items-center justify-between bg-primary px-[13px] md:ml-[1px]">
-          <div className="flex h-full items-center p-[13px]">
+          <div className="bg-primary relative z-20 flex max-h-[66px] cursor-pointer   items-center justify-between overflow-hidden px-[13px] md:ml-[1px]">
+            <div className="flex h-full items-center p-[13px] ">
               {IsMobile && (
                 <div
                   className="mr-[15px]"
@@ -208,7 +206,7 @@ const ContentContainer = () => {
               <div
                 className="flex h-full items-center"
                 onClick={() => {
-                  setAboutProfleChatObject(ChatObject)
+                  setAboutProfleChatObject(ChatObject);
                   setshowProfile(true);
                 }}
               >
@@ -363,8 +361,13 @@ const ContentContainer = () => {
             </AnimatePresence>
           </div>
           <main
-            style={mainContentStyle}
-            className="flex h-[calc(100vh-123px)] flex-col justify-end"
+            style={{
+              height: `calc(100vh - 123px${
+                ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
+              })`,
+              overflow: "hidden",
+            }}
+            className="flex h-[calc(100vh-123px)] flex-col justify-end overflow-hidden"
           >
             {Chats == null ? (
               <div className="mb-4 flex items-center justify-center text-center">
@@ -387,7 +390,7 @@ const ContentContainer = () => {
                     const messages = JSON.parse(
                       localStorage.getItem(`${ChatObject.activeChatId}`)
                     );
-
+                    if (!messages) return;
                     const newMessages = messages.filter(
                       (message) =>
                         message.timestamp?.seconds <
@@ -438,7 +441,7 @@ const ContentContainer = () => {
                 onClick={() => {
                   secondDivRef.current.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="absolute right-[20px] z-10 cursor-pointer rounded-lg p-3 dark:bg-[#1d232a]"
+                className="absolute right-[20px] z-10 cursor-pointer overflow-hidden rounded-lg p-3 dark:bg-[#1d232a]"
                 style={{
                   bottom: `${
                     ReplyObject.ReplyTextId
@@ -451,7 +454,7 @@ const ContentContainer = () => {
               </div>
             )}
           </main>
-          <Input />
+          <Input setReplyDivHeight={setReplyDivHeight} />
         </div>
       </div>
     )

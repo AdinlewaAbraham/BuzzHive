@@ -1,5 +1,4 @@
 make chats update locally for sending messages
-when clicking on user profile in groups  it does not open the correct profile 
 reply ui
 make img fit in MediaSection
 

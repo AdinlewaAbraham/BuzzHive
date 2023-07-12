@@ -14,8 +14,8 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const Chats = () => {
   const { User } = useContext(UserContext);
-  const { loading, whatToReturn } = useGetChats(User.id);
   const [Chats, set_Chats] = useState(null);
+  const { loading, whatToReturn } = useGetChats(User.id);
   const [sortedChats, setSortedChats] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
@@ -50,14 +50,10 @@ const Chats = () => {
   JSON.parse(localStorage.getItem(`${User.id}_userChats`));
   useEffect(() => {
     const storedChats = getStoredChats();
-    storedChats;
     if (storedChats && storedChats.length) {
-      storedChats;
       set_Chats(storedChats);
       setLoading(false);
     } else {
-      ("ranning");
-      chats;
       set_Chats(chats);
       chats == null
         ? 0

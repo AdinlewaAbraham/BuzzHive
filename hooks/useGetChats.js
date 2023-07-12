@@ -24,7 +24,6 @@ export const useGetChats = (currentUserId) => {
   const { ChatObject, activeId } = useContext(SelectedChannelContext);
 
   useEffect(() => {
-    ("ran");
     const conversationRef = collection(db, "conversations");
     const groupRef = collection(db, "groups");
     const groupQuery = query(
@@ -39,7 +38,6 @@ export const useGetChats = (currentUserId) => {
     if (JSON.parse(localStorage.getItem("user")) == undefined) {
       return;
     }
-    JSON.parse(localStorage.getItem("user"));
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       const activeChatId = JSON.parse(sessionStorage.getItem("activeChatId")); // this is a retarded hack but it works
       const lastMessagesObject = JSON.parse(
@@ -148,7 +146,6 @@ export const useGetChats = (currentUserId) => {
         };
         groupChats.push(groupChat);
       }
-
 
       setreturnGroupChats([...groupChats]);
       setisGroupChatsLoading(false);

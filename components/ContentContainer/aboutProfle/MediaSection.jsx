@@ -8,8 +8,7 @@ import { useRef } from "react";
 import { CircularProgress } from "@mui/joy";
 
 
-const MediaSection = () => {
-  const { ChatObject } = useContext(SelectedChannelContext);
+const MediaSection = ({ChatObject}) => {
   const [mediaMessages, setMediaMessages] = useState(null);
   const [renderedMedia, setRenderedMedia] = useState([]);
   const [hasMore, setHasMore] = useState(true);

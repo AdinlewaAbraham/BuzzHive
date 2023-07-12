@@ -415,6 +415,10 @@ const Settings = () => {
               text: "photos",
               icon: <MdOutlineImageNotSupported />,
             },
+            {
+              text: "chats",
+              icon: <MdOutlineImageNotSupported />,
+            },
           ].map((option) => (
             <DeleteOption
               key={option.text}
@@ -426,7 +430,21 @@ const Settings = () => {
                   returnText: "Cancel",
                   discardText: `Clear ${option.text}`,
                   disCardFunc: () => {
-                    handleDelete(option.text);
+                    if (option.text === "chats") {
+                      const chatsRoomsString = localStorage.getItem(
+                        `${User.id}_userChats`
+                      );
+                      if (!chatsRoomsString) return;
+                      const chatRooms = JSON.parse(chatsRoomsString);
+
+                      for (const { id } of chatRooms) {
+                        if (!id) return;
+                        localStorage.removeItem(id);
+                      }
+                      localStorage.removeItem(`${User.id}_userChats`)
+                    } else {
+                      handleDelete(option.text);
+                    }
                   },
                 });
                 setshowModal(true);

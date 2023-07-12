@@ -57,6 +57,49 @@ const ChatCard = ({
   const [currentChatId, setcurrentChatId] = useState();
 
   const activeChatIdRef = useRef(ChatObject.activeChatId);
+  // useEffect(() => {
+  //   if (!Chats) return 
+  //   const lastMessage = Chats[Chats.length - 1];
+  //   if (!lastMessage) return;
+  //   const { text, id, senderDisplayName, timestamp, type, senderId } =
+  //     lastMessage;
+  //   const userChatRooms = getStoredChats();
+  //   const updatedArr = userChatRooms.map((obj) => {
+  //     if (obj.id == ChatObject.activeChatId) {
+  //       const pendingMessagesTimestampObj = JSON.parse(
+  //         sessionStorage.getItem("pendingMessagesTimestampObj")
+  //       );
+  //       const modifiedObj ={
+  //         ...obj,
+  //         timestamp,
+  //         lastMessageType: type,
+  //         lastMessage: text,
+  //         status: "pending",
+  //         senderId,
+  //       }
+  //       if (!pendingMessagesTimestampObj) {
+  //         sessionStorage.setItem(
+  //           "pendingMessagesTimestampObj",
+  //           JSON.stringify({ [ChatObject.activeChatId]: modifiedObj })
+  //         );
+  //       } else {
+  //         pendingMessagesTimestampObj[ChatObject.activeChatId] = modifiedObj;
+  //         sessionStorage.setItem(
+  //           "pendingMessagesTimestampObj",
+  //           JSON.stringify(pendingMessagesTimestampObj)
+  //         );
+  //       }
+  //       return modifiedObj
+  //     } else {
+  //       return obj;
+  //     }
+  //   });
+  //   set_Chats(
+  //     updatedArr.sort((a, b) => {
+  //       a.timestamp - b.timestamp;
+  //     })
+  //   );
+  // }, [Chats]);
 
   useEffect(() => {
     sessionStorage.setItem(
@@ -115,7 +158,6 @@ const ChatCard = ({
         localStorage.setItem(id, JSON.stringify(modifiedArr));
       }
     }
-    JSON.parse(localStorage.getItem("user"));
     setactiveId(id);
     sessionStorage.setItem("activeChatId", new String(id));
     if (unReadCount === 0) {
@@ -258,7 +300,6 @@ const ChatCard = ({
                       if (firstMessageIndex === -1) {
                         return [...saveChats].splice(-30);
                       }
-                      console.log(firstMessageIndex);
                       return [...saveChats].splice(firstMessageIndex);
                     });
                   })

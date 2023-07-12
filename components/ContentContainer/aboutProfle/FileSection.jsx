@@ -3,8 +3,7 @@ import FileComponent from "../fileComponent/FileComponent";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { CircularProgress } from "@mui/joy";
 
-const FileSection = () => {
-  const { ChatObject } = useContext(SelectedChannelContext);
+const FileSection = ({ChatObject}) => {
   const [fileMessages, setFileMessages] = useState(null);
   const [renderedFiles, setRenderedFiles] = useState([]);
   const [hasMore, setHasMore] = useState(true);
