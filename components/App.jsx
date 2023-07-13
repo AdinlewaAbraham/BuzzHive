@@ -91,7 +91,7 @@ const App = () => {
         memoizedUser ? (
           <UserContext.Provider value={{ User, setUser }}>
             <SelectedChannelProvider>
-              <div className="flex h-full w-full flex-col-reverse overflow-y-hidden md:flex-row">
+              <div className="flex h-screen w-screen flex-col-reverse overflow-hidden md:flex-row">
                 <SideBar />
                 <ChannelBar />
                 <ContentContainer />

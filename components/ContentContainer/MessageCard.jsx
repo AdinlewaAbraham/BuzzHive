@@ -515,7 +515,7 @@ const MessageCard = ({
              ${
                chat.senderId === User.id
                  ? "bg-blue-400"
-                 : "bg-light-secondary dark:bg-gray-500"
+                 : "bg-light-secondary dark:bg-hover-dark"
              } `}
             onClick={() => {
               const scrollToElement = document.getElementById(

@@ -14,7 +14,6 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const Chats = () => {
   const { User } = useContext(UserContext);
-  const [Chats, set_Chats] = useState(null);
   const { loading, whatToReturn } = useGetChats(User.id);
   const [sortedChats, setSortedChats] = useState([]);
   const [Loading, setLoading] = useState(true);
@@ -23,7 +22,7 @@ const Chats = () => {
   const [animationParent] = useAutoAnimate({ duration: 300 });
 
   const chats = whatToReturn;
-  const { setSelectedChannel } = useContext(SelectedChannelContext);
+  const { setSelectedChannel, chatRooms, setChatRooms } = useContext(SelectedChannelContext);
 
   const getStoredChats = () => {
     const storedData = localStorage.getItem(`${User.id}_userChats`);
@@ -51,17 +50,17 @@ const Chats = () => {
   useEffect(() => {
     const storedChats = getStoredChats();
     if (storedChats && storedChats.length) {
-      set_Chats(storedChats);
+      setChatRooms(storedChats);
       setLoading(false);
     } else {
-      set_Chats(chats);
+      setChatRooms(chats);
       chats == null
         ? 0
         : localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
       setLoading(false);
     }
     if ((chats == null || chats.length == 0) && !loading) {
-      set_Chats(null);
+      setChatRooms(null);
     }
   }, [chats, User.id, whatToReturn]);
 
@@ -73,7 +72,7 @@ const Chats = () => {
         isOnline
       ) {
         localStorage.setItem(`${User.id}_userChats`, JSON.stringify(chats));
-        set_Chats(chats);
+        setChatRooms(chats);
       }
     };
     fetchData();
@@ -88,12 +87,12 @@ const Chats = () => {
   }, [User, chats, loading]);
 
   useMemo(async () => {
-    if (!Chats) return;
-    const sortedChats = Chats.slice().sort(
+    if (!chatRooms) return;
+    const sortedChats = chatRooms.slice().sort(
       (a, b) => b.timestamp.seconds - a.timestamp.seconds
     );
     setSortedChats(sortedChats);
-  }, [Chats]);
+  }, [chatRooms]);
   return (
     <div className="">
       <div className="h-[95px]">
@@ -136,7 +135,7 @@ const Chats = () => {
         exit={{ y: -20, opacity: 0 }}
         transition={{ duration: 0.2 }}
       >
-        {sortedChats.length === 0 && !Loading && Chats == null ? (
+        {sortedChats.length === 0 && !Loading && chatRooms == null ? (
           <div className="mt-6 flex flex-col items-center justify-center">
             <h2>You have no chats at the moment.</h2>
             <button
@@ -178,7 +177,6 @@ const Chats = () => {
                         status: chat.lastMessageStatus,
                       }}
                       unReadCount={chat.unReadmessagesCount}
-                      set_Chats={set_Chats}
                       chat={chat}
                       timestamp={chat.timestamp}
                     />

@@ -11,9 +11,7 @@ import { sendGroupMessage } from "@/utils/groupUtils/sendGroupMessage";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 import { UserContext } from "../App";
 import { ImAttachment } from "react-icons/im";
-import { RiGalleryLine } from "react-icons/ri";
-import { TiChartBarOutline } from "react-icons/ti";
-import { AiOutlineSend, AiOutlineFile } from "react-icons/ai";
+import { AiOutlineSend } from "react-icons/ai";
 import { ImCross } from "react-icons/im";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import MediaInput from "./MediaInput";
@@ -21,6 +19,7 @@ import PollInput from "./PollInput";
 import FileInput from "./FileInput";
 import { Timestamp } from "firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
+import InputMenu from "./InputMenu";
 const Input = ({ setReplyDivHeight }) => {
   const { User } = useContext(UserContext);
   const {
@@ -30,6 +29,8 @@ const Input = ({ setReplyDivHeight }) => {
     setReplyObject,
     setreplyDivHeight,
     setallowScrollObject,
+    setChatRooms,
+    chatRooms,
   } = useContext(SelectedChannelContext);
   const [message, setmessage] = useState("");
   const [showMediaPicker, setshowMediaPicker] = useState(false);
@@ -45,6 +46,12 @@ const Input = ({ setReplyDivHeight }) => {
   const elementRef = useRef(null);
   async function handleSend() {
     if (!message || message.trim().length === 0) return;
+    setReplyObject({
+      ReplyText: "",
+      ReplyTextId: "",
+      displayName: "",
+      ReplyUserId: "",
+    });
     const replyObject = {
       replyText: ReplyObject.ReplyText,
       replyTextId: ReplyObject.ReplyTextId,
@@ -80,6 +87,23 @@ const Input = ({ setReplyDivHeight }) => {
       [...prevChats, messageObj];
       return [...prevChats, messageObj];
     });
+
+    // const newChatRooms = chatRooms.map((room) => {
+    //   if (room.id === ChatObject.activeChatId) {
+    //     return {
+    //       ...room,
+    //       lastMessageSenderName: User.name,
+    //       lastMessage: message,
+    //       lastMessageType: "regular",
+    //       lastMessageStatus: "pending",
+    //       timestamp,
+    //     };
+    //   } else {
+    //     return room;
+    //   }
+    // });
+    // setChatRooms(newChatRooms);
+
     if (ChatObject.activeChatType == "group") {
       await sendGroupMessage(
         User.id,
@@ -225,13 +249,26 @@ const Input = ({ setReplyDivHeight }) => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="ml-[1px] max-h-[90px] overflow-hidden truncate px-10 py-2 dark:bg-[#1d232a]"
+            exit={{ opacity: 0 }}
+            className="bg-primary ml-[1px] max-h-[90px] w-full overflow-hidden py-2 pl-[54px] pr-[50px]"
             ref={elementRef}
           >
-            <div className="flex items-center justify-between rounded-lg bg-gray-500 p-1 ">
-              <div>
-                <p>{ReplyObject.displayName}</p>
-                <p>{ReplyObject.ReplyText}</p>
+            <div
+              className="relative flex items-center justify-between 
+             overflow-hidden truncate rounded-lg bg-light-secondary p-2 pl-2 dark:bg-hover-dark"
+            >
+              <span className="absolute left-0 top-0 bottom-0 w-1 bg-accent-blue"></span>
+              <div className="text-xs">
+                <p className="">
+                  {" "}
+                  {ReplyObject.ReplyUserId === User.id
+                    ? "You"
+                    : ReplyObject.displayName}
+                </p>
+
+                <p className="text-muted max-h-[48px] w-full truncate whitespace-normal  ">
+                  {ReplyObject.ReplyText}
+                </p>
               </div>
               <div
                 className="cursor-pointer"
@@ -240,10 +277,13 @@ const Input = ({ setReplyDivHeight }) => {
                     ReplyText: "",
                     ReplyTextId: "",
                     displayName: "",
+                    ReplyUserId: "",
                   });
                 }}
               >
-                <ImCross />
+                <i className="text-xs">
+                  <ImCross />
+                </i>
               </div>
             </div>
           </motion.div>
@@ -298,103 +338,14 @@ const Input = ({ setReplyDivHeight }) => {
           >
             <ImAttachment />
           </div>
-          <AnimatePresence>
-            {showMediaPicker && (
-              <motion.div
-                className="detectMe MediaPicker absolute bottom-[52px] z-[99]  w-[160px] overflow-hidden
-               rounded-lg bg-light-primary px-1
-                py-2 text-[15px]  dark:bg-dark-primary [&>div>div>svg]:mr-2
-               [&>div>div]:flex [&>div>div]:items-center [&>div>div]:py-1 
-               [&>div>div]:px-2 [&>div>label>svg]:mr-2 [&>div]:cursor-pointer [&>div]:rounded-md
-                hover:[&>div]:bg-hover-light dark:hover:[&>div]:bg-hover-dark"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-              >
-                <div className="file-input px-0 py-0">
-                  <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
-                    <i className="mr-2 text-muted-light dark:text-muted-dark">
-                      <AiOutlineFile />
-                    </i>
-                    File
-                    <input
-                      type="file"
-                      className="hidden h-full w-full cursor-pointer"
-                      onChange={(e) => {
-                        if (e.target.files[0].size > 20971520) {
-                          alert("Selected file exceeds the 20MB limit.");
-                          e.target.value = null;
-                          return;
-                        }
-                        e.target.files[0];
-                        setfile(e.target.files[0]);
-                        e.target.files[0];
-                        setshowMediaPicker(false);
-                      }}
-                    />
-                  </label>
-                </div>
-                <div>
-                  <label className="flex h-full w-full cursor-pointer items-center py-1 px-2">
-                    <i className="mr-2 text-muted-light dark:text-muted-dark">
-                      <RiGalleryLine />
-                    </i>
-                    Photo or video
-                    <input
-                      type="file"
-                      className="hidden h-full w-full cursor-pointer"
-                      onChange={async (e) => {
-                        if (e.target.files[0].size > 20971520) {
-                          alert("Selected file exceeds the 20MB limit.");
-                          e.target.value = null;
-                          return;
-                        }
-                        if (e.target.files[0].type.startsWith("image")) {
-                          setpicVidmedia({ type: "image/prop", loading: true });
-                          setshowMediaPicker(false);
-                          const blob = await downScalePicVid(
-                            e.target.files[0],
-                            0.7,
-                            1,
-                            0
-                          );
-                          const downscaledBlod = await downScalePicVid(
-                            blob,
-                            0.35,
-                            0.1,
-                            2
-                          );
-                          setpicVidmedia(blob);
-                          setblurredPicVidmedia(downscaledBlod);
-                        } else {
-                          const videoObj = e.target.files[0];
-                          videoObj;
-                          setpicVidmedia(videoObj);
-                          setblurredPicVidmedia(null);
-                        }
-                        setshowMediaPicker(false);
-                      }}
-                      accept="image/png, image/jpeg, video/mp4"
-                    />
-                  </label>
-                </div>
-                <div
-                  className="Poll-input"
-                  onClick={() => {
-                    setshowPollInput(true);
-                    setshowMediaPicker(false);
-                  }}
-                >
-                  <div>
-                    <i className="mr-2 rotate-90 text-muted-light dark:text-muted-dark">
-                      <TiChartBarOutline />
-                    </i>
-                    Poll
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <InputMenu
+            setfile={setfile}
+            setshowMediaPicker={setshowMediaPicker}
+            setpicVidmedia={setpicVidmedia}
+            setblurredPicVidmedia={setblurredPicVidmedia}
+            setshowPollInput={setshowPollInput}
+            showMediaPicker={showMediaPicker}
+          />
         </div>
         <input
           type="text"

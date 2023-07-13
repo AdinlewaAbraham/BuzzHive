@@ -39,7 +39,6 @@ const ChatCard = ({
   type,
   otherUserId,
   unReadCount,
-  set_Chats,
   isMessageSentByMe,
   chat,
 }) => {
@@ -51,55 +50,13 @@ const ChatCard = ({
     setshowChats,
     setactiveId,
     setallowScrollObject,
+    setChatRooms,
   } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
   const [invalidURL, setinvalidURL] = useState(true);
   const [currentChatId, setcurrentChatId] = useState();
 
   const activeChatIdRef = useRef(ChatObject.activeChatId);
-  // useEffect(() => {
-  //   if (!Chats) return 
-  //   const lastMessage = Chats[Chats.length - 1];
-  //   if (!lastMessage) return;
-  //   const { text, id, senderDisplayName, timestamp, type, senderId } =
-  //     lastMessage;
-  //   const userChatRooms = getStoredChats();
-  //   const updatedArr = userChatRooms.map((obj) => {
-  //     if (obj.id == ChatObject.activeChatId) {
-  //       const pendingMessagesTimestampObj = JSON.parse(
-  //         sessionStorage.getItem("pendingMessagesTimestampObj")
-  //       );
-  //       const modifiedObj ={
-  //         ...obj,
-  //         timestamp,
-  //         lastMessageType: type,
-  //         lastMessage: text,
-  //         status: "pending",
-  //         senderId,
-  //       }
-  //       if (!pendingMessagesTimestampObj) {
-  //         sessionStorage.setItem(
-  //           "pendingMessagesTimestampObj",
-  //           JSON.stringify({ [ChatObject.activeChatId]: modifiedObj })
-  //         );
-  //       } else {
-  //         pendingMessagesTimestampObj[ChatObject.activeChatId] = modifiedObj;
-  //         sessionStorage.setItem(
-  //           "pendingMessagesTimestampObj",
-  //           JSON.stringify(pendingMessagesTimestampObj)
-  //         );
-  //       }
-  //       return modifiedObj
-  //     } else {
-  //       return obj;
-  //     }
-  //   });
-  //   set_Chats(
-  //     updatedArr.sort((a, b) => {
-  //       a.timestamp - b.timestamp;
-  //     })
-  //   );
-  // }, [Chats]);
 
   useEffect(() => {
     sessionStorage.setItem(
@@ -197,7 +154,7 @@ const ChatCard = ({
         return obj;
       }
     });
-    set_Chats(
+    setChatRooms(
       updatedArr.sort((a, b) => {
         a.timestamp - b.timestamp;
       })
@@ -258,7 +215,7 @@ const ChatCard = ({
                     return obj;
                   }
                 });
-                set_Chats(
+                setChatRooms(
                   updatedArr.sort((a, b) => {
                     a.timestamp - b.timestamp;
                   })

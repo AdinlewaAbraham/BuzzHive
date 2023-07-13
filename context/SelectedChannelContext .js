@@ -40,6 +40,8 @@ const SelectedChannelContext = createContext({
     allowScroll: true,
   },
   setallowScrollObject: () => {},
+  chatRooms: [],
+  setChatRooms: () => {},
 });
 
 export const SelectedChannelProvider = ({ children }) => {
@@ -52,6 +54,7 @@ export const SelectedChannelProvider = ({ children }) => {
   const [showChats, setshowChats] = useState(true);
   const [activeId, setactiveId] = useState("");
   const [replyDivHeight, setreplyDivHeight] = useState("");
+  const [chatRooms, setChatRooms] = useState([]);
   const [allowScrollObject, setallowScrollObject] = useState({
     scrollTo: "",
     scrollBehaviour: "",
@@ -98,6 +101,8 @@ export const SelectedChannelProvider = ({ children }) => {
         setprevSelectedChannel,
         allowScrollObject,
         setallowScrollObject,
+        chatRooms,
+        setChatRooms,
       }}
     >
       {children}
