@@ -207,8 +207,8 @@ const ImageComponent = ({ chat }) => {
                 src={URL.createObjectURL(imageBlob)}
                 alt="Preview"
                 className={` Image
-                h-full object-contain
-               transition-all duration-500`}
+                h-full object-scale-down border
+               transition-all duration-500 `}
               />
             </motion.div>
           )}
