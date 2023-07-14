@@ -88,7 +88,7 @@ const MediaSection = ({ChatObject}) => {
           {renderedMedia.map((message) => (
             <div className="bg-secondary flex h-[200px] cursor-pointer items-center justify-center overflow-hidden object-contain">
               {message.type === "image" ? (
-                <ImageComponent chat={message} />
+                <ImageComponent chat={message} height={160} />
               ) : (
                 <VideoComponent chat={message} />
               )}

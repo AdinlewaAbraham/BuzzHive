@@ -3,7 +3,8 @@ import axios from "axios";
 import { FiDownload } from "react-icons/fi";
 import { useContext } from "react";
 import { UserContext } from "../../App";
-import { openDB } from "idb";
+import { initializeDB } from "@/utils/actualUtils/indexDB/imageDB";
+import { getImgFromIndexedDB } from "@/utils/actualUtils/indexDB/imageDB";
 import DownloadCircularAnimation from "../DownloadCircularAnimation";
 import UploadCircularAnimation from "../UploadCircularAnimation";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
@@ -27,24 +28,6 @@ const ImageComponent = ({ chat }) => {
   const [blurredImageBlob, setblurredImageBlob] = useState();
   const [fullScreenMode, setfullScreenMode] = useState(false);
 
-  async function initializeDB() {
-    const db = await openDB("myImagesDatabase", 1, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains("images")) {
-          db.createObjectStore("images");
-        }
-      },
-    });
-    return db;
-  }
-  const getImgFromIndexedDB = async (key) => {
-    const db = await initializeDB();
-    const tx = db.transaction("images", "readonly");
-    const store = tx.objectStore("images");
-    const value = await store.get(key);
-    await tx.done;
-    return value;
-  };
   const validateImage = async () => {
     const imageBlob = await getImgFromIndexedDB(`image-${chat.id}`);
     if (imageBlob) {
@@ -135,9 +118,7 @@ const ImageComponent = ({ chat }) => {
       <div className="relative flex h-full items-center justify-center">
         <div className="">
           {!imageBlob || chat.dataObject.status === "uploading" ? (
-            <div
-              className={` overflow-hidden`}
-            >
+            <div className={` overflow-hidden`}>
               {!blurredImageBlob ? (
                 <Skeleton
                   animation="wave"
@@ -207,7 +188,7 @@ const ImageComponent = ({ chat }) => {
                 src={URL.createObjectURL(imageBlob)}
                 alt="Preview"
                 className={` Image
-                h-full object-scale-down border
+                h-full object-cover
                transition-all duration-500 `}
               />
             </motion.div>

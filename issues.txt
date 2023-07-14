@@ -1,6 +1,5 @@
 make chats update locally for sending messages
-reply ui
-make img fit in MediaSection
+
 
 
 optimize stuff    

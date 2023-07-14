@@ -145,8 +145,11 @@ const FileComponent = ({ chat, defaultColor }) => {
 
   const getFileExtension = (fileName) => {
     const parts = fileName.split(".");
-    return { baseName: parts[0], extName: parts[parts.length - 1] };
+    const extName = parts.pop();
+    const baseName = parts.join(".");
+    return { baseName, extName };
   };
+  
   const { baseName, extName } = getFileExtension(chat.dataObject.name);
   return (
     <div

@@ -121,6 +121,7 @@ const FileInput = ({ file, setfile }) => {
           className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
           placeholder="Caption (optional)"
           onChange={(e) => {
+            if (e.target.value.length > 200) return
             setfileCaption(e.target.value);
           }}
         />

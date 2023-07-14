@@ -196,13 +196,20 @@ const PollInput = ({ setshowPollInputFunc }) => {
           type="text"
           placeholder="Type poll question"
           className=" bg-secondary mb-2 rounded-md px-2 py-2 focus:outline-none"
-          onChange={(e) => setpollQuestion(e.target.value)}
+          onChange={(e) => {
+            if (e.target.value.length > 200) return;
+            setpollQuestion(e.target.value);
+          }}
           value={pollQuestion}
         />
         <p className="mb-1">Options</p>
         <div
-          className={`bg-secondary scrollBar max-h-[calc(100vh-365px)] rounded-lg px-1 overflow-x-hidden
-         ${height < (32 * inputs.length) + 64 ? "overflow-y-scroll":"overflow-y-hidden"} `}
+          className={`bg-secondary scrollBar max-h-[calc(100vh-365px)] overflow-x-hidden rounded-lg px-1
+         ${
+           height < 32 * inputs.length + 64
+             ? "overflow-y-scroll"
+             : "overflow-y-hidden"
+         } `}
         >
           <ul ref={animationParent} className="">
             {inputs.map((input, index) => (
@@ -240,10 +247,12 @@ const PollInput = ({ setshowPollInputFunc }) => {
                 }}
               >
                 <input
-                  className=" z-50 w-full bg-inherit outline-none"
+                  className=" z-50 w-full break-words bg-inherit outline-none"
                   key={input.id}
                   value={input.value}
-                  onChange={(e) => handleChange(input.id, e.target.value)}
+                  onChange={(e) => {
+                    handleChange(input.id, e.target.value);
+                  }}
                   onBlur={() => handleBlur(input.id, index)}
                   placeholder="+  Add Option"
                   draggable={false}

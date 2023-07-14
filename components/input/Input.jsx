@@ -20,12 +20,13 @@ import FileInput from "./FileInput";
 import { Timestamp } from "firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
 import InputMenu from "./InputMenu";
+import ReplyBoard from "./ReplyBoard";
 const Input = ({ setReplyDivHeight }) => {
   const { User } = useContext(UserContext);
   const {
     ChatObject,
     setChats,
-    ReplyObject,
+    replyObject,
     setReplyObject,
     setreplyDivHeight,
     setallowScrollObject,
@@ -43,20 +44,23 @@ const Input = ({ setReplyDivHeight }) => {
   const [blurredPicVidmedia, setblurredPicVidmedia] = useState(null);
 
   const senderid = User.id;
-  const elementRef = useRef(null);
   async function handleSend() {
     if (!message || message.trim().length === 0) return;
     setReplyObject({
-      ReplyText: "",
-      ReplyTextId: "",
+      replyText: "",
+      replyTextId: "",
       displayName: "",
-      ReplyUserId: "",
+      replyUserId: "",
+      replyMessageType: "",
+      replyDataObject: {}
     });
-    const replyObject = {
-      replyText: ReplyObject.ReplyText,
-      replyTextId: ReplyObject.ReplyTextId,
-      replyDisplayName: ReplyObject.displayName,
-      replyUserId: ReplyObject.ReplyUserId,
+    const replyObj = {
+      replyText: replyObject.replyText,
+      replyTextId: replyObject.replyTextId,
+      replyDisplayName: replyObject.displayName,
+      replyUserId: replyObject.replyUserId,
+      replyDataObject: replyObject.replyDataObject,
+      replyMessageType: replyObject.replyMessageType
     };
     const time = new Date();
 
@@ -74,10 +78,12 @@ const Input = ({ setReplyDivHeight }) => {
       reactions: [],
       status: "pending",
       id: "propId",
-      type: "regular",
+      type: replyObject.replyTextId ? "reply" : "regular",
       senderDisplayName: User.name,
       senderId: User.id,
+      replyObject: replyObject.replyTextId ? replyObject : {},
     };
+    console.log(messageObj)
     setallowScrollObject({
       scrollTo: "bottom",
       scrollBehaviour: "smooth",
@@ -111,9 +117,9 @@ const Input = ({ setReplyDivHeight }) => {
         ChatObject.activeChatId,
         message,
         User.name,
-        ReplyObject.ReplyTextId ? "reply" : "regular",
+        replyObject.replyTextId ? "reply" : "regular",
         time,
-        ReplyObject.ReplyTextId ? replyObject : {},
+        replyObject.replyTextId ? replyObj : {},
         null,
         null,
         clearMessage
@@ -125,9 +131,9 @@ const Input = ({ setReplyDivHeight }) => {
         message,
         senderid,
         User.name,
-        ReplyObject.ReplyTextId ? "reply" : "regular",
+        replyObject.replyTextId ? "reply" : "regular",
         time,
-        ReplyObject.ReplyTextId ? replyObject : {},
+        replyObject.replyTextId ? replyObj : {},
         null,
         null,
         clearMessage
@@ -144,12 +150,6 @@ const Input = ({ setReplyDivHeight }) => {
     }
   }
 
-  useEffect(() => {
-    if (elementRef.current) {
-      const height = elementRef.current.offsetHeight;
-      setReplyDivHeight(height);
-    }
-  }, [ReplyObject]);
   const popupRef = useRef(null);
 
   const handleClickOutside = useCallback(
@@ -219,7 +219,7 @@ const Input = ({ setReplyDivHeight }) => {
               </div>
               <div className="z-[99] flex flex-col rounded-lg p-5 md:flex-row [&>button]:w-full [&>button]:rounded-lg [&>button]:py-2">
                 <button
-                  className="detectMe mr-1  bg-light-primary p-4 dark:bg-dark-primary"
+                  className="detectMe mr-1 bg-light-primary p-4 dark:bg-dark-primary"
                   onClick={() => {
                     setShowPopup(false);
                   }}
@@ -245,48 +245,8 @@ const Input = ({ setReplyDivHeight }) => {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {ReplyObject.ReplyTextId && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="bg-primary ml-[1px] max-h-[90px] w-full overflow-hidden py-2 pl-[54px] pr-[50px]"
-            ref={elementRef}
-          >
-            <div
-              className="relative flex items-center justify-between 
-             overflow-hidden truncate rounded-lg bg-light-secondary p-2 pl-2 dark:bg-hover-dark"
-            >
-              <span className="absolute left-0 top-0 bottom-0 w-1 bg-accent-blue"></span>
-              <div className="text-xs">
-                <p className="">
-                  {" "}
-                  {ReplyObject.ReplyUserId === User.id
-                    ? "You"
-                    : ReplyObject.displayName}
-                </p>
-
-                <p className="text-muted max-h-[48px] w-full truncate whitespace-normal  ">
-                  {ReplyObject.ReplyText}
-                </p>
-              </div>
-              <div
-                className="cursor-pointer"
-                onClick={() => {
-                  setReplyObject({
-                    ReplyText: "",
-                    ReplyTextId: "",
-                    displayName: "",
-                    ReplyUserId: "",
-                  });
-                }}
-              >
-                <i className="text-xs">
-                  <ImCross />
-                </i>
-              </div>
-            </div>
-          </motion.div>
+        {replyObject.replyTextId && (
+          <ReplyBoard setReplyDivHeight={setReplyDivHeight} />
         )}
       </AnimatePresence>
 
@@ -349,11 +309,13 @@ const Input = ({ setReplyDivHeight }) => {
         </div>
         <input
           type="text"
-          className="w-full  bg-transparent px-4 py-2 placeholder-muted-light outline-none dark:placeholder-muted-dark"
+          className="w-full bg-transparent px-4 py-2 placeholder-muted-light outline-none
+           dark:placeholder-muted-dark max-h-[50px]"
           placeholder="Type a message"
           value={message}
           onKeyDown={handleInputKeyDown}
           onChange={(e) => {
+            if (e.target.value.length > 500) return;
             setmessage(e.target.value);
           }}
         />

@@ -43,9 +43,10 @@ import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 import { CircularProgress } from "@mui/joy";
 import { ref, deleteObject } from "firebase/storage";
 import { motion, AnimatePresence } from "framer-motion";
-import { Collapse } from "@mui/material";
+import { Collapse, useStepContext } from "@mui/material";
 import Badge from "../Badge";
 import EmojiReactionsBoard from "./EmojiReactionsBoard";
+import ReplyBoard from "./ReplyBoard";
 
 const MessageCard = ({
   chat,
@@ -83,6 +84,15 @@ const MessageCard = ({
   const [isforwarding, setisforwarding] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [emojiReactionBoardRef, setemojiReactionBoardRef] = useState(null);
+  const [showFullText, setShowFullText] = useState(false);
+  const [isTextOverflowed, setIsTextOverflowed] = useState(false);
+
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [displayNameWidth, setDisplayNameWidth] = useState(0);
+
+  const paraContainerRef = useRef(null);
+  const displayNameContainerRef = useRef(null);
+
   const [emojiReactionBoardPopperRef, setemojiReactionBoardPopperRef] =
     useState(null);
 
@@ -130,6 +140,33 @@ const MessageCard = ({
   );
 
   const messageRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (paraContainerRef?.current) {
+        setContainerWidth(paraContainerRef.current.offsetWidth);
+      }
+      if (displayNameContainerRef?.current) {
+        setDisplayNameWidth(displayNameContainerRef.current.offsetWidth);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [paraContainerRef, displayNameContainerRef]);
+
+  useEffect(() => {
+    const containerElement = paraContainerRef.current;
+    if (containerElement) {
+      const { scrollHeight, clientHeight } = containerElement;
+      setIsTextOverflowed(scrollHeight > clientHeight);
+    }
+  }, []);
 
   useEffect(() => {
     const getContacts = () => {
@@ -239,7 +276,7 @@ const MessageCard = ({
     );
     return (
       <div className="flex w-full items-center justify-center" id="unreadId">
-        <div className="my-2 flex justify-center rounded-lg dark:bg-black bg-white p-2 text-center">
+        <div className="my-2 flex justify-center rounded-lg bg-red-600 p-2 text-center">
           {`Unread Messages`}
         </div>
       </div>
@@ -252,10 +289,20 @@ const MessageCard = ({
       label: "Reply",
       action: () =>
         setReplyObject({
-          ReplyText: `${chat.text}`,
-          ReplyTextId: `${chat.id}`,
-          displayName: `${chat.senderDisplayName}`,
-          ReplyUserId: `${chat.senderId}`,
+          replyText:
+            chat.type === "file"
+              ? chat.text === ""
+                ? chat.dataObject.name
+                : chat.text
+              : chat.text === ""
+              ? chat.type
+              : chat.text,
+          replyTextId: chat.id,
+          displayName: chat.senderDisplayName,
+          replyUserId: chat.senderId,
+          replyMessageType: chat.type,
+          replyDataObject:
+            chat.type === "reply" ? chat.replyObject : chat.dataObject,
         }),
     },
     {
@@ -399,7 +446,7 @@ const MessageCard = ({
   return (
     <div
       ref={messageRef}
-      className={`group my-2 flex  justify-start px-5  ${
+      className={`group my-2 flex justify-start px-5 ${
         chat.senderId === currentId ? " flex-row-reverse" : " "
       } ${chat.reactions?.length === 0 ? "" : "mb-[30px]"}  `}
       key={chat.id}
@@ -467,6 +514,7 @@ const MessageCard = ({
           ChatObject.activeChatType === "group" &&
           !SamePrevSender && (
             <p
+              ref={displayNameContainerRef}
               className={`text-muted text-[11px] ${
                 (chat.type === "pic/video" ||
                   chat.type === "image" ||
@@ -510,38 +558,12 @@ const MessageCard = ({
           </span>
         )}
         {chat.type == "reply" && (
-          <div
-            className={`max-h-[80px] truncate rounded-lg p-2 text-start 
-             ${
-               chat.senderId === User.id
-                 ? "bg-blue-400"
-                 : "bg-light-secondary dark:bg-hover-dark"
-             } `}
-            onClick={() => {
-              const scrollToElement = document.getElementById(
-                `${chat.replyObject.replyTextId}_mainCard`
-              );
-              const className =
-                chat.replyObject.replyUserId === User.id
-                  ? "pulse-bg-user"
-                  : theme === "light"
-                  ? "pulse-bg-notUser-light"
-                  : "pulse-bg-notUser-dark";
-              if (scrollToElement) {
-                scrollToElement.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
-                });
-
-                scrollToElement.classList.remove(className);
-                void scrollToElement.offsetWidth;
-                scrollToElement.classList.add(className);
-              }
-            }}
-          >
-            <p className="text-[9px] ">{chat.replyObject.replyDisplayName}</p>
-            <p className="text-[12px]">{chat.replyObject.replyText}</p>
-          </div>
+          <ReplyBoard
+            chat={chat}
+            User={User}
+            width={containerWidth}
+            displayNameWidth={displayNameWidth}
+          />
         )}
         {chat.type === "file" && <FileComponent chat={chat} />}
         {(chat.type === "pic/video" ||
@@ -576,9 +598,12 @@ const MessageCard = ({
           }`}
         >
           <p
-            className={`max-w-[400px] break-words text-start ${
+            ref={paraContainerRef}
+            className={` ${
+              !showFullText && "max-h-[124px]"
+            } max-w-[400px] overflow-hidden break-words text-start ${
               chat.type === "poll" && "hidden"
-            }`}
+            } `}
           >
             {chat.text?.split(" ").map((word, index) => (
               <span
@@ -596,6 +621,15 @@ const MessageCard = ({
                 {word}{" "}
               </span>
             ))}
+
+            {isTextOverflowed && (
+              <a
+                onClick={() => setShowFullText(!showFullText)}
+                className={`absolute bottom-1 left-[10px] cursor-pointer text-blue-900 hover:text-blue-700`}
+              >
+                {showFullText ? "Read less" : "Read more"}{" "}
+              </a>
+            )}
           </p>
 
           <div className="ml-3 flex w-full items-center justify-end text-end">

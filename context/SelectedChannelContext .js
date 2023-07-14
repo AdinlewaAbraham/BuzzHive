@@ -14,10 +14,13 @@ const SelectedChannelContext = createContext({
     displayName: "",
   },
   setChatObject: () => {},
-  ReplyObject: {
-    ReplyText: "",
-    ReplyTextId: "",
+  replyObject: {
+    replyText: "",
+    replyTextId: "",
     displayName: "",
+    replyUserId: "",
+    replyMessageType: "",
+    replyDataObject: {}
   },
   setReplyObject: () => {},
   ShowAddGroup: false,
@@ -68,10 +71,13 @@ export const SelectedChannelProvider = ({ children }) => {
     photoUrl: "",
     displayName: "",
   });
-  const [ReplyObject, setReplyObject] = useState({
-    ReplyText: "",
-    ReplyTextId: "",
+  const [replyObject, setReplyObject] = useState({
+    replyText: "",
+    replyTextId: "",
     displayName: "",
+    replyUserId: "",
+    replyMessageType: "",
+    replyDataObject: {}
   });
 
   return (
@@ -93,7 +99,7 @@ export const SelectedChannelProvider = ({ children }) => {
         setshowChats,
         activeId,
         setactiveId,
-        ReplyObject,
+        replyObject,
         setReplyObject,
         replyDivHeight,
         setreplyDivHeight,

@@ -36,13 +36,13 @@ const ContentContainer = () => {
     setChatObject,
     showChats,
     setshowChats,
-    ReplyObject,
+    replyObject,
     allowScrollObject,
     setallowScrollObject,
   } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
 
-  const [replyDivHeight, setReplyDivHeight] = useState(50);
+  const [replyDivHeight, setReplyDivHeight] = useState(0);
   const [sortedChats, setSortedChats] = useState([]);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [showProfile, setshowProfile] = useState(false);
@@ -363,7 +363,7 @@ const ContentContainer = () => {
           <main
             style={{
               height: `calc(100vh - 123px${
-                ReplyObject.ReplyTextId ? ` - ${replyDivHeight}px` : ""
+                replyObject.replyTextId ? ` - ${replyDivHeight}px` : ""
               })`,
               overflow: "hidden",
             }}
@@ -444,7 +444,7 @@ const ContentContainer = () => {
                 className="absolute right-[20px] z-10 cursor-pointer overflow-hidden rounded-lg p-3 dark:bg-[#1d232a]"
                 style={{
                   bottom: `${
-                    ReplyObject.ReplyTextId
+                    replyObject.replyTextId
                       ? `${replyDivHeight + 120}px`
                       : "120px"
                   }`,
