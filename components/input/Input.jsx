@@ -52,7 +52,7 @@ const Input = ({ setReplyDivHeight }) => {
       displayName: "",
       replyUserId: "",
       replyMessageType: "",
-      replyDataObject: {}
+      replyDataObject: {},
     });
     const replyObj = {
       replyText: replyObject.replyText,
@@ -60,7 +60,7 @@ const Input = ({ setReplyDivHeight }) => {
       replyDisplayName: replyObject.displayName,
       replyUserId: replyObject.replyUserId,
       replyDataObject: replyObject.replyDataObject,
-      replyMessageType: replyObject.replyMessageType
+      replyMessageType: replyObject.replyMessageType,
     };
     const time = new Date();
 
@@ -83,33 +83,32 @@ const Input = ({ setReplyDivHeight }) => {
       senderId: User.id,
       replyObject: replyObject.replyTextId ? replyObject : {},
     };
-    console.log(messageObj)
     setallowScrollObject({
       scrollTo: "bottom",
       scrollBehaviour: "smooth",
       allowScroll: true,
     });
     setChats((prevChats) => {
-      [...prevChats, messageObj];
       return [...prevChats, messageObj];
     });
 
-    // const newChatRooms = chatRooms.map((room) => {
-    //   if (room.id === ChatObject.activeChatId) {
-    //     return {
-    //       ...room,
-    //       lastMessageSenderName: User.name,
-    //       lastMessage: message,
-    //       lastMessageType: "regular",
-    //       lastMessageStatus: "pending",
-    //       timestamp,
-    //     };
-    //   } else {
-    //     return room;
-    //   }
-    // });
-    // setChatRooms(newChatRooms);
-
+    const newChatRooms = chatRooms.map((room) => {
+      if (room.id === ChatObject.activeChatId) {
+        return {
+          ...room,
+          lastMessageSenderName: User.name,
+          lastMessage: message,
+          lastMessageType: "regular",
+          lastMessageStatus: "pending",
+          timestamp,
+          senderId: User.id,
+        };
+      } else {
+        return room;
+      }
+    });
+    localStorage.setItem(`${User.id}_userChats`, JSON.stringify(newChatRooms))
+    setChatRooms(newChatRooms);
     if (ChatObject.activeChatType == "group") {
       await sendGroupMessage(
         User.id,
@@ -309,8 +308,8 @@ const Input = ({ setReplyDivHeight }) => {
         </div>
         <input
           type="text"
-          className="w-full bg-transparent px-4 py-2 placeholder-muted-light outline-none
-           dark:placeholder-muted-dark max-h-[50px]"
+          className="max-h-[50px] w-full bg-transparent px-4 py-2 placeholder-muted-light
+           outline-none dark:placeholder-muted-dark"
           placeholder="Type a message"
           value={message}
           onKeyDown={handleInputKeyDown}

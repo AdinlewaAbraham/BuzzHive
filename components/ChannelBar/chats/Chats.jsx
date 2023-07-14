@@ -48,6 +48,7 @@ const Chats = () => {
   }, []);
   JSON.parse(localStorage.getItem(`${User.id}_userChats`));
   useEffect(() => {
+    console.log(chatRooms)
     const storedChats = getStoredChats();
     if (storedChats && storedChats.length) {
       setChatRooms(storedChats);

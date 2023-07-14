@@ -20,6 +20,7 @@ import {
   FaFileImage,
   FaFileVideo,
 } from "react-icons/fa";
+import { Timestamp } from "firebase/firestore";
 
 export const RenderFileType = ({ type, size }) => {
   let fileType;
@@ -91,15 +92,63 @@ export const RenderFileType = ({ type, size }) => {
 
 const FileInput = ({ file, setfile }) => {
   const { User } = useContext(UserContext);
-  const { ChatObject, setChats, Chats, setallowScrollObject } = useContext(
-    SelectedChannelContext
-  );
+  const {
+    ChatObject,
+    setChats,
+    Chats,
+    setallowScrollObject,
+    setChatRooms,
+    chatRooms,
+  } = useContext(SelectedChannelContext);
   const [fileCaption, setfileCaption] = useState("");
 
   function setChatsFunc(chats) {
     setChats(chats);
   }
-
+  const handleFileSend = async () => {
+    const capturedId = JSON.parse(JSON.stringify(ChatObject.activeChatId));
+    const capturedFile = file;
+    setfile(null);
+    setallowScrollObject({
+      scrollTo: "bottom",
+      scrollBehaviour: "smooth",
+      allowScroll: true,
+    });
+    const currentTime = new Date().getTime();
+  
+    const seconds = Math.floor(currentTime / 1000);
+    const nanoseconds = (currentTime % 1000) * 10 ** 6;
+    
+    const time = new Timestamp(seconds, nanoseconds)
+    const newChatRooms = chatRooms.map((room) => {
+      if (room.id === ChatObject.activeChatId) {
+        return {
+          ...room,
+          lastMessageSenderName: User.name,
+          lastMessage: fileCaption,
+          lastMessageType: "file",
+          lastMessageStatus: "pending",
+          timestamp: time,
+          senderId: User.id,
+          fileName: file.name
+        };
+      } else {
+        return room;
+      }
+    });
+    localStorage.setItem(`${User.id}_userChats`, JSON.stringify(newChatRooms));
+    setChatRooms(newChatRooms);
+    await handleFileUpload(
+      capturedFile,
+      ChatObject,
+      fileCaption,
+      User,
+      setChatsFunc,
+      Chats,
+      capturedId,
+      ChatObject.activeChatId
+    );
+  };
   return (
     <motion.div
       className="file-input bg-primary absolute bottom-[65px] left-2 z-30 flex
@@ -121,33 +170,14 @@ const FileInput = ({ file, setfile }) => {
           className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
           placeholder="Caption (optional)"
           onChange={(e) => {
-            if (e.target.value.length > 200) return
+            if (e.target.value.length > 200) return;
             setfileCaption(e.target.value);
           }}
         />
         <div
           className="flex items-center rounded-md bg-accent-blue px-2 py-2"
-          onClick={async () => {
-            const capturedId = JSON.parse(
-              JSON.stringify(ChatObject.activeChatId)
-            );
-            const capturedFile = file;
-            setfile(null);
-            setallowScrollObject({
-              scrollTo: "bottom",
-              scrollBehaviour: "smooth",
-              allowScroll: true,
-            });
-            await handleFileUpload(
-              capturedFile,
-              ChatObject,
-              fileCaption,
-              User,
-              setChatsFunc,
-              Chats,
-              capturedId,
-              ChatObject.activeChatId
-            );
+          onClick={() => {
+            handleFileSend();
           }}
         >
           <AiOutlineSend />

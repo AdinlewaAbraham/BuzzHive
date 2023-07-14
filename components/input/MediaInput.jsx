@@ -17,7 +17,7 @@ const MediaInput = ({
   setpicVidmediaToNull,
   setblurredPicVidmedia,
 }) => {
-  const { ChatObject, setChats, setallowScrollObject } = useContext(
+  const { ChatObject, setChats, setallowScrollObject,chatRooms, setChatRooms } = useContext(
     SelectedChannelContext
   );
   const { User } = useContext(UserContext);
@@ -145,7 +145,7 @@ const MediaInput = ({
           className="w-full bg-transparent px-4 py-2 placeholder-[#aaabaf] outline-none"
           placeholder="Caption (optional)"
           onChange={(e) => {
-            if (e.target.value.length > 200) return
+            if (e.target.value.length > 200) return;
             setmediaCaption(e.target.value);
           }}
         />
@@ -163,6 +163,26 @@ const MediaInput = ({
               scrollBehaviour: "smooth",
               allowScroll: true,
             });
+            const newChatRooms = chatRooms.map((room) => {
+              if (room.id === ChatObject.activeChatId) {
+                return {
+                  ...room,
+                  lastMessageSenderName: User.name,
+                  lastMessage: mediaCaption,
+                  lastMessageType: isImage? "image" : "video",
+                  lastMessageStatus: "pending",
+                  timestamp: time,
+                  senderId: User.id,
+                };
+              } else {
+                return room;
+              }
+            });
+            localStorage.setItem(
+              `${User.id}_userChats`,
+              JSON.stringify(newChatRooms)
+            );
+            setChatRooms(newChatRooms);
             await handlePicVidUpload(
               picVidmedia,
               blurredPicVidmedia,

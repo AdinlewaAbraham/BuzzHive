@@ -100,16 +100,23 @@ const ReplyBoard = ({ chat, User, width, displayNameWidth }) => {
   return (
     <div
       style={{ width: width > displayNameWidth ? width : displayNameWidth }}
-      className={`flex h-[45px] justify-between truncate rounded-lg px-2 pr-0 text-start 
+      className={`relative flex h-[45px] justify-between truncate rounded-lg px-2 pr-0 text-start 
        ${
          chat.senderId === User.id
            ? "bg-blue-400"
-           : "bg-light-secondary dark:bg-hover-dark"
+           : "bg-light-secondary dark:bg-gray-500"
        } `}
       onClick={() => {
         handleClick();
       }}
     >
+      <span
+        className={`absolute left-0 top-0 bottom-0 w-1 ${
+          chat.senderId === User.id
+            ? "bg-blue-900"
+            : "bg-blue-400"
+        }`}
+      />
       <div className="truncate py-2 pr-2 ">
         <p className=" truncate text-[9px]">
           {chat.replyObject.replyUserId === User.id

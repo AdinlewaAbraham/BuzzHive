@@ -21,7 +21,8 @@ export const useGetChats = (currentUserId) => {
   const [isGroupChatsLoading, setisGroupChatsLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  const { ChatObject, activeId } = useContext(SelectedChannelContext);
+  const { ChatObject, activeId, chatRooms } = useContext(SelectedChannelContext);
+  
 
   useEffect(() => {
     const conversationRef = collection(db, "conversations");

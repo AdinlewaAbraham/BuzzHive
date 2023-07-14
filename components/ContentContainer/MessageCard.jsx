@@ -370,8 +370,18 @@ const MessageCard = ({
       const storageFileRef = ref(storage, chat.dataObject.filePath);
       const deleteFilePromise = deleteObject(storageFileRef);
       const deleteDocPromise = deleteDoc(docRef);
+      const removeFromLastMessage = async () => {
+        const doc = await getDoc(docRef);
+        if (doc.id === chat.id) {
+          // if this is true updated the doc to reflect the message has been deleted
+        }
+      };
 
-      await Promise.all([deleteDocPromise, deleteFilePromise]);
+      await Promise.all([
+        deleteDocPromise,
+        deleteFilePromise,
+        removeFromLastMessage,
+      ]);
     } else {
       await deleteDoc(docRef);
     }

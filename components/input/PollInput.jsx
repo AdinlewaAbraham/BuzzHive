@@ -9,9 +9,13 @@ import Checkbox from "../Checkbox";
 import { motion } from "framer-motion";
 
 const PollInput = ({ setshowPollInputFunc }) => {
-  const { ChatObject, setChats, setallowScrollObject } = useContext(
-    SelectedChannelContext
-  );
+  const {
+    ChatObject,
+    setChats,
+    setallowScrollObject,
+    chatRooms,
+    setChatRooms,
+  } = useContext(SelectedChannelContext);
   const [inputs, setInputs] = useState([
     { id: "1", value: "" },
     { id: "2", value: "" },
@@ -144,6 +148,23 @@ const PollInput = ({ setshowPollInputFunc }) => {
       scrollBehaviour: "smooth",
       allowScroll: true,
     });
+    const newChatRooms = chatRooms.map((room) => {
+      if (room.id === ChatObject.activeChatId) {
+        return {
+          ...room,
+          lastMessageSenderName: User.name,
+          lastMessage: pollQuestion,
+          lastMessageType: "poll",
+          lastMessageStatus: "pending",
+          timestamp,
+          senderId: User.id,
+        };
+      } else {
+        return room;
+      }
+    });
+    localStorage.setItem(`${User.id}_userChats`, JSON.stringify(newChatRooms));
+    setChatRooms(newChatRooms);
 
     setChats((prevChats) => [...prevChats, pollObject]);
     if (ChatObject.activeChatType === "group") {

@@ -19,12 +19,9 @@ import { UserContext } from "../../App";
 import { changeMessagesStatus } from "@/utils/messagesUtils/changeMessagesStatus";
 import { TiChartBarOutline } from "react-icons/ti";
 import { HiOutlinePhotograph } from "react-icons/hi";
-import {
-  BsFileEarmark,
-  BsCheckAll,
-  BsCheckLg,
-  BiTimeFive,
-} from "react-icons/bs";
+import { BsFileEarmark, BsCheckAll, BsCheckLg } from "react-icons/bs";
+import { AiOutlineStop } from "react-icons/ai";
+import { BiTimeFive } from "react-icons/bi";
 import { formatCount } from "@/utils/actualUtils/formatCount";
 
 import { formatTime } from "@/utils/actualUtils/formatTime";
@@ -244,25 +241,27 @@ const ChatCard = ({
                 }
               }
 
+              if (JSON.parse(sessionStorage.getItem("50pxAwayFromBottom"))) {
+                setallowScrollObject({
+                  scrollTo: "bottom",
+                  scrollBehaviour: "smooth",
+                  allowScroll: true,
+                });
+              }
+              setChats((prevMessages) => {
+                const firstMessageId = prevMessages[0]["id"];
+
+                const firstMessageIndex = saveChats.findIndex(
+                  (message) => message.id === firstMessageId
+                );
+
+                if (firstMessageIndex === -1) {
+                  return [...saveChats].splice(-30);
+                }
+                return [...saveChats].splice(firstMessageIndex);
+              });
               if (User.isReadReceiptsOn) {
-                changeMessagesStatus(id, type, "seen")
-                  .then(() => {
-                    setChats((prevMessages) => {
-                      const firstMessageId = prevMessages[0]["id"];
-
-                      const firstMessageIndex = saveChats.findIndex(
-                        (message) => message.id === firstMessageId
-                      );
-
-                      if (firstMessageIndex === -1) {
-                        return [...saveChats].splice(-30);
-                      }
-                      return [...saveChats].splice(firstMessageIndex);
-                    });
-                  })
-                  .catch((error) => {
-                    "Error updating message status:", error;
-                  });
+                changeMessagesStatus(id, type, "seen");
               }
             } else if (id !== ChatObject.activeChatId) {
               changeMessagesStatus(id, type, "received")
@@ -462,19 +461,14 @@ const ChatCard = ({
       <div className="flex  w-[calc(100%-62px)] flex-col items-start  justify-between truncate">
         <div className="flex w-full  items-center justify-between">
           <h3 className=" flex items-center font-normal ">
-            {name}{" "}
-            {id === "eaqHdrv5x1Z4jF7ZPoU6s7r1jOB2" && (
-              <i className="ml-2 flex items-center border text-accent-blue">
-                <MdVerified />
-              </i>
-            )}
+            {name}
             <Badge id={otherUserId} />
           </h3>
           <p className="text-muted  text-[11px]">{formatTime(timestamp)}</p>
         </div>
 
         <div className="flex w-full  items-center justify-between">
-          <div className=" flex w-[90%] flex-row truncate text-sm  text-muted-light dark:text-muted-dark">
+          <div className=" flex w-[95%] items-center truncate text-sm text-muted-light dark:text-muted-dark">
             {isMessageSentByMe && (
               <i className="mr-1 flex items-center">
                 {message.status === "pending" && <BiTimeFive />}
@@ -492,20 +486,27 @@ const ChatCard = ({
                   <i className="mr-1">
                     <HiOutlinePhotograph />
                   </i>
-                  {message.text === "" && message.type}
+                  <p className="truncate">
+                    {message.text === "" && message.type}
+                  </p>
                 </div>
               )}
               {message.type === "file" && (
                 <div className=" flex items-center truncate">
                   <i className="mr-1">
                     <BsFileEarmark />
-                  </i>
+                  </i>{" "}
                   {message.text === "" && chat.fileName}
                 </div>
               )}
               {message.type === "poll" && (
                 <i className="mr-1 flex rotate-90 items-center">
                   <TiChartBarOutline />
+                </i>
+              )}
+              {message.type === "deleted" && (
+                <i className="mr-1 flex rotate-90 items-center">
+                  <AiOutlineStop />
                 </i>
               )}
             </i>

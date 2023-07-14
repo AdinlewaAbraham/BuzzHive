@@ -117,9 +117,6 @@ const ContentContainer = () => {
       setactiveIndexId(searchedMessages[currentSearchIndex].id);
     }
   }, [currentSearchIndex]);
-  useEffect(() => {
-    console.log(aboutProfleChatObject);
-  }, [aboutProfleChatObject]);
 
   useEffect(() => {
     sethasMoreTop(true);
@@ -168,14 +165,16 @@ const ContentContainer = () => {
 
   const handleScroll = () => {
     const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
-      const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
-      if (distanceToBottom > 50) {
-        setshowScrollTobottom(true);
-      } else {
-        setshowScrollTobottom(false);
-      }
+    if (!scrollContainer) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+    const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
+    if (distanceToBottom > 50) {
+      setshowScrollTobottom(true);
+      sessionStorage.setItem("50pxAwayFromBottom", JSON.stringify(true))
+    } else {
+      setshowScrollTobottom(false);
+      sessionStorage.setItem("50pxAwayFromBottom", JSON.stringify(false))
+ 
     }
   };
   return (
@@ -264,7 +263,7 @@ const ContentContainer = () => {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -20, opacity: 0 }}
                   transition={{ duration: 0.2, ease: "easeIn" }}
-                  className="absolute top-[70px] right-1"
+                  className="fixed top-[70px] right-1"
                 >
                   <div
                     className="[&>i]: [&>i]:text-muted relative flex rounded-lg 
