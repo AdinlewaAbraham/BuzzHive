@@ -158,7 +158,7 @@ const MessageCard = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [paraContainerRef, displayNameContainerRef]);
+  }, [paraContainerRef, displayNameContainerRef, chat]);
 
   useEffect(() => {
     const containerElement = paraContainerRef.current;
@@ -166,7 +166,7 @@ const MessageCard = ({
       const { scrollHeight, clientHeight } = containerElement;
       setIsTextOverflowed(scrollHeight > clientHeight);
     }
-  }, []);
+  }, [paraContainerRef]);
 
   useEffect(() => {
     const getContacts = () => {
@@ -354,10 +354,12 @@ const MessageCard = ({
   const handleMessageDelete = async () => {
     setShowMenu(null);
     if (User.id !== chat.senderId) return;
+    const capturedId = ChatObject.activeChatId;
+    const capturedType = ChatObject.activeChatType;
     const docRef = doc(
       db,
-      ChatObject.activeChatType === "group" ? "groups" : "conversations",
-      ChatObject.activeChatId,
+      capturedType === "group" ? "groups" : "conversations",
+      capturedId,
       "messages",
       chat.id
     );
@@ -370,20 +372,22 @@ const MessageCard = ({
       const storageFileRef = ref(storage, chat.dataObject.filePath);
       const deleteFilePromise = deleteObject(storageFileRef);
       const deleteDocPromise = deleteDoc(docRef);
-      const removeFromLastMessage = async () => {
-        const doc = await getDoc(docRef);
-        if (doc.id === chat.id) {
-          // if this is true updated the doc to reflect the message has been deleted
-        }
-      };
-
-      await Promise.all([
-        deleteDocPromise,
-        deleteFilePromise,
-        removeFromLastMessage,
-      ]);
+      await Promise.all([deleteDocPromise, deleteFilePromise]);
     } else {
       await deleteDoc(docRef);
+    }
+    const chatRoomRef = doc(
+      db,
+      capturedType === "group" ? "groups" : "conversations",
+      capturedId
+    );
+    const chatRoomDoc = await getDoc(chatRoomRef);
+
+    if (chatRoomDoc.data().lastMessage.lastMessageId === chat.id) {
+      await updateDoc(chatRoomRef, {
+        ...chatRoomDoc.data(),
+        ["lastMessage"]: { ...chatRoomDoc.data().lastMessage, type: "deleted" },
+      });
     }
   };
 
@@ -609,7 +613,8 @@ const MessageCard = ({
         >
           <p
             ref={paraContainerRef}
-            className={` ${
+            className={`text-sm chat-message ${
+              
               !showFullText && "max-h-[124px]"
             } max-w-[400px] overflow-hidden break-words text-start ${
               chat.type === "poll" && "hidden"
@@ -635,7 +640,7 @@ const MessageCard = ({
             {isTextOverflowed && (
               <a
                 onClick={() => setShowFullText(!showFullText)}
-                className={`absolute bottom-1 left-[10px] cursor-pointer text-blue-900 hover:text-blue-700`}
+                className={`absolute bottom-1 left-[10px] cursor-pointer hover:underline text-blue-900 hover:text-blue-700`}
               >
                 {showFullText ? "Read less" : "Read more"}{" "}
               </a>
@@ -645,7 +650,7 @@ const MessageCard = ({
           <div className="ml-3 flex w-full items-center justify-end text-end">
             <div className={`ml-auto flex items-center justify-end`}>
               <div
-                className={`text-muted mt-1 text-xs ${
+                className={`text-muted mt-1 text-[10px] ${
                   chat.senderId !== User.id && "mr-3"
                 } `}
               >
@@ -865,10 +870,10 @@ const MessageCard = ({
           </AnimatePresence>
 
           <div
-            className={`MenuLists relative ${
+            className={`MenuLists relative text-black dark:text-white  ${
               chat.status === "pending" && "hidden"
             }  flex cursor-pointer items-center justify-center
-             rounded-r-full rounded-l-full bg-light-primary px-1 py-[6px] text-muted-light group-hover:opacity-100
+             rounded-r-full rounded-l-full bg-light-primary p-1.5 text-muted-light group-hover:opacity-100
              dark:bg-dark-primary dark:text-muted-dark md:opacity-0
              ${isActivePopup && "md:opacity-100"}
             
@@ -878,22 +883,28 @@ const MessageCard = ({
             }}
             ref={setReferenceElement}
           >
-            <i
-              className={` md:transition-all md:duration-150 ${
+            <span className="w-[10px]" />
+            <motion.i
+              className={`  absolute inset-0 flex items-center ${
                 chat.senderId === currentId
-                  ? `ml-2 flex-row-reverse md:ml-0 md:group-hover:ml-2 ${
-                      isActivePopup && "md:ml-2"
-                    }`
-                  : ` group-hover:mr-2 ${isActivePopup && "md:mr-2"}`
-              }  `}
+                  ? "justify-end pr-2 "
+                  : "justify-start pl-2"
+              } `}
+              whileTap={{ y: 5 }}
             >
               <BsChevronDown size={10} />
-            </i>
+            </motion.i>
             <i
-              className={`transition-opacity duration-150 
-            group-hover:opacity-100 md:opacity-0  ${
-              isActivePopup && "md:opacity-100"
-            }`}
+              className={`ml-2 transition-opacity  duration-150 group-hover:opacity-100 md:ml-0 md:opacity-0 
+            md:transition-all md:duration-150 
+            ${
+              chat.senderId === currentId
+                ? `mr-2 flex-row-reverse  md:group-hover:mr-2 ${
+                    isActivePopup ? " md:mr-2 " : "md:mr-0"
+                  }`
+                : ` group-hover:ml-2 ${isActivePopup && "md:ml-2"}`
+            } 
+            ${isActivePopup && "md:opacity-100"}`}
             >
               <BsEmojiSmile />
             </i>

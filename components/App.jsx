@@ -12,6 +12,7 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import { CircularProgress } from "@mui/joy";
 import { useTheme } from "next-themes";
 import LoginPage from "./login/LoginPage";
+import axios from "axios";
 
 export const UserContext = createContext();
 
@@ -22,6 +23,7 @@ const App = () => {
   const [isAuthed, setIsAuthed] = useState(false);
 
   const { setTheme } = useTheme();
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {

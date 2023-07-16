@@ -46,6 +46,13 @@
 html {
   scroll-behavior: smooth;
 }
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+.chat-message {
+  font-family: "Open Sans", sans-serif;
+}
 .scrollBar::-webkit-scrollbar-thumb {
   border-radius: 999px;
 }

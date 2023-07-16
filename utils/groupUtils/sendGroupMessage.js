@@ -37,6 +37,7 @@ export const sendGroupMessage = async (
   };
   const user = await getUser(senderId);
   const newMessage = {
+    lastMessageId: createdId || customId,
     lastMessage: messageText,
     type: type,
     status: "sent",

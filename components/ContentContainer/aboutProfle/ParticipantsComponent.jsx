@@ -275,6 +275,7 @@ const ParticipantsComponent = ({ groupObject }) => {
         <AddParticipants
           setShowAddParticipants={setShowAddParticipants}
           groupObject={groupObject}
+          setParticipants={setParticipants}
         />
       )}
       <div>
@@ -296,6 +297,7 @@ const ParticipantsComponent = ({ groupObject }) => {
           </div>
         ) : (
           <>
+        {console.log(participants)}
             {participants.map((user) => (
               <ParticipantCard
                 user={user}

@@ -17,9 +17,13 @@ const MediaInput = ({
   setpicVidmediaToNull,
   setblurredPicVidmedia,
 }) => {
-  const { ChatObject, setChats, setallowScrollObject,chatRooms, setChatRooms } = useContext(
-    SelectedChannelContext
-  );
+  const {
+    ChatObject,
+    setChats,
+    setallowScrollObject,
+    chatRooms,
+    setChatRooms,
+  } = useContext(SelectedChannelContext);
   const { User } = useContext(UserContext);
   const [mediaCaption, setmediaCaption] = useState("");
   const [ImageBase64, setImageBase64] = useState();
@@ -103,20 +107,33 @@ const MediaInput = ({
     >
       {picVidmedia.type.startsWith("image/") ? (
         picVidmedia?.loading ? (
-          <div className="z-[999] flex h-[calc(100vh-195px)] items-center justify-center rounded-t-lg bg-white text-lg dark:bg-black ">
-            <i className="mr-2">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="z-[999] flex py-10 items-center justify-center rounded-t-lg  bg-white
+           text-lg dark:bg-black"
+          >
+            <div className="mr-2">
               <CircularProgress size="md" variant="plain" />
-            </i>
-            Optimizing image for better performance...
-          </div>
+            </div>
+            <span className="font-semibold">
+              Optimizing image for improved performance...
+            </span>
+          </motion.div>
         ) : (
-          <div className="z-[999] flex h-[calc(100vh-195px)] justify-center rounded-t-lg bg-white dark:bg-black ">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="z-[999] flex h-[calc(100vh-195px)] justify-center rounded-t-lg bg-white dark:bg-black "
+          >
             <img
               src={URL.createObjectURL(picVidmedia)}
               alt="Downscaled media "
-              className="object-contain"
+              className="max-h-[calc(100vh-195px)] object-contain"
             />
-          </div>
+          </motion.div>
         )
       ) : (
         <>
@@ -169,7 +186,7 @@ const MediaInput = ({
                   ...room,
                   lastMessageSenderName: User.name,
                   lastMessage: mediaCaption,
-                  lastMessageType: isImage? "image" : "video",
+                  lastMessageType: isImage ? "image" : "video",
                   lastMessageStatus: "pending",
                   timestamp: time,
                   senderId: User.id,

@@ -100,7 +100,7 @@ const ReplyBoard = ({ chat, User, width, displayNameWidth }) => {
   return (
     <div
       style={{ width: width > displayNameWidth ? width : displayNameWidth }}
-      className={`relative flex h-[45px] justify-between truncate rounded-lg px-2 pr-0 text-start 
+      className={`relative flex h-[45px] justify-between truncate rounded-lg px-2 pr-0 text-start cursor-pointer
        ${
          chat.senderId === User.id
            ? "bg-blue-400"

@@ -43,6 +43,7 @@ export async function sendMessage(
       text: messageText,
       type: type,
       status: user1Id === user2Id ? "seen" : "sent",
+      lastMessageId: createdId || customId,
     };
     if (type === "file") {
       lastMessage.fileName = fileObj?.name;

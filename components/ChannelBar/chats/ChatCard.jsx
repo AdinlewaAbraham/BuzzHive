@@ -144,6 +144,7 @@ const ChatCard = ({
     }
     const lastMessage = messages[messages.length - 1];
     const Chats = getStoredChats();
+    if (!Chats) return
     const updatedArr = Chats.map((obj) => {
       if (obj.id == id) {
         return { ...obj, unReadmessagesCount: 0 };
@@ -240,7 +241,6 @@ const ChatCard = ({
                   localStorage.setItem("user", JSON.stringify(newObj));
                 }
               }
-
               if (JSON.parse(sessionStorage.getItem("50pxAwayFromBottom"))) {
                 setallowScrollObject({
                   scrollTo: "bottom",
@@ -249,6 +249,7 @@ const ChatCard = ({
                 });
               }
               setChats((prevMessages) => {
+                if (!prevMessages) return
                 const firstMessageId = prevMessages[0]["id"];
 
                 const firstMessageIndex = saveChats.findIndex(
@@ -262,6 +263,8 @@ const ChatCard = ({
               });
               if (User.isReadReceiptsOn) {
                 changeMessagesStatus(id, type, "seen");
+              } else {
+                changeMessagesStatus(id, type, "received");
               }
             } else if (id !== ChatObject.activeChatId) {
               changeMessagesStatus(id, type, "received")
@@ -458,7 +461,7 @@ const ChatCard = ({
           <FaUserAlt size={22} />
         )}
       </div>
-      <div className="flex  w-[calc(100%-62px)] flex-col items-start  justify-between truncate">
+      <div className="flex  w-[calc(100%-62px)] flex-col items-start justify-between truncate">
         <div className="flex w-full  items-center justify-between">
           <h3 className=" flex items-center font-normal ">
             {name}
@@ -468,9 +471,9 @@ const ChatCard = ({
         </div>
 
         <div className="flex w-full  items-center justify-between">
-          <div className=" flex w-[95%] items-center truncate text-sm text-muted-light dark:text-muted-dark">
+          <div className=" flex w-[95%] items-center truncate text-[14px] text-muted-light dark:text-muted-dark">
             {isMessageSentByMe && (
-              <i className="mr-1 flex items-center">
+              <i className="mr-1 flex items-center ">
                 {message.status === "pending" && <BiTimeFive />}
                 {message.status === "sent" && <BsCheckLg />}
                 {message.status === "received" && <BsCheckAll />}
@@ -478,7 +481,8 @@ const ChatCard = ({
               </i>
             )}
             {!isMessageSentByMe && <p className="mr-1">{sender}:</p>}
-            <i className="flex">
+            <i className="flex items-center ">
+              {/* make this better by using switch statement */}
               {(message.type === "pic/video" ||
                 message.type === "image" ||
                 message.type === "video") && (
@@ -486,17 +490,19 @@ const ChatCard = ({
                   <i className="mr-1">
                     <HiOutlinePhotograph />
                   </i>
-                  <p className="truncate">
-                    {message.text === "" && message.type}
-                  </p>
+                  {message.text === "" && message.type === "deleted"
+                    ? "Deleted message"
+                    : message.type}
                 </div>
               )}
               {message.type === "file" && (
                 <div className=" flex items-center truncate">
                   <i className="mr-1">
                     <BsFileEarmark />
-                  </i>{" "}
-                  {message.text === "" && chat.fileName}
+                  </i>
+                  {message.text === "" && message.type === "deleted"
+                    ? "Deleted message"
+                    : chat.fileName}
                 </div>
               )}
               {message.type === "poll" && (
@@ -504,14 +510,16 @@ const ChatCard = ({
                   <TiChartBarOutline />
                 </i>
               )}
+
               {message.type === "deleted" && (
-                <i className="mr-1 flex rotate-90 items-center">
+                <i className="mr-1 flex items-center ">
                   <AiOutlineStop />
                 </i>
               )}
             </i>
-
-            <p className="truncate">{message.text}</p>
+            <p className="flex items-center truncate ">
+              {message.type === "deleted" ? "Deleted message" : message.text}
+            </p>
           </div>
           <div className="ml-2 min-w-max">
             {unReadCount !== 0 && (

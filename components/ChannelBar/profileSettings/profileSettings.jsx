@@ -11,13 +11,19 @@ import { db } from "@/utils/firebaseUtils/firebase";
 import { updateDoc, doc, onSnapshot } from "firebase/firestore";
 import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
-import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { storage } from "@/utils/firebaseUtils/firebase";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Image from "next/image";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { AnimatePresence, motion } from "framer-motion";
 import Badge from "@/components/Badge";
+import { MdClose } from "react-icons/md";
 
 const EditProfileInfo = ({ title, toBeEdited }) => {
   const [showInput, setshowInput] = useState(false);
@@ -50,12 +56,12 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
         updateDoc(userRef, { ["queryName"]: toBeUpdated.toLocaleLowerCase() });
       }
     } catch (error) {
-     throw error
+      console.error(error);
     } finally {
       setshowInput(false);
     }
   };
-  
+
   return (
     <div className="mb-3">
       <h5 className="text-muted-light dark:text-muted-dark">{title}</h5>
@@ -66,9 +72,9 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
             name=""
             id=""
             ref={inputRef}
-            className="w-full bg-transparent outline-none"
+            className="w-full break-words bg-transparent outline-none"
             onChange={(e) => settoBeUpdated(e.target.value)}
-            maxLength={title === "Bio" ? 100 : 25}
+            maxLength={title === "Bio" ? 100 : 30}
           />
           <div
             onClick={() => handleSubmit(title)}
@@ -79,7 +85,7 @@ const EditProfileInfo = ({ title, toBeEdited }) => {
         </div>
       ) : (
         <div className="flex items-center justify-between">
-          <p className="w-full">{toBeEdited}</p>
+          <p className=" w-[calc(100%-45px)] break-words">{toBeEdited}</p>
           <div
             onClick={() => setshowInput(true)}
             className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg p-2 hover:bg-hover-light dark:hover:bg-hover-dark"
@@ -103,6 +109,7 @@ const ProfileSettings = () => {
   const [dontShowText, setDontShowText] = useState(false);
   const [showMenu, setshowMenu] = useState(false);
   const [showCheckMark, setShowCheckMark] = useState(false);
+  const [fullScreenMode, setFullScreenMode] = useState(false);
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -132,9 +139,7 @@ const ProfileSettings = () => {
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setProgress(progress);
       },
-      (error) => {
-
-      },
+      (error) => {},
       async () => {
         try {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
@@ -153,26 +158,24 @@ const ProfileSettings = () => {
           setTimeout(() => {
             setDontShowText(false);
           }, 1000);
-        } catch (error) {
-
-        }
+        } catch (error) {}
       }
     );
   };
   const { setSelectedChannel, setprevSelectedChannel, prevSelectedChannel } =
     useContext(SelectedChannelContext);
   const removeImg = async () => {
-    setshowMenu(false)
-    const userRef = doc(db, "users", User.id)
+    setshowMenu(false);
+    const userRef = doc(db, "users", User.id);
 
-    setUser({ ...User, photoUrl: null })
+    setUser({ ...User, photoUrl: null });
 
-    await updateDoc(userRef, { ["photoUrl"]: null })
+    await updateDoc(userRef, { ["photoUrl"]: null });
     const profilePicRef = ref(storage, `users/profilePicture/${User.id}`);
     await deleteObject(profilePicRef)
       .then(() => true)
       .catch(() => false);
-  }
+  };
 
   return (
     <div className="px-2">
@@ -188,12 +191,14 @@ const ProfileSettings = () => {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -20, opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="overflow-y-auto scrollBar md:h-[calc(100vh-100px)] h-[calc(100vh-150px)] "
+        className="scrollBar h-[calc(100vh-150px)] overflow-y-auto md:h-[calc(100vh-100px)] "
       >
         <div className="flex w-full items-center justify-center">
           <div
-            className={`Menu relative  ${!(User.photoUrl && invalidURL) && "bg-imgCover-light dark:bg-imgCover-dark"
-              } 
+            className={`Menu relative  ${
+              !(User.photoUrl && invalidURL) &&
+              "bg-imgCover-light dark:bg-imgCover-dark"
+            } 
               ${isUploading && "scale-90"} 
               flex h-[100px] w-[100px] cursor-pointer items-center justify-center  rounded-full bg-inherit
               transition-transform duration-300 `}
@@ -212,9 +217,10 @@ const ProfileSettings = () => {
               </div>
             )}
             <div
-              className={` absolute inset-0 flex  items-center  ${isUploading && "opacity-100"
-                }  justify-center rounded-full bg-gray-900 
-              dark:bg-opacity-50 bg-opacity-10 opacity-0 transition-opacity  duration-150 hover:opacity-100`}
+              className={` absolute inset-0 flex  items-center  ${
+                isUploading && "opacity-100"
+              }  justify-center rounded-full bg-gray-900 
+              bg-opacity-10 opacity-0 transition-opacity duration-150  hover:opacity-100 dark:bg-opacity-50`}
               onClick={() => {
                 !isUploading ? setshowMenu(true) : "open img";
               }}
@@ -266,8 +272,8 @@ const ProfileSettings = () => {
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -10, opacity: 0 }}
-                  className="Menu bg-secondary hover:[&>li]:bg-hover-light dark:hover:[&>li]:bg-hover-dark [&>li]: [&>li]: absolute bottom-[-140px] rounded-lg
-                              p-2 [&>li]:whitespace-nowrap [&>li]:rounded-lg [&>li]:p-2
+                  className="Menu bg-secondary [&>li]: [&>li]: absolute bottom-[-140px] rounded-lg p-2 [&>li]:whitespace-nowrap
+                              [&>li]:rounded-lg [&>li]:p-2 hover:[&>li]:bg-hover-light dark:hover:[&>li]:bg-hover-dark
                               "
                 >
                   <li
@@ -277,7 +283,9 @@ const ProfileSettings = () => {
                   >
                     Remove image
                   </li>
-                  <li>View image</li>
+                  {User.photoUrl && invalidURL && (
+                    <li onClick={() => setFullScreenMode(true)}>View image</li>
+                  )}
                   <li className="relative">
                     Change image
                     <label className="absolute inset-0 flex h-full w-full cursor-pointer items-center justify-center ">
@@ -299,14 +307,43 @@ const ProfileSettings = () => {
         </div>
 
         <div className="mb-7 text-center">
-          <h4 className="font-medium mt-2 flex items-center justify-center ">{User.name}<Badge id={User.id} /></h4>
-          <p className="text-muted-light  dark:text-muted-dark">{User.bio}</p>
+          <h4 className="mt-2 flex items-center justify-center break-words font-medium ">
+            {User.name}
+            <Badge id={User.id} />
+          </h4>
+          <p className="break-words  text-muted-light dark:text-muted-dark">
+            {User.bio}
+          </p>
         </div>
         <section>
           <EditProfileInfo title={"Display Name"} toBeEdited={User.name} />
           <EditProfileInfo title={"Bio"} toBeEdited={User.bio} />
         </section>
       </motion.div>
+      <AnimatePresence>
+        {fullScreenMode && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99] flex items-center justify-center bg-white dark:bg-black"
+          >
+            <div
+              className="absolute top-4 right-4  flex h-[66px] items-center justify-end rounded-lg bg-white px-4
+                    text-[30px]  text-black dark:bg-black dark:text-white [&>i]:cursor-pointer"
+            >
+              <i onClick={() => setFullScreenMode(false)}>
+                <MdClose />
+              </i>
+            </div>
+            <img
+              src={User.photoUrl}
+              alt=""
+              className="h-full w-full object-contain"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

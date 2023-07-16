@@ -1,11 +1,3 @@
-remove mesage from chatroomcard if it is deleted
-make it scroll when receiving new messages from another user
-
-
-test for added messages  when readrecipt is on and also off
-check if scroll when message is added 
-
-
 optimize stuff    
  --use alot of promise.all()
  --make initial query sort messages so i dont sort messages over and over again    

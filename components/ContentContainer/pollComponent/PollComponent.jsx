@@ -170,7 +170,7 @@ const PollComponent = ({ PollObject, searchText, searchedMessages }) => {
 
   return (
     <div className="text-left ">
-      <h3 className="max-w-[300px]  whitespace-normal break-words ">
+      <h3 className="max-w-[300px] chat-message whitespace-normal break-words ">
         {question?.split(" ").map((word, index) => (
           <span
             key={index}

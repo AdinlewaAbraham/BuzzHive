@@ -19,7 +19,7 @@ import { ImBlocked } from "react-icons/im";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { UserContext } from "../../App";
 import { MdGroup } from "react-icons/md";
-import { FaUserAlt } from "react-icons/fa";
+import { FaUserAlt, FaCheck } from "react-icons/fa";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import ParticipantsComponent from "./ParticipantsComponent";
 import FileSection from "./FileSection";
@@ -42,23 +42,92 @@ import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import Badge from "@/components/Badge";
 import { MdClose, MdOutlineFileDownload } from "react-icons/md";
 
+const EditProfileInfo = ({ type, toBeEdited }) => {
+  const [showInput, setshowInput] = useState(false);
+  const inputRef = useRef(null);
+  const [toBeUpdated, settoBeUpdated] = useState("");
+  const { User, setUser } = useContext(UserContext);
+  const { ChatObject } = useContext(SelectedChannelContext);
+  useEffect(() => {
+    if (showInput && inputRef.current) {
+      inputRef.current.value = toBeEdited;
+      inputRef.current.focus();
+    }
+  }, [showInput]);
+  useEffect(() => {
+    const userRef = doc(db, "users", User.id);
+    const unsub = onSnapshot(userRef, (snapShot) => {
+      if (snapShot.data()) {
+        localStorage.setItem("user", JSON.stringify(snapShot.data()));
+        setUser(snapShot.data());
+      }
+    });
+    return () => unsub();
+  }, []);
+  const handleSubmit = async () => {
+    try {
+      if (toBeUpdated.trim() === "") return;
+      const groupRef = doc(db, "groups", ChatObject.activeChatId);
+      updateDoc(groupRef, { [type === "Bio" ? "bio" : "name"]: toBeUpdated });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setshowInput(false);
+    }
+  };
+
+  return (
+    <div className="mb-3">
+      {showInput ? (
+        <div className="flex items-center justify-between">
+          <input
+            type="text"
+            name=""
+            id=""
+            ref={inputRef}
+            className="w-full bg-transparent outline-none"
+            onChange={(e) => settoBeUpdated(e.target.value)}
+            maxLength={type === "Bio" ? 100 : 30}
+          />
+          <div
+            onClick={() => handleSubmit()}
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg p-2 hover:bg-hover-light dark:hover:bg-hover-dark"
+          >
+            <FaCheck />
+          </div>
+        </div>
+      ) : (
+        <div className="flex w-full items-center justify-between">
+          <p className=""> {toBeEdited}</p>
+          <div
+            onClick={() => setshowInput(true)}
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg p-2 hover:bg-hover-light dark:hover:bg-hover-dark"
+          >
+            <MdOutlineModeEditOutline size={20} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 const Menu = ({ icon, header, context }) => {
   return (
     <div className="my-3 flex items-center">
       <i className="text-muted"> {icon}</i>
-      <div className="ml-3">
+      <div className="ml-3 w-full">
         <p className="text-muted text-sm">{header}</p>
-        <h4>{context}</h4>
+        <EditProfileInfo toBeEdited={context} type={header} />
       </div>
     </div>
   );
 };
 
-const Header = ({ title, isActive, onClick,ChatObject }) => {
+const Header = ({ title, isActive, onClick, ChatObject }) => {
   return ChatObject.activeChatType === "group" || title !== "Participants" ? (
     <div
-      className={`relative w-full cursor-pointer select-none pb-5 text-center ${!isActive && "text-muted"
-        }`}
+      className={`relative w-full cursor-pointer select-none pb-5 text-center ${
+        !isActive && "text-muted"
+      }`}
       onClick={onClick}
     >
       {isActive && (
@@ -71,9 +140,8 @@ const Header = ({ title, isActive, onClick,ChatObject }) => {
   );
 };
 
-const AboutProfile = ({ setshowProfile,ChatObject }) => {
+const AboutProfile = ({ setshowProfile, ChatObject, setChatObject }) => {
   const [profile, setprofile] = useState();
-  const { setChatObject } = useContext(SelectedChannelContext);
 
   const [activeComponent, setActiveComponent] = useState("Media");
   const [prevComponent, setPrevComponent] = useState(null);
@@ -90,6 +158,7 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
   const [showCheckMark, setShowCheckMark] = useState(false);
 
   const [fullScreenMode, setFullScreenMode] = useState(false);
+  const [imgUrl, setImgUrl] = useState(ChatObject.photoUrl);
 
   const { User } = useContext(UserContext);
   useEffect(() => {
@@ -170,10 +239,7 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
   };
   const handleImageChange = async (file, dataObject) => {
     setProgress(0);
-    setChatObject({
-      ...dataObject,
-      photoUrl: URL.createObjectURL(file),
-    });
+    setImgUrl(URL.createObjectURL(file));
     setinvalidURL(true);
     setisUploading(true);
     const storage = getStorage();
@@ -189,7 +255,7 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setProgress(progress);
       },
-      (error) => { },
+      (error) => {},
       async () => {
         try {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
@@ -209,17 +275,14 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
           setTimeout(() => {
             setDontShowText(false);
           }, 1000);
-        } catch (error) { }
+        } catch (error) {}
       }
     );
   };
   const removeImg = async () => {
     setshowMenu(false);
     const groupRef = doc(db, "groups", ChatObject.activeChatId);
-    setChatObject((prevState) => ({
-      ...prevState,
-      photoUrl: null,
-    }));
+    
     await updateDoc(groupRef, { photoUrl: null });
     const storageRef = ref(storage, "groupIcons/" + ChatObject.activeChatId);
 
@@ -227,6 +290,7 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
       .then(() => true)
       .catch(() => false);
   };
+
   return (
     <div className=" absolute inset-0 left-[1px] z-40 bg-light-secondary dark:bg-dark-secondary">
       <div className=" bg-primary  h-[66px] w-full pl-4">
@@ -244,13 +308,14 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
           </h4>
         </div>
       </div>
-      <div className="scrollBar h-[calc(100vh-76px)] overflow-y-auto ">
+      <div className="scrollBar h-[calc(100vh-76px)] overflow-y-auto overflow-x-hidden ">
         <div className="relative">
           <div className=" bg-primary mb-5 flex flex-col items-center justify-center py-10">
             <div
-              className={`Menu relative  ${!(ChatObject.photoUrl && invalidURL) &&
+              className={`Menu relative  ${
+                !(ChatObject.photoUrl && invalidURL) &&
                 "bg-imgCover-light dark:bg-imgCover-dark"
-                } 
+              } 
               ${isUploading && "scale-90"} 
               flex h-[200px] w-[200px] cursor-pointer items-center justify-center  rounded-full bg-inherit
             transition-transform duration-300 `}
@@ -270,15 +335,16 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
               )}
 
               <div
-                className={` absolute inset-0 flex  items-center  ${isUploading && "opacity-100"
-                  }  justify-center rounded-full bg-gray-900
+                className={` absolute inset-0 flex  items-center  ${
+                  isUploading && "opacity-100"
+                }  justify-center rounded-full bg-gray-900
                 bg-opacity-10 opacity-0 transition-opacity duration-150  hover:opacity-100 dark:bg-opacity-50`}
                 onClick={() => {
                   isAdmin && !isUploading
                     ? setshowMenu(true)
-                    : ChatObject.photoUrl && invalidURL
-                      ? setFullScreenMode(true)
-                      : false;
+                    : (profile?.photoUrl || ChatObject.photoUrl) && invalidURL
+                    ? setFullScreenMode(true)
+                    : false;
                 }}
               >
                 <AnimatePresence>
@@ -288,7 +354,7 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
                       viewBox="0 0 24 24"
                       width="80"
                       height="80"
-                      className="translate-x-1 translate-y-[-7px] "  
+                      className="translate-x-1 translate-y-[-7px] "
                     >
                       <motion.path
                         fill="none"
@@ -312,9 +378,9 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
                   <MdOutlineModeEditOutline size={30} />
                 )}
               </div>
-              {ChatObject.photoUrl && invalidURL ? (
+              {imgUrl && invalidURL ? (
                 <img
-                  src={ChatObject.photoUrl}
+                  src={imgUrl}
                   alt="profile pic"
                   className={`h-full w-full rounded-full object-cover`}
                   onError={() => setinvalidURL(false)}
@@ -338,16 +404,20 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
                     
                     <li
                       onClick={() => {
+                        setChatObject({ ...ChatObject, photoUrl: null })
+                        setImgUrl(null)
                         removeImg();
                       }}
                     >
                       Remove image
                     </li>
-                    {ChatObject.photoUrl && invalidURL && (
-                      <li onClick={() => setFullScreenMode(true)}>
-                        View image
-                      </li>
-                    )}
+
+                    {(profile?.photoUrl || ChatObject.photoUrl) &&
+                      invalidURL && (
+                        <li onClick={() => setFullScreenMode(true)}>
+                          View image
+                        </li>
+                      )}
                     <li className="relative">
                       Change image
                       <label className="absolute inset-0 flex h-full w-full cursor-pointer items-center justify-center ">
@@ -378,14 +448,12 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
                     className="absolute top-4 right-4  flex h-[66px] items-center justify-end rounded-lg bg-white px-4
                     text-[30px]  text-black dark:bg-black dark:text-white [&>i]:cursor-pointer"
                   >
-                    <i
-                      onClick={() => setFullScreenMode(false)}
-                    >
+                    <i onClick={() => setFullScreenMode(false)}>
                       <MdClose />
                     </i>
                   </div>
                   <img
-                    src={ChatObject.photoUrl}
+                    src={profile?.photoUrl || ChatObject.photoUrl}
                     alt=""
                     className="h-full w-full object-contain"
                   />
@@ -393,7 +461,8 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
               )}
             </AnimatePresence>
             <h3 className="mt-2 flex items-center justify-center text-lg font-medium">
-              {ChatObject.displayName} <Badge id={ChatObject.otherUserId} />
+              {profile?.name || ChatObject.displayName}{" "}
+              <Badge id={ChatObject.otherUserId} />
             </h3>
             {ChatObject.activeChatType === "group" && (
               <p className="text-muted text-sm">
@@ -406,7 +475,7 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
             <Menu
               icon={<BiAt />}
               header="username"
-              context={ChatObject.displayName}
+              context={profile?.name || ChatObject.displayName}
             />
             <Menu
               icon={<AiOutlineInfoCircle />}
@@ -417,8 +486,9 @@ const AboutProfile = ({ setshowProfile,ChatObject }) => {
         </div>
 
         <div
-          className={`  ${ChatObject.activeChatType === "group" && "mb-5"
-            } bg-primary flex flex-col items-center justify-around  p-5`}
+          className={`  ${
+            ChatObject.activeChatType === "group" && "mb-5"
+          } bg-primary flex flex-col items-center justify-around  p-5`}
         >
           <div className="mb-3 flex w-full justify-around">
             {["Media", "Files", "Participants"].map((header) => (

@@ -314,7 +314,7 @@ const Input = ({ setReplyDivHeight }) => {
           value={message}
           onKeyDown={handleInputKeyDown}
           onChange={(e) => {
-            if (e.target.value.length > 500) return;
+            if (e.target.value.length > 2000) return;
             setmessage(e.target.value);
           }}
         />

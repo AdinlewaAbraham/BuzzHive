@@ -276,7 +276,6 @@ const AddGroup = () => {
   function cancelCreateGroup() {
     setOpen(true);
   }
-  console.log(activeUsers)
   return (
     <div className="relative h-full min-h-[430px]">
       <ModalComp
@@ -320,6 +319,7 @@ const AddGroup = () => {
                   />
 
                   {user.name}
+                  <Badge id={user.id} styles={" text-blue-900"} />
                   <i
                     className={`text-danger absolute right-1 cursor-pointer p-1
                    opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${
@@ -404,6 +404,7 @@ const AddGroup = () => {
                   onChange={(e) => {
                     setgroupName(e.target.value);
                   }}
+                  maxLength={30}
                 />
               </div>
               <div className="mt-4">
@@ -421,6 +422,7 @@ const AddGroup = () => {
                   onChange={(e) => {
                     setgroupBio(e.target.value);
                   }}
+                  maxLength={100}
                 />
               </div>
             </div>

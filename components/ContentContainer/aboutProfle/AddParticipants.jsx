@@ -56,7 +56,7 @@ const UserCard = (p) => {
   );
 };
 
-const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
+const AddParticipants = ({ setShowAddParticipants, groupObject, setParticipants }) => {
   const [animationParent] = useAutoAnimate({ duration: 150 });
   const [activeUsers, setactiveUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -174,7 +174,7 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
     const userid = selectedUsers.map((user) => user.id);
     const groupRef = doc(db, "groups", ChatObject.activeChatId);
     await updateDoc(groupRef, { members: arrayUnion(...userid) });
-
+    setParticipants(prevParticipants=> [...prevParticipants, ...selectedUsers])
     setAddedUsers(true);
     setTimeout(() => {
       setShowAddParticipants(false);
@@ -307,7 +307,6 @@ const AddParticipants = ({ setShowAddParticipants, groupObject }) => {
               <div className="flex items-center justify-center [&>span]:mr-1">
                 {addedUsers ? (
                   <>
-                    {" "}
                     Successfully added {selectedUsers.length} user
                     {selectedUsers > 1 && "s"}.{" "}
                     <svg

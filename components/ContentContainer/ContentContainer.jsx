@@ -119,6 +119,7 @@ const ContentContainer = () => {
   }, [currentSearchIndex]);
 
   useEffect(() => {
+    sessionStorage.setItem("50pxAwayFromBottom", JSON.stringify(true));
     sethasMoreTop(true);
     setshowProfile(false);
   }, [ChatObject.activeChatId]);
@@ -170,11 +171,10 @@ const ContentContainer = () => {
     const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
     if (distanceToBottom > 50) {
       setshowScrollTobottom(true);
-      sessionStorage.setItem("50pxAwayFromBottom", JSON.stringify(true))
+      sessionStorage.setItem("50pxAwayFromBottom", JSON.stringify(false));
     } else {
       setshowScrollTobottom(false);
-      sessionStorage.setItem("50pxAwayFromBottom", JSON.stringify(false))
- 
+      sessionStorage.setItem("50pxAwayFromBottom", JSON.stringify(true));
     }
   };
   return (
@@ -187,6 +187,7 @@ const ContentContainer = () => {
             <AboutProfile
               setshowProfile={setshowProfile}
               ChatObject={aboutProfleChatObject}
+              setChatObject={setAboutProfleChatObject}
             />
           )}
           <div className="bg-primary relative z-20 flex max-h-[66px] cursor-pointer   items-center justify-between overflow-hidden px-[13px] md:ml-[1px]">
@@ -410,7 +411,7 @@ const ContentContainer = () => {
                     <div className="mb-5 mt-3 flex items-center justify-center">
                       <i className="mr-2">
                         <CircularProgress variant="plain" size="sm" />
-                      </i>{" "}
+                      </i>
                       loading more chats...
                     </div>
                   }

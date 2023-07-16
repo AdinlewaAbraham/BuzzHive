@@ -18,11 +18,12 @@ const Chats = () => {
   const [sortedChats, setSortedChats] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [animationParent] = useAutoAnimate({ duration: 300 });
 
   const chats = whatToReturn;
-  const { setSelectedChannel, chatRooms, setChatRooms } = useContext(SelectedChannelContext);
+  const { setSelectedChannel, chatRooms, setChatRooms, selectedChannel } =
+    useContext(SelectedChannelContext);
 
   const getStoredChats = () => {
     const storedData = localStorage.getItem(`${User.id}_userChats`);
@@ -48,7 +49,6 @@ const Chats = () => {
   }, []);
   JSON.parse(localStorage.getItem(`${User.id}_userChats`));
   useEffect(() => {
-    console.log(chatRooms)
     const storedChats = getStoredChats();
     if (storedChats && storedChats.length) {
       setChatRooms(storedChats);
@@ -86,35 +86,42 @@ const Chats = () => {
       unsub();
     };
   }, [User, chats, loading]);
-
   useMemo(async () => {
     if (!chatRooms) return;
-    const sortedChats = chatRooms.slice().sort(
-      (a, b) => b.timestamp.seconds - a.timestamp.seconds
-    );
+    const sortedChats = chatRooms
+      .slice()
+      .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
     setSortedChats(sortedChats);
   }, [chatRooms]);
   return (
-    <div className="">
+    <div
+      className={`${selectedChannel !== "chats" && "hidden"} overflow-hidden`}
+    >
       <div className="h-[95px]">
         <div className="flex h-[66px] items-center justify-between px-4">
           <h1 className="text-2xl ">Chats</h1>
           <div className="relative flex items-center text-muted-light dark:text-muted-dark">
             <i
-              className="mr-6 cursor-pointer"
+              className="group relative mr-6 flex min-h-max min-w-max cursor-pointer items-center justify-center"
               onClick={() => {
                 setSelectedChannel("addcontact");
               }}
             >
               <HiUserAdd size={27} />
+              <span className="sidebar-tooltip origin-top bottom-[-50px] left-[-35px] group-hover:scale-100">
+                Add contact
+              </span>
             </i>
             <i
               onClick={() => {
                 setSelectedChannel("addGroup");
               }}
-              className="cursor-pointer"
+              className="group relative flex min-h-max min-w-max cursor-pointer items-center justify-center"
             >
               <MdGroupAdd size={25} />
+              <span className="sidebar-tooltip origin-top bottom-[-50px] left-[-40px] group-hover:scale-100">
+                Add group
+              </span>
             </i>
           </div>
         </div>
@@ -126,11 +133,11 @@ const Chats = () => {
             outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-
           />
         </div>
       </div>
       <motion.div
+        key={selectedChannel === "chats"}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -20, opacity: 0 }}
@@ -152,18 +159,22 @@ const Chats = () => {
           <>
             {sortedChats.length !== 0 ? (
               <div
-              ref={animationParent}
+                ref={animationParent}
                 className="scrollBar  mt-6 flex h-[calc(100vh-190px)] flex-col items-center overflow-y-auto overflow-x-hidden
                pt-[2px] pr-[2px] md:h-[calc(100vh-120px)] "
               >
                 {sortedChats
                   .filter(
                     (chat) =>
-                      chat.senderDisplayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+                      chat.senderDisplayName
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()) ||
+                      chat.lastMessage
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase())
                   )
                   .map((chat) => (
-                    <ChatCard  
+                    <ChatCard
                       key={chat.id}
                       otherUserId={chat.otherParticipant}
                       type={chat.type}

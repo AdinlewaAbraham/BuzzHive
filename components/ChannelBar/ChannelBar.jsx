@@ -15,8 +15,11 @@ const ChannelBar = () => {
         className="h-[calc(100vh-70px)] max-h-screen w-full overflow-y-hidden bg-light-primary p-4 pt-0 dark:bg-dark-primary 
     md:mr-[0px] md:h-screen md:w-[30%]  md:min-w-[400px]"
       >
-        {selectedChannel === "chats" && <Chats />}
-        {selectedChannel === "addcontact" && <AddContact />}
+        <Chats />
+        {/* Notice that I have not applied a conditional statement to this component.
+         It is intentionally kept mounted at all times to ensure that the user can
+         receive new messages when another channel is active. */} 
+         {selectedChannel === "addcontact" && <AddContact />}
         {selectedChannel === "addGroup" && <AddGroup />}
         {selectedChannel === "settings" && <Settings />}
         {selectedChannel === "profileSettings" && <ProfileSettings />}

@@ -130,18 +130,19 @@ export const useGetChats = (currentUserId) => {
         } else {
           unReadmessagesCount = 0;
         }
+        if (!group.lastMessage) continue
         const groupChat = {
           id: doc.id,
-          senderId: group.lastMessage.senderId,
+          senderId: group.lastMessage?.senderId,
           otherParticipant: doc.id,
           senderDisplayName: group.name,
-          lastMessageSenderName: group.lastMessage.senderDisplayName,
+          lastMessageSenderName: group.lastMessage?.senderDisplayName,
           senderDisplayImg: group.photoUrl,
-          lastMessage: group.lastMessage.lastMessage,
-          lastMessageType: group.lastMessage.type,
-          lastMessageStatus: group.lastMessage.status,
+          lastMessage: group.lastMessage?.lastMessage,
+          lastMessageType: group.lastMessage?.type,
+          lastMessageStatus: group.lastMessage?.status,
           fileName: group.lastMessage?.fileName,
-          timestamp: group.lastMessage.timestamp,
+          timestamp: group.lastMessage?.timestamp,
           type: "group",
           unReadmessagesCount,
         };
