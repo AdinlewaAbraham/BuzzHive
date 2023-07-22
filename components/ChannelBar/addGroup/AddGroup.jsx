@@ -253,7 +253,7 @@ const AddGroup = () => {
 
     let triggerHeight = container.scrollTop + container.offsetHeight;
     if (triggerHeight >= container.scrollHeight - 20 && hasMore) {
-      // addUsers();
+       addUsers();
     }
   };
 
@@ -325,7 +325,10 @@ const AddGroup = () => {
                    opacity-0 transition-all duration-300 group-hover:bg-accent-blue ${
                      !showAddGroupMenu && "group-hover:opacity-100  "
                    } `}
-                    onClick={() => handleRemoveUser(user.id)}
+                    onClick={() => {
+                      if (showAddGroupMenu) return;
+                      handleRemoveUser(user.id);
+                    }}
                   >
                     <GiCancel />
                   </i>
@@ -517,13 +520,14 @@ const AddGroup = () => {
               {activeUsers?.length > 0 && (
                 <div className="relative">
                   <h2
-                    className="sticky top-0 mb-1 bg-light-primary p-2 pt-0
+                    className="sticky md:top-0 top-[-2px] mb-1 bg-light-primary p-2 pt-0
                   text-muted-light dark:bg-dark-primary dark:text-muted-dark "
                   >
                     Active chats
                   </h2>
                   <div>
-                    {activeUsers.filter((user)=>user.otherParticipant !== User.id)
+                    {activeUsers
+                      .filter((user) => user.otherParticipant !== User.id)
                       .slice()
                       .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds)
                       .map((user) => {
@@ -559,7 +563,7 @@ const AddGroup = () => {
               )}
 
               <h2
-                className="sticky top-0 mb-1 mt-1 rounded-lg bg-light-primary p-2
+                className="sticky  md:top-0 top-[-2px] mb-1 mt-1 rounded-lg  bg-light-primary p-2
               text-muted-light dark:bg-dark-primary dark:text-muted-dark"
               >
                 All users

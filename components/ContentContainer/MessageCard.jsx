@@ -166,7 +166,7 @@ const MessageCard = ({
       const { scrollHeight, clientHeight } = containerElement;
       setIsTextOverflowed(scrollHeight > clientHeight);
     }
-  }, [paraContainerRef]);
+  }, [paraContainerRef, chat]);
 
   useEffect(() => {
     const getContacts = () => {
@@ -613,8 +613,7 @@ const MessageCard = ({
         >
           <p
             ref={paraContainerRef}
-            className={`text-sm chat-message ${
-              
+            className={`chat-message text-sm ${
               !showFullText && "max-h-[124px]"
             } max-w-[400px] overflow-hidden break-words text-start ${
               chat.type === "poll" && "hidden"
@@ -640,7 +639,7 @@ const MessageCard = ({
             {isTextOverflowed && (
               <a
                 onClick={() => setShowFullText(!showFullText)}
-                className={`absolute bottom-1 left-[10px] cursor-pointer hover:underline text-blue-900 hover:text-blue-700`}
+                className={`absolute bottom-1 left-[10px] cursor-pointer text-blue-900 hover:text-blue-700 hover:underline`}
               >
                 {showFullText ? "Read less" : "Read more"}{" "}
               </a>
@@ -890,7 +889,7 @@ const MessageCard = ({
                   ? "justify-end pr-2 "
                   : "justify-start pl-2"
               } `}
-              whileTap={{ y: 5 }}
+              whileTap={{ y: 3 }}
             >
               <BsChevronDown size={10} />
             </motion.i>

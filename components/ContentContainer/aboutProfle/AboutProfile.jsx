@@ -4,6 +4,7 @@ import { db, storage } from "@/utils/firebaseUtils/firebase";
 import {
   arrayRemove,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -42,7 +43,7 @@ import { downScalePicVid } from "@/utils/messagesUtils/downScalePicVid";
 import Badge from "@/components/Badge";
 import { MdClose, MdOutlineFileDownload } from "react-icons/md";
 
-const EditProfileInfo = ({ type, toBeEdited }) => {
+const EditProfileInfo = ({ type, toBeEdited, isAdmin }) => {
   const [showInput, setshowInput] = useState(false);
   const inputRef = useRef(null);
   const [toBeUpdated, settoBeUpdated] = useState("");
@@ -99,24 +100,26 @@ const EditProfileInfo = ({ type, toBeEdited }) => {
       ) : (
         <div className="flex w-full items-center justify-between">
           <p className=""> {toBeEdited}</p>
-          <div
-            onClick={() => setshowInput(true)}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg p-2 hover:bg-hover-light dark:hover:bg-hover-dark"
-          >
-            <MdOutlineModeEditOutline size={20} />
-          </div>
+          {isAdmin && (
+            <div
+              onClick={() => setshowInput(true)}
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg p-2 hover:bg-hover-light dark:hover:bg-hover-dark"
+            >
+              <MdOutlineModeEditOutline size={20} />
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 };
-const Menu = ({ icon, header, context }) => {
+const Menu = ({ icon, header, context, isAdmin }) => {
   return (
     <div className="my-3 flex items-center">
       <i className="text-muted"> {icon}</i>
       <div className="ml-3 w-full">
         <p className="text-muted text-sm">{header}</p>
-        <EditProfileInfo toBeEdited={context} type={header} />
+        <EditProfileInfo toBeEdited={context} type={header} isAdmin={isAdmin} />
       </div>
     </div>
   );
@@ -140,9 +143,11 @@ const Header = ({ title, isActive, onClick, ChatObject }) => {
   );
 };
 
-const AboutProfile = ({ setshowProfile, ChatObject, setChatObject }) => {
+const AboutProfile = ({ setshowProfile, ChatObject, setLocalChatObject }) => {
   const [profile, setprofile] = useState();
-
+  const { setChatObject, chatRooms, setChatRooms } = useContext(
+    SelectedChannelContext
+  );
   const [activeComponent, setActiveComponent] = useState("Media");
   const [prevComponent, setPrevComponent] = useState(null);
 
@@ -222,12 +227,43 @@ const AboutProfile = ({ setshowProfile, ChatObject, setChatObject }) => {
     .catch((error) => {
       console.error("Error getting document: ", error);
     });
-  const exitGroup = async () => {
+  const exitGroup = async (User, ChatObject) => {
     const groupRef = doc(db, "groups", ChatObject.activeChatId);
-    await updateDoc(groupRef, {
-      members: arrayRemove(User.id),
-      admins: arrayRemove(User.id),
-    });
+    const groupSnapshot = await getDoc(groupRef);
+
+    if (!groupSnapshot.exists()) {
+      return;
+    }
+    const { members } = groupSnapshot.data();
+
+    const isLastUser = members.length === 1 && members[0] === User.id;
+
+    if (isLastUser) {
+      const storage = getStorage();
+      const storageRef = ref(
+        storage,
+        `${ChatObject.activeChatType}/${ChatObject.activeChatId}`
+      );
+      const deleteGroupSever = async (ref) => {
+        try {
+          deleteObject(ref);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      await Promise.all([deleteDoc(groupRef), deleteGroupSever(storageRef)]);
+    } else {
+      await updateDoc(groupRef, {
+        members: arrayRemove(User.id),
+        admins: arrayRemove(User.id),
+      });
+    }
+    const filteredChatRooms = chatRooms.filter(
+      (chatRoom) => chatRoom.id !== ChatObject.activeChatId
+    );
+    setChatRooms(filteredChatRooms);
+    localStorage.setItem(`${User.id}_userChats`, filteredChatRooms);
+    localStorage.removeItem(ChatObject.activeChatId);
     setChatObject({
       activeChatId: "",
       activeChatType: "",
@@ -236,7 +272,9 @@ const AboutProfile = ({ setshowProfile, ChatObject, setChatObject }) => {
       photoUrl: "",
       displayName: "",
     });
+    setshowProfile(false);
   };
+
   const handleImageChange = async (file, dataObject) => {
     setProgress(0);
     setImgUrl(URL.createObjectURL(file));
@@ -282,7 +320,7 @@ const AboutProfile = ({ setshowProfile, ChatObject, setChatObject }) => {
   const removeImg = async () => {
     setshowMenu(false);
     const groupRef = doc(db, "groups", ChatObject.activeChatId);
-    
+
     await updateDoc(groupRef, { photoUrl: null });
     const storageRef = ref(storage, "groupIcons/" + ChatObject.activeChatId);
 
@@ -401,11 +439,10 @@ const AboutProfile = ({ setshowProfile, ChatObject, setChatObject }) => {
                               [&>li]:rounded-lg [&>li]:p-2 hover:[&>li]:bg-hover-light dark:hover:[&>li]:bg-hover-dark
                               "
                   >
-                    
                     <li
                       onClick={() => {
-                        setChatObject({ ...ChatObject, photoUrl: null })
-                        setImgUrl(null)
+                        setLocalChatObject({ ...ChatObject, photoUrl: null });
+                        setImgUrl(null);
                         removeImg();
                       }}
                     >
@@ -476,11 +513,13 @@ const AboutProfile = ({ setshowProfile, ChatObject, setChatObject }) => {
               icon={<BiAt />}
               header="username"
               context={profile?.name || ChatObject.displayName}
+              isAdmin={isAdmin}
             />
             <Menu
               icon={<AiOutlineInfoCircle />}
               header="Bio"
               context={profile?.bio}
+              isAdmin={isAdmin}
             />
           </div>
         </div>
@@ -524,7 +563,7 @@ const AboutProfile = ({ setshowProfile, ChatObject, setChatObject }) => {
           description: "Are you sure you want to exit?",
           returnText: "Cancel",
           disCardFunc: () => {
-            exitGroup();
+            exitGroup(User, ChatObject);
           },
           discardText: "Exit",
         }}

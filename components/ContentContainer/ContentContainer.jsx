@@ -206,7 +206,7 @@ const ContentContainer = () => {
               <div
                 className="flex h-full items-center"
                 onClick={() => {
-                  setAboutProfleChatObject(ChatObject);
+                  setAboutProfleChatObject({ ...ChatObject });
                   setshowProfile(true);
                 }}
               >
@@ -222,24 +222,14 @@ const ContentContainer = () => {
                      "bg-[#dfe5e7] text-[#ffffff] dark:bg-gray-500"
                    } `}
                   >
-                    <div className="flex items-center justify-center rounded-full bg-inherit text-[30px]">
-                      {ChatObject.photoUrl && invalidURL ? (
-                        <img
-                          src={ChatObject.photoUrl}
-                          alt="profile pic"
-                          className={`h-[40px] w-[40px] rounded-full object-cover`}
-                          onError={() => setinvalidURL(false)}
-                        />
-                      ) : ChatObject.activeChatType === "group" ? (
-                        <i className="text-[30px]">
-                          <MdGroup />
-                        </i>
-                      ) : (
-                        <i className="text-[25px]">
-                          <FaUserAlt />
-                        </i>
-                      )}
-                    </div>
+                    <Img
+                      src={ChatObject.photoUrl}
+                      type={ChatObject.activeChatType}
+                      styles="h-[40px] w-[40px] rounded-full bg-coverColor"
+                      imgStyles="h-[40px] w-[40px] rounded-full"
+                      groupSize="70"
+                      personalSize="40"
+                    />
                   </div>
                 </div>
                 <div className="ml-[10px]">{ChatObject.displayName}</div>{" "}

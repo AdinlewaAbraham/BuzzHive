@@ -52,7 +52,6 @@ const ChatCard = ({
   const { User } = useContext(UserContext);
   const [invalidURL, setinvalidURL] = useState(true);
   const [currentChatId, setcurrentChatId] = useState();
-
   const activeChatIdRef = useRef(ChatObject.activeChatId);
 
   useEffect(() => {
@@ -144,7 +143,7 @@ const ChatCard = ({
     }
     const lastMessage = messages[messages.length - 1];
     const Chats = getStoredChats();
-    if (!Chats) return
+    if (!Chats) return;
     const updatedArr = Chats.map((obj) => {
       if (obj.id == id) {
         return { ...obj, unReadmessagesCount: 0 };
@@ -249,7 +248,7 @@ const ChatCard = ({
                 });
               }
               setChats((prevMessages) => {
-                if (!prevMessages) return
+                if (!prevMessages) return;
                 const firstMessageId = prevMessages[0]["id"];
 
                 const firstMessageIndex = saveChats.findIndex(
@@ -399,7 +398,7 @@ const ChatCard = ({
     if (User.isReadReceiptsOn) {
       changeMessagesStatus(ChatObject.activeChatId, type, "seen");
     }
-
+    console.log(ChatObject.activeChatId);
     if (
       localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&
       localStorage.getItem(`${ChatObject.activeChatId}`) !== "{}" &&
@@ -426,11 +425,11 @@ const ChatCard = ({
           (a, b) => a.timestamp?.seconds - b.timestamp?.seconds
         );
         const filteredMessages = sortedMessages.filter((message) => message);
-        setChats(filteredMessages.splice(-30));
         localStorage.setItem(
           `${ChatObject.activeChatId}`,
           JSON.stringify(filteredMessages)
         );
+        setChats(JSON.parse(JSON.stringify(filteredMessages.splice(-30))));
       };
       getMessage();
     }

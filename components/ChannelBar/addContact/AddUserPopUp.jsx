@@ -4,19 +4,38 @@ import { UserContext } from "@/components/App";
 import { sendMessage } from "@/utils/messagesUtils/sendMessage";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import Badge from "@/components/Badge";
+import { CircularProgress } from "@mui/joy";
 
 const AddUserPopUp = ({ setShowUserPopupTofalse, user }) => {
   const { User } = useContext(UserContext);
   const { setSelectedChannel } = useContext(SelectedChannelContext);
 
-  const [mycontacts, setmycontacts] = useState([]);
+  const [isInContacts, setIsInContacts] = useState(false);
+  const [loadingState, setLoadingState] = useState(true);
+  const [noStortedChats, setNoStortedChats] = useState(false);
   const [addingUser, setaddingUser] = useState(false);
   useEffect(() => {
+    setLoadingState(true);
     const storedData = JSON?.parse(
       localStorage.getItem(`${User.id}_userChats`)
     );
     if (storedData) {
-      setmycontacts(storedData.map((contact) => contact.id));
+      console.log(storedData);
+      const inChats = storedData.some(
+        (chatRoom) => chatRoom.otherParticipant === user.id
+      );
+      console.log(inChats);
+      if (inChats) {
+        console.log(user);
+        setIsInContacts(true);
+        console.log(true);
+      } else {
+        setIsInContacts(false);
+      }
+      setLoadingState(false);
+    } else {
+      setNoStortedChats(true);
+      setIsInContacts(true)
     }
   }, []);
   return (
@@ -30,12 +49,27 @@ const AddUserPopUp = ({ setShowUserPopupTofalse, user }) => {
           type="personnal"
         />
         <div className="my-2 text-center">
-          <p className="flex items-center justify-center">{user.name}<Badge id={user.id} /></p> 
+          <p className="flex items-center justify-center">
+            {user.name}
+            <Badge id={user.id} />
+          </p>
           <p className="text-sm text-muted-light dark:text-muted-dark">
             {user.bio}
           </p>
         </div>
-        {mycontacts.includes(user.id) ? (
+        {loadingState ? (
+          <button
+            className={`flex w-full cursor-wait items-center
+           justify-center rounded-lg bg-accent-blue  
+             py-2
+           `}
+          >
+            <i className="mr-1 flex items-center justify-center">
+              <CircularProgress size="sm" variant="plain" />
+            </i>
+            Loading...
+          </button>
+        ) : !isInContacts ? (
           <button
             className={`flex w-full items-center justify-center rounded-lg bg-accent-blue py-2  ${
               addingUser && "cursor-wait"
@@ -56,7 +90,7 @@ const AddUserPopUp = ({ setShowUserPopupTofalse, user }) => {
                 null,
                 () => {}
               ).then(() => {
-                setmycontacts([...mycontacts, user.id]);
+                setIsInContacts(true);
                 setaddingUser(false);
 
                 setTimeout(() => {

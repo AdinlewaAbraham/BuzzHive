@@ -65,9 +65,7 @@ const AddContact = () => {
 
     setUsers(fetchedUsers);
     setLoading(false);
-  }
-
-
+  };
 
   const addUsers = async () => {
     if (addUsersLoading) return;
@@ -102,7 +100,6 @@ const AddContact = () => {
 
     let triggerHeight = container.scrollTop + container.offsetHeight;
 
-
     if (triggerHeight >= container.scrollHeight - 30 && hasMore) {
       addUsers();
     }
@@ -113,7 +110,6 @@ const AddContact = () => {
   }, []);
 
   function goBack() {
-
     setSelectedChannel(prevSelectedChannel || "chats");
     setprevSelectedChannel("addcontact");
   }
@@ -133,10 +129,8 @@ const AddContact = () => {
             setSearchQuery(newSearchQuery);
 
             if (newSearchQuery === "") {
-
-              fetchUsers()
+              fetchUsers();
             } else {
-
               fetchedUsersWithQuery(newSearchQuery);
             }
           }}
@@ -149,31 +143,38 @@ const AddContact = () => {
         transition={{ duration: 0.2 }}
       >
         {loading ? (
-          [1, 2, 3, 4, 5].map((key) => (
-            <div
-              className="flex cursor-pointer items-center px-4 py-4"
-              key={key}
-              style={{ width: "100%" }}
-            >
-              <i className="skeleton absolute h-[50px] w-[50px] rounded-full"></i>
-              <div className="ml-[60px] w-full">
-                <div className="skeleton mb-[10px] h-[10px] w-[30%] rounded-md"></div>
-                <div className="skeleton h-[15px] w-[80%] rounded-md"></div>
+          <div
+            className={`scrollBar  relative mt-[10px] h-[calc(100vh-211px)] overflow-y-auto
+          md:h-[calc(100vh-141px)] 
+         `}
+          >
+            {[1, 2, 3, 4, 5].map((key) => (
+              <div
+                className="flex cursor-pointer items-center px-4 py-4"
+                key={key}
+                style={{ width: "100%" }}
+              >
+                <i className="skeleton absolute h-[50px] w-[50px] rounded-full"></i>
+                <div className="ml-[60px] w-full">
+                  <div className="skeleton mb-[10px] h-[10px] w-[30%] rounded-md"></div>
+                  <div className="skeleton h-[15px] w-[80%] rounded-md"></div>
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         ) : (
           <div
             ref={scrollContainerRef}
             onScroll={handleOnScroll}
-            className={`scrollBar  relative mt-[10px] h-[calc(100vh-211px)] md:h-[calc(100vh-141px)]
-            overflow-y-auto 
+            className={`scrollBar  relative mt-[10px] h-[calc(100vh-211px)] overflow-y-auto
+            md:h-[calc(100vh-141px)] 
            `}
           >
-            {users.length === 0 &&
-              <div className="flex justify-center items-center h-full">
+            {users.length === 0 && (
+              <div className="flex h-full items-center justify-center">
                 no contacts found
-              </div>}
+              </div>
+            )}
             {users
               .filter((user) => user.id !== User.id)
               .map((user) => (
