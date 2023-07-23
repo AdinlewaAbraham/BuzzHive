@@ -15,6 +15,7 @@ import { TbLogout } from "react-icons/tb";
 import { getAuth, signOut } from "firebase/auth";
 import { TbFileShredder } from "react-icons/tb";
 import { TbVideoOff } from "react-icons/tb";
+import { RiChatDeleteLine } from "react-icons/ri";
 import Image from "next/image";
 import { MdOutlineImageNotSupported } from "react-icons/md";
 import Checkbox from "@/components/Checkbox";
@@ -402,7 +403,7 @@ const Settings = () => {
             ))}
           </div>
           <h3 className="my-2 p-1">Delete downloads</h3>
-          <p className="text-sm text-muted-light dark:text-muted-dark">
+          <p className="text-sm text-muted-light mb-1 dark:text-muted-dark">
             Free up space by deleting locally stored media files.
           </p>
           {[
@@ -417,7 +418,7 @@ const Settings = () => {
             },
             {
               text: "chats",
-              icon: <MdOutlineImageNotSupported />,
+              icon: <RiChatDeleteLine />,
             },
           ].map((option) => (
             <DeleteOption
@@ -441,7 +442,7 @@ const Settings = () => {
                         if (!id) return;
                         localStorage.removeItem(id);
                       }
-                      localStorage.removeItem(`${User.id}_userChats`)
+                      localStorage.removeItem(`${User.id}_userChats`);
                     } else {
                       handleDelete(option.text);
                     }

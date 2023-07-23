@@ -261,6 +261,7 @@ const AboutProfile = ({ setshowProfile, ChatObject, setLocalChatObject }) => {
     const filteredChatRooms = chatRooms.filter(
       (chatRoom) => chatRoom.id !== ChatObject.activeChatId
     );
+    // test this stuff
     setChatRooms(filteredChatRooms);
     localStorage.setItem(`${User.id}_userChats`, filteredChatRooms);
     localStorage.removeItem(ChatObject.activeChatId);
