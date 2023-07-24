@@ -59,7 +59,7 @@ const MessageCard = ({
 }) => {
   const [animationParent] = useAutoAnimate();
 
-  const { ChatObject, setReplyObject, setChats, Chats } = useContext(
+  const { ChatObject, setReplyObject, setChats, Chats , chatRooms} = useContext(
     SelectedChannelContext
   );
 
@@ -78,7 +78,6 @@ const MessageCard = ({
   const [popperElement, setPopperElement] = useState(null);
   const [arrowElement, setArrowElement] = useState(null);
   const [forwardMessageModal, setforwardMessageModal] = useState(false);
-  const [contacts, setcontacts] = useState([]);
   const [selectedUsers, setselectedUsers] = useState([]);
   const [Height, setHeight] = useState(0);
   const [isforwarding, setisforwarding] = useState(false);
@@ -168,15 +167,6 @@ const MessageCard = ({
     }
   }, [paraContainerRef, chat]);
 
-  useEffect(() => {
-    const getContacts = () => {
-      const contacts = JSON?.parse(
-        localStorage.getItem(`${User.id}_userChats`)
-      );
-      setcontacts(contacts);
-    };
-    return () => getContacts();
-  }, []);
   useEffect(() => {
     const currentIndex = Chats.findIndex((chatItem) => chatItem === chat);
     if (currentIndex > 0) {
@@ -811,7 +801,7 @@ const MessageCard = ({
                     className="scrollBar overflow-auto"
                     id="scrollContacts"
                   >
-                    {[...contacts]
+                    {[...chatRooms]
                       .filter((contact) =>
                         contact.senderDisplayName
                           .toLowerCase()
