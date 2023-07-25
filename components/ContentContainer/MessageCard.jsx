@@ -331,16 +331,16 @@ const MessageCard = ({
       </div>
     );
   }
-
-  if (chat.type == "timeStamp") {
+  if (chat.type === "timeStamp") {
     return (
       <div className="sticky top-2 z-10 flex items-center justify-center pb-4">
-        <p className=" my-2 max-w-[50%] truncate rounded-md bg-white  p-3 text-center text-[13px] dark:bg-black">
+        <p className="my-2 max-w-[50%] truncate rounded-md bg-white p-3 text-center text-[13px] dark:bg-black h-10">
           {chat.day}
         </p>
       </div>
     );
   }
+  
   const handleMessageDelete = async () => {
     setShowMenu(null);
     if (User.id !== chat.senderId) return;
