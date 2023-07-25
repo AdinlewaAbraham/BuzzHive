@@ -99,18 +99,18 @@ const ReplyBoard = ({ setReplyDivHeight }) => {
       ref={elementRef}
     >
       <div
-        className="relative flex items-center justify-between 
+        className="relative flex items-center justify-between
        overflow-hidden truncate rounded-lg bg-light-secondary  pl-2 dark:bg-hover-dark"
       >
         <span className="absolute left-0 top-0 bottom-0 w-1 bg-accent-blue"></span>
-        <div className="py-2 text-xs">
+        <div className="w-full py-2  text-xs">
           <p className="">
             {replyObject.replyUserId === User.id
               ? "You"
               : replyObject.displayName}
           </p>
 
-          <div className="text-muted mr-10 flex items-center truncate">
+          <div className="text-muted flex items-center ">
             <i
               className={`${
                 !(messageType === "regular" || messageType === "reply") &&
@@ -120,8 +120,10 @@ const ReplyBoard = ({ setReplyDivHeight }) => {
               {renderMessageType()}
             </i>
             <p
-              className=" scrollBar max-h-[48px] w-full
-           overflow-y-auto overflow-x-hidden whitespace-normal"
+              className={` ${
+                messageType === "image" || messageType === "video" ? "" : ""
+              } 
+              w-[calc(100%-43px)] truncate`}
             >
               {" "}
               {replyObject.replyText}

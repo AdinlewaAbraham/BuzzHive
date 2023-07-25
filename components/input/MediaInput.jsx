@@ -62,7 +62,6 @@ const MediaInput = ({
     const loadImage = async () => {
       if (ImageBase64) {
         const img = new Image();
-        console.log(img);
         const ImgFile = await base64toFile(ImageBase64, picVidmedia.name);
         img.src = URL.createObjectURL(ImgFile);
 
@@ -165,6 +164,7 @@ const MediaInput = ({
             if (e.target.value.length > 200) return;
             setmediaCaption(e.target.value);
           }}
+          value={mediaCaption}
         />
         <div
           className="flex items-center rounded-md bg-blue-600 px-2 py-2"

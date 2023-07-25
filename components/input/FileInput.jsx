@@ -173,6 +173,7 @@ const FileInput = ({ file, setfile }) => {
             if (e.target.value.length > 200) return;
             setfileCaption(e.target.value);
           }}
+          value={fileCaption}
         />
         <div
           className="flex items-center rounded-md bg-accent-blue px-2 py-2"
