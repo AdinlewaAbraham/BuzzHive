@@ -9,8 +9,6 @@ optimize stuff
 
  if a user is the only person in a group delete the group on both the database and the storage database --- not tested
 
- delete all chats icons 
- forward modal not showing anything
 
 repl
 

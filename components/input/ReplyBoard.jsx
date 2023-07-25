@@ -121,9 +121,9 @@ const ReplyBoard = ({ setReplyDivHeight }) => {
             </i>
             <p
               className={` ${
-                messageType === "image" || messageType === "video" ? "" : ""
+                messageType === "image" || messageType === "video" ? "w-[calc(100%-250px)] " : "w-[calc(100%-43px)] "
               } 
-              w-[calc(100%-43px)] truncate`}
+              truncate`}
             >
               {" "}
               {replyObject.replyText}

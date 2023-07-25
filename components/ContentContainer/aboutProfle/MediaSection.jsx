@@ -20,10 +20,11 @@ const MediaSection = ({ChatObject}) => {
       const messages = JSON.parse(
         localStorage.getItem(ChatObject.activeChatId)
       );
-      if (!messages) return 
-      const MediaMessages = messages.filter(
+      if (!messages) return
+      const MediaMessages = messages?.filter(
         (message) => message.type === "video" || message.type === "image"
       );
+      console.log("this is media messages" + MediaMessages)
       setMediaMessages(MediaMessages);
       const firstRenderBatch = JSON.parse(JSON.stringify(MediaMessages)).splice(
         0,
@@ -70,14 +71,14 @@ const MediaSection = ({ChatObject}) => {
 
   return (
     <div className=" flex h-[350px] w-full overflow-y-auto ">
-      {mediaMessages === null ? (
+      {renderedMedia === null ? (
         <div className="flex items-center justify-center w-full h-[350px] ">          
           <i className="mr-1">
             <CircularProgress size="sm" variant="plain" />
           </i>
           loading...
         </div>
-      ) : JSON.stringify(mediaMessages) === "[]" ? (
+      ) : JSON.stringify(renderedMedia) === "[]" ? (
         <div className="flex justify-center items-center w-full h-[350px] ">there are no media files</div>
       ) : (
         <div
