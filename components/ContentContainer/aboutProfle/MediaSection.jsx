@@ -7,8 +7,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import { useRef } from "react";
 import { CircularProgress } from "@mui/joy";
 
-
-const MediaSection = ({ChatObject}) => {
+const MediaSection = ({ ChatObject }) => {
   const [mediaMessages, setMediaMessages] = useState(null);
   const [renderedMedia, setRenderedMedia] = useState([]);
   const [hasMore, setHasMore] = useState(true);
@@ -20,11 +19,11 @@ const MediaSection = ({ChatObject}) => {
       const messages = JSON.parse(
         localStorage.getItem(ChatObject.activeChatId)
       );
-      if (!messages) return
+      if (!messages) return;
       const MediaMessages = messages?.filter(
         (message) => message.type === "video" || message.type === "image"
       );
-      console.log( MediaMessages)
+      console.log(MediaMessages);
       setMediaMessages(MediaMessages);
       const firstRenderBatch = JSON.parse(JSON.stringify(MediaMessages)).splice(
         0,
@@ -33,8 +32,7 @@ const MediaSection = ({ChatObject}) => {
       setRenderedMedia(firstRenderBatch);
       setLastMediaFile(firstRenderBatch[firstRenderBatch.length - 1]?.id);
     };
-
-    return () => getMediaMessages();
+    getMediaMessages();
   }, [ChatObject.activeChatId]);
 
   const scrollContainerRef = useRef(null);
@@ -71,15 +69,17 @@ const MediaSection = ({ChatObject}) => {
 
   return (
     <div className=" flex h-[350px] w-full overflow-y-auto ">
-      {renderedMedia === null ? (
-        <div className="flex items-center justify-center w-full h-[350px] ">          
+      {mediaMessages === null ? (
+        <div className="flex h-[350px] w-full items-center justify-center ">
           <i className="mr-1">
             <CircularProgress size="sm" variant="plain" />
           </i>
           loading...
         </div>
-      ) : JSON.stringify(renderedMedia) === "[]" ? (
-        <div className="flex justify-center items-center w-full h-[350px] ">there are no media files</div>
+      ) : JSON.stringify(mediaMessages) === "[]" ? (
+        <div className="flex h-[350px] w-full items-center justify-center ">
+          there are no media files
+        </div>
       ) : (
         <div
           className="scrollBar grid grid-cols-3 gap-2 overflow-x-hidden pr-1"
