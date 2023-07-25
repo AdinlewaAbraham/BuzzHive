@@ -24,7 +24,7 @@ const MediaSection = ({ChatObject}) => {
       const MediaMessages = messages?.filter(
         (message) => message.type === "video" || message.type === "image"
       );
-      console.log("this is media messages" + MediaMessages)
+      console.log( MediaMessages)
       setMediaMessages(MediaMessages);
       const firstRenderBatch = JSON.parse(JSON.stringify(MediaMessages)).splice(
         0,
