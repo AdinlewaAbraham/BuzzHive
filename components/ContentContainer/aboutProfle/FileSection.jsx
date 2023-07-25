@@ -3,7 +3,7 @@ import FileComponent from "../fileComponent/FileComponent";
 import SelectedChannelContext from "@/context/SelectedChannelContext ";
 import { CircularProgress } from "@mui/joy";
 
-const FileSection = ({ChatObject}) => {
+const FileSection = ({ ChatObject }) => {
   const [fileMessages, setFileMessages] = useState(null);
   const [renderedFiles, setRenderedFiles] = useState([]);
   const [hasMore, setHasMore] = useState(true);
@@ -29,7 +29,7 @@ const FileSection = ({ChatObject}) => {
       setLastFile(firstRenderBatch[firstRenderBatch.length - 1]?.id);
     };
 
-    return () => getFileMessages();
+    getFileMessages();
   }, [ChatObject.activeChatId]);
 
   const scrollContainerRef = useRef(null);
