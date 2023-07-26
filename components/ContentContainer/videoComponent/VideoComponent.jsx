@@ -183,6 +183,7 @@ const VideoComponent = ({ chat }) => {
                     width={300}
                     height={'100%'}
                     onError={() => setImageError(true)}
+                    className="rounded-md"
                   />
                 </div>
               )}

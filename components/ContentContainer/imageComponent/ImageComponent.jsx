@@ -129,7 +129,7 @@ const ImageComponent = ({ chat }) => {
               ) : (
                 <img
                   src={URL.createObjectURL(blurredImageBlob)}
-                  className="cursor-pointer object-cover"
+                  className="cursor-pointer object-cover rounded-md"
                   width={300}
                   height={chat.dataObject.imgHeight || 300}
                   onClick={() => downloadImage(downloadSRC, "image")}
@@ -145,7 +145,7 @@ const ImageComponent = ({ chat }) => {
                   onClick={() => setfullScreenMode(true)}
                   src={URL.createObjectURL(imageBlob)}
                   alt="Preview"
-                  className="Image cursor-pointer object-cover"
+                  className="Image cursor-pointer object-cover rounded-md"
                   width={300}
                   height={chat.dataObject.imgHeight || 300}
                 />
@@ -189,7 +189,7 @@ const ImageComponent = ({ chat }) => {
                 alt="Preview"
                 className={` Image
                 h-full object-cover
-               transition-all duration-500 `}
+               transition-all duration-500 rounded-md `}
               />
             </motion.div>
           )}
