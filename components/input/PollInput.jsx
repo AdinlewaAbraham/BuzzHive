@@ -297,7 +297,7 @@ const PollInput = ({ setshowPollInputFunc }) => {
             Allow multiple answers
           </div>
           <div
-            className="flex items-center rounded-md bg-blue-600 px-2 py-2"
+            className="flex items-center rounded-md cursor-pointer bg-blue-600 px-2 py-2"
             onClick={() => handlePollSend()}
           >
             <AiOutlineSend />

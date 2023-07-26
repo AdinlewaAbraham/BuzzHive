@@ -176,7 +176,7 @@ const FileInput = ({ file, setfile }) => {
           value={fileCaption}
         />
         <div
-          className="flex items-center rounded-md bg-accent-blue px-2 py-2"
+          className="flex items-center rounded-md cursor-pointer bg-accent-blue px-2 py-2"
           onClick={() => {
             handleFileSend();
           }}

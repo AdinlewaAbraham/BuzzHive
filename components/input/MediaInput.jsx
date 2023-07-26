@@ -167,7 +167,7 @@ const MediaInput = ({
           value={mediaCaption}
         />
         <div
-          className="flex items-center rounded-md bg-blue-600 px-2 py-2"
+          className="flex items-center rounded-md bg-blue-600 px-2 py-2 cursor-pointer"
           onClick={async () => {
             let currentTime = new Date().getTime();
 
