@@ -398,7 +398,7 @@ const Settings = () => {
                 <Checkbox
                   isChecked={User.autoDownloadSettings[option.toLowerCase()]}
                 />
-                <label for="myCheckbox">{option}</label>
+                <label htmlFor="myCheckbox">{option}</label>
               </div>
             ))}
           </div>

@@ -153,6 +153,7 @@ const FileComponent = ({ chat, defaultColor }) => {
   const { baseName, extName } = getFileExtension(chat.dataObject.name);
   return (
     <div
+    key={chat.id}
       className={`truncate ${chat.senderId === User.id && !defaultColor ? "bg-blue-400" : "dark:bg-gray-500 bg-light-secondary"} rounded-lg p-2 ${chat.text !== "" && "mb-2"
         }`}
     >

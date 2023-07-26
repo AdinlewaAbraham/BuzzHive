@@ -135,10 +135,6 @@ const VideoComponent = ({ chat }) => {
       await downloadVideo();
     }
   };
-
-  useEffect(() => {
-    console.log(chat.dataObject.imgHeight || 300)
-  }, [chat])
   
   return (
     <div key={messageId}>

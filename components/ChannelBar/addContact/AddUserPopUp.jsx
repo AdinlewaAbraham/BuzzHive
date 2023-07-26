@@ -20,15 +20,11 @@ const AddUserPopUp = ({ setShowUserPopupTofalse, user }) => {
       localStorage.getItem(`${User.id}_userChats`)
     );
     if (storedData) {
-      console.log(storedData);
       const inChats = storedData.some(
         (chatRoom) => chatRoom.otherParticipant === user.id
       );
-      console.log(inChats);
       if (inChats) {
-        console.log(user);
         setIsInContacts(true);
-        console.log(true);
       } else {
         setIsInContacts(false);
       }

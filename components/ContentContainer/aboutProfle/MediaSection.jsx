@@ -23,7 +23,6 @@ const MediaSection = ({ ChatObject }) => {
       const MediaMessages = messages?.filter(
         (message) => message.type === "video" || message.type === "image"
       );
-      console.log(MediaMessages);
       setMediaMessages(MediaMessages);
       const firstRenderBatch = JSON.parse(JSON.stringify(MediaMessages)).splice(
         0,
@@ -87,7 +86,7 @@ const MediaSection = ({ ChatObject }) => {
           ref={scrollContainerRef}
         >
           {renderedMedia.map((message) => (
-            <div className="bg-secondary flex h-[200px] cursor-pointer items-center justify-center overflow-hidden object-contain">
+            <div key={message.id} className="bg-secondary flex h-[200px] cursor-pointer items-center justify-center overflow-hidden object-contain">
               {message.type === "image" ? (
                 <ImageComponent chat={message} height={160} />
               ) : (

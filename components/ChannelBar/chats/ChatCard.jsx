@@ -398,7 +398,6 @@ const ChatCard = ({
     if (User.isReadReceiptsOn) {
       changeMessagesStatus(ChatObject.activeChatId, type, "seen");
     }
-    console.log(ChatObject.activeChatId);
     if (
       localStorage.getItem(`${ChatObject.activeChatId}`) !== "[]" &&
       localStorage.getItem(`${ChatObject.activeChatId}`) !== "{}" &&

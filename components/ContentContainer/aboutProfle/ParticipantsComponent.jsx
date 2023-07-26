@@ -297,7 +297,6 @@ const ParticipantsComponent = ({ groupObject }) => {
           </div>
         ) : (
           <>
-        {console.log(participants)}
             {participants.map((user) => (
               <ParticipantCard
                 user={user}

@@ -35,7 +35,7 @@ const UserCard = ({ user }) => {
   }, []);
 
   return (
-    <>
+    <div id={user.id} key={user.id}>
       <AnimatePresence>
         {showUserPopup && (
           <motion.div
@@ -84,7 +84,7 @@ const UserCard = ({ user }) => {
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

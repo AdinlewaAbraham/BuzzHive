@@ -187,7 +187,7 @@ const ContentContainer = () => {
             <AboutProfile
               setshowProfile={setshowProfile}
               ChatObject={aboutProfleChatObject}
-              setChatObject={setAboutProfleChatObject}
+              setLocalChatObject={setAboutProfleChatObject}
             />
           )}
           <div className="bg-primary relative z-20 flex max-h-[66px] cursor-pointer   items-center justify-between overflow-hidden px-[13px] md:ml-[1px]">

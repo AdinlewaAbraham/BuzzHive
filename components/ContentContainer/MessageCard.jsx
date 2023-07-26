@@ -59,7 +59,7 @@ const MessageCard = ({
 }) => {
   const [animationParent] = useAutoAnimate();
 
-  const { ChatObject, setReplyObject, setChats, Chats , chatRooms} = useContext(
+  const { ChatObject, setReplyObject, setChats, Chats, chatRooms } = useContext(
     SelectedChannelContext
   );
 
@@ -265,7 +265,11 @@ const MessageCard = ({
       sessionStorage.getItem("activeChatRoomUnreadMessageCount")
     );
     return (
-      <div className="flex w-full items-center justify-center" id="unreadId">
+      <div
+        className="flex w-full items-center justify-center"
+        id="unreadId"
+        key={chat.id}
+      >
         <div className="my-2 flex justify-center rounded-lg bg-red-600 p-2 text-center">
           {`Unread Messages`}
         </div>
@@ -311,7 +315,6 @@ const MessageCard = ({
       icon: <MdOutlineContentCopy />,
       label: "Copy",
       action: () => {
-        console.log(chat.text);
         navigator.clipboard.writeText(chat.text);
       },
     },
@@ -324,7 +327,11 @@ const MessageCard = ({
 
   if (chat.type === "announcement") {
     return (
-      <div className="flex items-center justify-center truncate pb-4">
+      <div
+        className="flex items-center justify-center truncate pb-4"
+        key={chat.id}
+        id={chat.id}
+      >
         <p className="my-2 max-w-[50%] truncate rounded-md bg-white  p-3 text-center text-[13px] dark:bg-black">
           {chat.text}
         </p>
@@ -333,14 +340,17 @@ const MessageCard = ({
   }
   if (chat.type === "timeStamp") {
     return (
-      <div className="sticky top-2 z-10 flex items-center justify-center pb-4">
-        <p className="my-2 max-w-[50%] truncate rounded-md bg-white p-3 text-center text-[13px] dark:bg-black h-10">
+      <div
+        className="sticky top-2 z-10 flex items-center justify-center pb-4"
+        key={chat.day}
+      >
+        <p className="my-2 h-10 max-w-[50%] truncate rounded-md bg-white p-3 text-center text-[13px] dark:bg-black">
           {chat.day}
         </p>
       </div>
     );
   }
-  
+
   const handleMessageDelete = async () => {
     setShowMenu(null);
     if (User.id !== chat.senderId) return;

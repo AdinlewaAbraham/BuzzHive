@@ -115,7 +115,7 @@ const EditProfileInfo = ({ type, toBeEdited, isAdmin }) => {
 };
 const Menu = ({ icon, header, context, isAdmin }) => {
   return (
-    <div className="my-3 flex items-center">
+    <div className="my-3 flex items-center" key={header}>
       <i className="text-muted"> {icon}</i>
       <div className="ml-3 w-full">
         <p className="text-muted text-sm">{header}</p>
@@ -132,6 +132,7 @@ const Header = ({ title, isActive, onClick, ChatObject }) => {
         !isActive && "text-muted"
       }`}
       onClick={onClick}
+      key={title}
     >
       {isActive && (
         <span className="absolute bottom-0 left-0 h-1 w-full rounded-sm bg-accent-blue "></span>
