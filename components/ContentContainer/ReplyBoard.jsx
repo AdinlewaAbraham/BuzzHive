@@ -31,7 +31,7 @@ const ReplyBoard = ({ chat, User, width, displayNameWidth }) => {
         }
       }
     };
-    return () => getThumbnail();
+    getThumbnail();
   }, []);
   async function initializeDB() {
     const db = await openDB("myvideosDatabase", 1, {
@@ -100,7 +100,7 @@ const ReplyBoard = ({ chat, User, width, displayNameWidth }) => {
   return (
     <div
       style={{ width: width > displayNameWidth ? width : displayNameWidth }}
-      className={`relative flex h-[45px] justify-between truncate rounded-lg px-2 pr-0 text-start cursor-pointer
+      className={`relative flex h-[45px] cursor-pointer justify-between truncate rounded-lg px-2 pr-0 text-start
        ${
          chat.senderId === User.id
            ? "bg-blue-400"
@@ -112,9 +112,7 @@ const ReplyBoard = ({ chat, User, width, displayNameWidth }) => {
     >
       <span
         className={`absolute left-0 top-0 bottom-0 w-1 ${
-          chat.senderId === User.id
-            ? "bg-blue-900"
-            : "bg-blue-400"
+          chat.senderId === User.id ? "bg-blue-900" : "bg-blue-400"
         }`}
       />
       <div className="truncate py-2 pr-2 ">

@@ -107,7 +107,7 @@ const Input = ({ setReplyDivHeight }) => {
         return room;
       }
     });
-    localStorage.setItem(`${User.id}_userChats`, JSON.stringify(newChatRooms))
+    localStorage.setItem(`${User.id}_userChats`, JSON.stringify(newChatRooms));
     setChatRooms(newChatRooms);
     if (ChatObject.activeChatType == "group") {
       await sendGroupMessage(
@@ -307,6 +307,7 @@ const Input = ({ setReplyDivHeight }) => {
           />
         </div>
         <input
+          autoFocus
           type="text"
           className="max-h-[50px] w-full bg-transparent px-4 py-2 placeholder-muted-light
            outline-none dark:placeholder-muted-dark"

@@ -370,9 +370,15 @@ const MessageCard = ({
       chat.type === "video"
     ) {
       const storageFileRef = ref(storage, chat.dataObject.filePath);
-      const deleteFilePromise = deleteObject(storageFileRef);
-      const deleteDocPromise = deleteDoc(docRef);
-      await Promise.all([deleteDocPromise, deleteFilePromise]);
+      const deleteFilePromise = async () => {
+        try {
+          await deleteObject(storageFileRef);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      const deleteDocPromise = await deleteDoc(docRef)
+      await Promise.all([deleteDocPromise, deleteFilePromise()]);
     } else {
       await deleteDoc(docRef);
     }
@@ -583,7 +589,7 @@ const MessageCard = ({
         {(chat.type === "pic/video" ||
           chat.type === "image" ||
           chat.type === "video") && (
-          <div>
+          <div className={`${chat.text !== "" && "mb-1.5"}`}>
             <>
               {chat.dataObject.type.startsWith("image") ? (
                 <ImageComponent chat={chat} />
