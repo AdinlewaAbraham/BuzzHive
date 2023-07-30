@@ -344,7 +344,7 @@ const MessageCard = ({
         className="sticky top-2 z-10 flex items-center justify-center pb-4"
         key={chat.day}
       >
-        <p className="my-2 h-10 max-w-[50%] truncate rounded-md bg-white p-3 text-center text-[13px] dark:bg-black">
+        <p className="my-2 h-10 max-w-[50%] truncate rounded-md bg-white p-3 px-4 text-center text-[13px] dark:bg-black">
           {chat.day}
         </p>
       </div>
