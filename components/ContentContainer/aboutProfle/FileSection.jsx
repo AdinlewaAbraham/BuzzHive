@@ -78,7 +78,7 @@ const FileSection = ({ ChatObject }) => {
         </div>
       ) : JSON.stringify(renderedFiles) === "[]" ? (
         <div className="flex h-[350px] w-full items-center justify-center ">
-          There are no media files
+          There are currently no files available.
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">

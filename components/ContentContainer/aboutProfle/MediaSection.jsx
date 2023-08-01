@@ -77,7 +77,7 @@ const MediaSection = ({ ChatObject }) => {
         </div>
       ) : JSON.stringify(mediaMessages) === "[]" ? (
         <div className="flex h-[350px] w-full items-center justify-center ">
-          there are no media files
+          There are currently no media files available.
         </div>
       ) : (
         <div
@@ -86,7 +86,10 @@ const MediaSection = ({ ChatObject }) => {
           ref={scrollContainerRef}
         >
           {renderedMedia.map((message) => (
-            <div key={message.id} className="bg-secondary flex h-[200px] cursor-pointer items-center justify-center overflow-hidden object-contain">
+            <div
+              key={message.id}
+              className="bg-secondary flex h-[200px] cursor-pointer items-center justify-center overflow-hidden object-contain"
+            >
               {message.type === "image" ? (
                 <ImageComponent chat={message} height={160} />
               ) : (
