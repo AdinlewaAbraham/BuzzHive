@@ -377,7 +377,7 @@ const MessageCard = ({
           console.error(error);
         }
       };
-      const deleteDocPromise = await deleteDoc(docRef)
+      const deleteDocPromise = await deleteDoc(docRef);
       await Promise.all([deleteDocPromise, deleteFilePromise()]);
     } else {
       await deleteDoc(docRef);
@@ -711,169 +711,6 @@ const MessageCard = ({
         }`}
       >
         <div className="relative">
-          <AnimatePresence>
-            {showReactEmojiTray && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, height: 0 }}
-                id="emojiBoard"
-                className="z-[100] w-[280px] overflow-hidden "
-                ref={setPopperElement}
-                style={popperStyles1.popper}
-                {...popperAttributes1.popper}
-              >
-                <EmojiPicker
-                  setshowReactEmojiTray={setshowReactEmojiTray}
-                  addEmojiToLastUsedEmojiTray={addEmojiToLastUsedEmojiTray}
-                  handleEmojiReaction={handleEmojiReaction}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {forwardMessageModal && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, height: 0 }}
-                className="clickEvent bg-primary z-[30] w-[280px] overflow-y-hidden rounded-lg p-3"
-                ref={setPopperElement}
-                style={popperStyles1.popper}
-                {...popperAttributes1.popper}
-              >
-                <div className="min-h-[250px]">
-                  <h1 className="mb-2 flex items-center justify-start text-lg font-medium">
-                    Forward message
-                  </h1>
-                  <p className="text-muted mb-2 text-sm">
-                    Select up to 5 contacts{" "}
-                  </p>
-
-                  <div ref={selectedUserHeight}>
-                    <ul
-                      ref={animationParent}
-                      className={`${
-                        selectedUsers.length === 0 && "hidden h-0"
-                      }  scrollBar mb-2 flex max-h-[116px]
-                         flex-wrap items-center overflow-y-auto rounded-lg bg-light-secondary 
-                         p-1 dark:bg-dark-secondary `}
-                    >
-                      {selectedUsers.map((user) => (
-                        <li
-                          key={user.id}
-                          id={user.id}
-                          className="parent-div text-bold relative m-1 flex items-center whitespace-nowrap
-                          rounded-lg bg-accent-blue px-1 py-0.5 text-center text-[12px] font-semibold "
-                        >
-                          <Img
-                            src={user.senderDisplayImg}
-                            styles="rounded-full h-5 w-5 "
-                            imgStyles="rounded-full h-5 w-5 "
-                            personalSize="50"
-                            type="personnal"
-                          />
-                          {user.senderDisplayName}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <input
-                    type="text"
-                    className=" mb-2 w-full rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light
-                outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  {selectedUsers.length > 0 && (
-                    <button
-                      className={` ${
-                        isforwarding && "cursor-wait"
-                      } mb-4 w-full rounded-lg bg-accent-blue py-2`}
-                      onClick={() => {
-                        if (isforwarding) return;
-                        handleMessageForward();
-                      }}
-                    >
-                      {isforwarding ? (
-                        <div className="flex items-center justify-center">
-                          <i className="mr-1">
-                            <CircularProgress variant="plain" size="sm" />
-                          </i>
-                          Forwarding...
-                        </div>
-                      ) : (
-                        <>
-                          Forward to {selectedUsers.length} contact
-                          {selectedUsers.length === 1 ? "" : "s"}
-                        </>
-                      )}
-                    </button>
-                  )}
-                  <div
-                    style={divStyles}
-                    className="scrollBar overflow-auto"
-                    id="scrollContacts"
-                  >
-                    {[...chatRooms]
-                      .filter((contact) =>
-                        contact.senderDisplayName
-                          .toLowerCase()
-                          .includes(searchQuery.toLowerCase())
-                      )
-                      .map((contact) => (
-                        <div
-                          className="hover:bg-hover flex cursor-pointer items-center justify-between rounded-lg px-2 py-2"
-                          onClick={() => {
-                            const index = selectedUsers.findIndex(
-                              (user) =>
-                                user.otherParticipant ===
-                                contact.otherParticipant
-                            );
-
-                            if (index === -1) {
-                              if (selectedUsers.length >= 5) return;
-                              setselectedUsers([...selectedUsers, contact]);
-                            } else {
-                              const updatedUsers = selectedUsers.filter(
-                                (user) =>
-                                  user.otherParticipant !==
-                                  contact.otherParticipant
-                              );
-                              setselectedUsers(updatedUsers);
-                            }
-                          }}
-                        >
-                          <div className="flex items-center">
-                            <Img
-                              src={contact.senderDisplayImg}
-                              styles="w-[35px] h-[35px] rounded-full mr-1"
-                              imgStyles="rounded-full "
-                              type={contact.type}
-                              groupSize="70"
-                              personalSize="45"
-                            />
-                            {contact.senderDisplayName}
-                          </div>
-                          <input
-                            type="checkbox"
-                            name=""
-                            id=""
-                            checked={selectedUsers.some(
-                              (c) =>
-                                c.otherParticipant === contact.otherParticipant
-                            )}
-                          />
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           <div
             className={`MenuLists relative text-black dark:text-white  ${
               chat.status === "pending" && "hidden"
@@ -916,6 +753,164 @@ const MessageCard = ({
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {forwardMessageModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, height: 0 }}
+            className="clickEvent bg-primary z-[30] w-[280px] overflow-y-hidden rounded-lg p-3"
+            ref={setPopperElement}
+            style={popperStyles1.popper}
+            {...popperAttributes1.popper}
+          >
+            <div className="min-h-[250px]">
+              <h1 className="mb-2 flex items-center justify-start text-lg font-medium">
+                Forward message
+              </h1>
+              <p className="text-muted mb-2 text-sm">
+                Select up to 5 contacts{" "}
+              </p>
+
+              <div ref={selectedUserHeight}>
+                <ul
+                  ref={animationParent}
+                  className={`${
+                    selectedUsers.length === 0 && "hidden h-0"
+                  }  scrollBar mb-2 flex max-h-[116px]
+                         flex-wrap items-center overflow-y-auto rounded-lg bg-light-secondary 
+                         p-1 dark:bg-dark-secondary `}
+                >
+                  {selectedUsers.map((user) => (
+                    <li
+                      key={user.id}
+                      id={user.id}
+                      className="parent-div text-bold relative m-1 flex items-center whitespace-nowrap
+                          rounded-lg bg-accent-blue px-1 py-0.5 text-center text-[12px] font-semibold "
+                    >
+                      <Img
+                        src={user.senderDisplayImg}
+                        styles="rounded-full h-5 w-5 "
+                        imgStyles="rounded-full h-5 w-5 "
+                        personalSize="50"
+                        type="personnal"
+                      />
+                      {user.senderDisplayName}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <input
+                type="text"
+                className=" mb-2 w-full rounded-lg bg-light-secondary px-3 py-2 placeholder-muted-light
+                outline-none  dark:bg-dark-secondary dark:placeholder-muted-dark"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {selectedUsers.length > 0 && (
+                <button
+                  className={` ${
+                    isforwarding && "cursor-wait"
+                  } mb-4 w-full rounded-lg bg-accent-blue py-2`}
+                  onClick={() => {
+                    if (isforwarding) return;
+                    handleMessageForward();
+                  }}
+                >
+                  {isforwarding ? (
+                    <div className="flex items-center justify-center">
+                      <i className="mr-1">
+                        <CircularProgress variant="plain" size="sm" />
+                      </i>
+                      Forwarding...
+                    </div>
+                  ) : (
+                    <>
+                      Forward to {selectedUsers.length} contact
+                      {selectedUsers.length === 1 ? "" : "s"}
+                    </>
+                  )}
+                </button>
+              )}
+              <div
+                style={divStyles}
+                className="scrollBar overflow-auto"
+                id="scrollContacts"
+              >
+                {[...chatRooms]
+                  .filter((contact) =>
+                    contact.senderDisplayName
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase())
+                  )
+                  .map((contact) => (
+                    <div
+                      className="hover:bg-hover flex cursor-pointer items-center justify-between rounded-lg px-2 py-2"
+                      onClick={() => {
+                        const index = selectedUsers.findIndex(
+                          (user) =>
+                            user.otherParticipant === contact.otherParticipant
+                        );
+
+                        if (index === -1) {
+                          if (selectedUsers.length >= 5) return;
+                          setselectedUsers([...selectedUsers, contact]);
+                        } else {
+                          const updatedUsers = selectedUsers.filter(
+                            (user) =>
+                              user.otherParticipant !== contact.otherParticipant
+                          );
+                          setselectedUsers(updatedUsers);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center">
+                        <Img
+                          src={contact.senderDisplayImg}
+                          styles="w-[35px] h-[35px] rounded-full mr-1"
+                          imgStyles="rounded-full "
+                          type={contact.type}
+                          groupSize="70"
+                          personalSize="45"
+                        />
+                        {contact.senderDisplayName}
+                      </div>
+                      <input
+                        type="checkbox"
+                        name=""
+                        id=""
+                        checked={selectedUsers.some(
+                          (c) => c.otherParticipant === contact.otherParticipant
+                        )}
+                      />
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showReactEmojiTray && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, height: 0 }}
+            id="emojiBoard"
+            className="z-[100] w-[280px] overflow-hidden"
+            ref={setPopperElement}
+            style={popperStyles1.popper}
+            {...popperAttributes1.popper}
+          >
+            <EmojiPicker
+              setshowReactEmojiTray={setshowReactEmojiTray}
+              addEmojiToLastUsedEmojiTray={addEmojiToLastUsedEmojiTray}
+              handleEmojiReaction={handleEmojiReaction}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {showMenu && (
           <motion.ul
