@@ -3,7 +3,7 @@
 A Full Stack Chat Application using Next.js and Firebase
 
 ## App Preview
-
+[Video Demo](https://drive.google.com/file/d/1Md9kVAoAHpT0-lnuuIExX2PWIrXVgBCo/view?usp=sharing)
 ## Features
 
 - Group Chats
