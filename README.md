@@ -3,7 +3,7 @@
 A Full Stack Chat Application using Next.js and Firebase
 
 ## App Preview
-[Watch My Video](https://www.example.com/my_large_video.mp4)
+
 ## Features
 
 - Group Chats
