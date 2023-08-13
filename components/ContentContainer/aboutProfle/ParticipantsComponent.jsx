@@ -198,7 +198,7 @@ const ParticipantCard = ({ user, groupObject, isAdmin, setParticipants }) => {
 const ParticipantsComponent = ({ groupObject }) => {
   if (!groupObject) {
     return (
-      <div className="flex h-[350px] w-full items-center justify-center">
+      <div className="flex h-[350px] w-full items-center text-center justify-center">
         <i className="mr-1">
           <CircularProgress size="sm" variant="plain" />
         </i>

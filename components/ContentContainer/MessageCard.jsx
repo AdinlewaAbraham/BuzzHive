@@ -271,7 +271,7 @@ const MessageCard = ({
         key={chat.id}
       >
         <div className="my-2 flex justify-center rounded-lg bg-red-600 p-2 text-center">
-          {`Unread Messages`}
+          Unread Messages
         </div>
       </div>
     );
