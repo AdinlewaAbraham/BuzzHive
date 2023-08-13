@@ -487,7 +487,9 @@ const ChatCard = ({
                   </i>
                   {message.text === "" && message.type === "deleted"
                     ? "Deleted message"
-                    : message.type}
+                    : message.text === ""
+                    ? message.type
+                    : ""}
                 </div>
               )}
               {message.type === "file" && (
