@@ -2,7 +2,10 @@
 
 A Full Stack Chat Application using Next.js and Firebase
 
-## App Preview
+## Screenshots
+![chrome_dd2yKFCNvu](https://github.com/AdinlewaAbraham/BuzzHive/assets/115866421/60622bef-00d1-4c6c-b59b-efaf6f0db96b)
+
+## Video Demo
 
 ## Features
 
