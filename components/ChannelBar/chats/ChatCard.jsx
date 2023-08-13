@@ -70,6 +70,17 @@ const ChatCard = ({
     return storedData ? JSON.parse(storedData) : null;
   }
 
+  const waitForLocalStorageData = (callback) => {
+    const checkData = () => {
+      const data = JSON.parse(localStorage.getItem(id));
+      if (data) {
+        clearInterval(interval);
+        callback(data);
+      }
+    };
+
+    const interval = setInterval(checkData, 100);
+  };
   const handleChatClick = async () => {
     if (ChatObject.activeChatId === id) {
       return;
@@ -89,27 +100,29 @@ const ChatCard = ({
         localStorage.setItem(id, JSON.stringify(filteredData));
       }
     } else {
-      const data = JSON.parse(localStorage.getItem(id)).sort((a, b) => {
-        a.timestamp?.seconds - b.timestamp?.seconds;
-      });
-      const unreadObj = {
-        type: "unread",
-        id: "unreadId",
-      };
-      if (data) {
-        const filteredData = data.filter((message) => {
-          if (!message) return;
-          return message.type !== "unread";
+      waitForLocalStorageData((data) => {
+        const sortedData = data.sort((a, b) => {
+          a.timestamp?.seconds - b.timestamp?.seconds;
         });
-        const index = filteredData.length - unReadCount;
+        const unreadObj = {
+          type: "unread",
+          id: "unreadId",
+        };
+        if (sortedData) {
+          const filteredData = sortedData.filter((message) => {
+            if (!message) return;
+            return message.type !== "unread";
+          });
+          const index = filteredData.length - unReadCount;
 
-        const modifiedArr = [
-          ...filteredData.slice(0, index),
-          unreadObj,
-          ...filteredData.slice(index),
-        ];
-        localStorage.setItem(id, JSON.stringify(modifiedArr));
-      }
+          const modifiedArr = [
+            ...filteredData.slice(0, index),
+            unreadObj,
+            ...filteredData.slice(index),
+          ];
+          localStorage.setItem(id, JSON.stringify(modifiedArr));
+        }
+      });
     }
     setactiveId(id);
     sessionStorage.setItem("activeChatId", new String(id));
@@ -151,18 +164,10 @@ const ChatCard = ({
         return obj;
       }
     });
-    setChatRooms(
-      updatedArr.sort((a, b) => {
-        a.timestamp - b.timestamp;
-      })
-    );
+    setChatRooms([...updatedArr]);
     localStorage.setItem(
       `${User.id}_userChats`,
-      JSON.stringify(
-        updatedArr.sort((a, b) => {
-          a.timestamp - b.timestamp;
-        })
-      )
+      JSON.stringify([...updatedArr])
     );
 
     if (lastMessage) {
@@ -212,18 +217,10 @@ const ChatCard = ({
                     return obj;
                   }
                 });
-                setChatRooms(
-                  updatedArr.sort((a, b) => {
-                    a.timestamp - b.timestamp;
-                  })
-                );
+                setChatRooms([...updatedArr]);
                 localStorage.setItem(
                   `${User.id}_userChats`,
-                  JSON.stringify(
-                    updatedArr.sort((a, b) => {
-                      a.timestamp - b.timestamp;
-                    })
-                  )
+                  JSON.stringify(updatedArr)
                 );
                 if (lastMessage) {
                   updateDoc(userRef, {
