@@ -276,6 +276,7 @@ const Settings = () => {
       setdeleteMediaTrigger((prev) => !prev);
     }, 1000);
   }
+  const headerMargin = "mt-5 mb-2 ";
   return (
     <div className=" h-screen">
       <Modal
@@ -298,8 +299,8 @@ const Settings = () => {
         className="scrollBar h-[calc(100vh-70px-16px-66px)] overflow-scroll md:h-[calc(100vh-16px-66px)]"
       >
         <div className="flex flex-col">
-          <h2 className="mb-4 text-xl font-medium">Account</h2>
-          <h3 className="mb-2">Privacy</h3>
+          <h2 className={`mb-2 mt-1 text-xl font-medium`}>Account</h2>
+          <h3 className="mb-1">Privacy</h3>
           <h5 className="text-muted-light dark:text-muted-dark">
             Read receipts
           </h5>
@@ -321,38 +322,12 @@ const Settings = () => {
               selectedMenuText={User.isReadReceiptsOn ? "ON" : "OFF"}
             />
           </div>
-          <h5 className="text-muted-light dark:text-muted-dark">Log out</h5>
-
-          <button
-            onClick={() => {
-              setmodalObject({
-                header: "Log out confirmation",
-                description: "Are you sure you want to log out?",
-                returnText: "No",
-                discardText: "Yes",
-                disCardFunc: () => {
-                  const auth = getAuth();
-                  signOut(auth)
-                    .then(() => {})
-                    .catch((error) => {});
-                },
-              });
-              setshowModal(true);
-            }}
-            className="my-1 flex max-w-[max-content] items-center justify-center
-            rounded-lg bg-light-secondary p-2
-          dark:bg-dark-secondary"
-          >
-            <i className="mr-1 flex items-center">
-              {" "}
-              <TbLogout size="22" />
-            </i>
-            Log out
-          </button>
         </div>
         <div className="flex flex-col">
-          <h2 className="mb-4 mt-1 text-xl font-medium">Personalization</h2>
-          <h3 className="mb-2">Theme</h3>
+          <h2 className={` ${headerMargin} text-xl font-medium`}>
+            Personalization
+          </h2>
+          <h3 className="mb-1">Theme</h3>
           <h5 className=" mb-1 text-muted-light dark:text-muted-dark">
             App color theme
           </h5>
@@ -382,8 +357,10 @@ const Settings = () => {
           </div>
         </div>
         <div className=" flex flex-col ">
-          <h2 className="mb-4 mt-1 text-xl font-medium">Storage</h2>
-          <h3 className="mb-2">Automatic downloads</h3>
+          <h2 className={`${headerMargin} text-xl font-medium`}>
+            Storage
+          </h2>
+          <h3 className="mb-1">Automatic downloads</h3>
           <p className="text-sm text-muted-light dark:text-muted-dark">
             Choose which media will be automatically downloaded from the
             messages you receive
@@ -402,8 +379,8 @@ const Settings = () => {
               </div>
             ))}
           </div>
-          <h3 className="my-2 p-1">Delete downloads</h3>
-          <p className="text-sm text-muted-light mb-1 dark:text-muted-dark">
+          <h3 className="my-1 p-1">Delete downloads</h3>
+          <p className="mb-1 text-sm text-muted-light dark:text-muted-dark">
             Free up space by deleting locally stored media files.
           </p>
           {[
@@ -455,6 +432,36 @@ const Settings = () => {
             />
           ))}
         </div>
+
+        <h2 className={`${headerMargin} text-xl font-medium`}>Log out</h2>
+        <button
+          onClick={() => {
+            setmodalObject({
+              header: "Log out confirmation",
+              description: "Are you sure you want to log out?",
+              returnText: "No",
+              discardText: "Yes",
+              disCardFunc: () => {
+                const auth = getAuth();
+                signOut(auth)
+                  .then(() => {})
+                  .catch((error) => {
+                    console.error(error);
+                  });
+              },
+            });
+            setshowModal(true);
+          }}
+          className="my-1 flex max-w-[max-content] items-center justify-center
+                rounded-lg bg-light-secondary p-2
+                text-red-400 dark:bg-dark-secondary"
+        >
+          <i className="mr-1 flex items-center">
+            {" "}
+            <TbLogout size="22" />
+          </i>
+          Log out
+        </button>
       </motion.div>
     </div>
   );
