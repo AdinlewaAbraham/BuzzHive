@@ -1,37 +1,32 @@
-import React, {useState} from 'react'
-import { FcGoogle } from "react-icons/fc";
-import { SigninWithGoogle } from '@/utils/userAuthentication/SigninWithGoogle';
-import { CircularProgress } from "@mui/joy";
+import React, { useState } from "react";
+import SignInButton from "./SignInButton";
+import { SiHive } from "react-icons/si";
 
 const LoginPage = () => {
-    const [isSigningIn, setisSigningIn] = useState(false);
   return (
     <div className="flex h-screen items-center justify-center">
-      <div className="rounded-lg bg-accent-blue px-2 py-4">
-        {!isSigningIn ? (
-          <button
-            className="flex items-center justify-center"
-            onClick={() => {
-              setisSigningIn(true);
-              SigninWithGoogle(setisSigningIn);
-            }}
-          >
-            <i className="mr-1 flex items-center">
-              <FcGoogle size={25} />
+      <div className="flex h-screen flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center">
+            <i className="flex justify-center">
+              <SiHive size={40} />
             </i>
-            Sign in with Google
-          </button>
-        ) : (
-          <div className="flex items-center justify-center">
-            <i className="mr-2 flex items-center">
-              <CircularProgress size="sm" variant="plain" />
-            </i>
-            logging in...
+            <h2 className="mt-6 text-center text-3xl font-extrabold ">
+              Sign in to Buzzhive
+            </h2>
+            <p className="text-muted mt-2 text-center text-sm ">
+              Connect with your Google account
+            </p>
           </div>
-        )}
+          <div className="mt-8 space-y-6">
+            <div className="space-y-4">
+              <SignInButton />{" "}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;

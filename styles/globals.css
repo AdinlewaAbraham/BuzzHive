@@ -47,6 +47,7 @@ html {
   scroll-behavior: smooth;
 }
 body {
+  @apply bg-secondary text-gray-900 dark:text-slate-200;
   font-family: "Roboto", sans-serif;
 }
 
@@ -155,9 +156,6 @@ body {
   transform: scale(0.8);
   transition: opacity 300ms, transform 300ms;
 }
-
-
-
 
 .width-calc {
   width: calc(100% - 500px);
